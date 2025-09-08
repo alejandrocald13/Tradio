@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.env
+.venv/
+
+# Django
+/staticfiles/
+media/
+
+# General
+.DS_Store
