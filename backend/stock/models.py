@@ -9,3 +9,14 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class Stock(models.Model):
+    name = models.CharField(max_length=150)
+    symbol = models.CharField(max_length=10, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    current_price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    is_active = models.IntegerField(default=1)  # status: 1 = active, 0 = deleted (soft delete)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+ 
