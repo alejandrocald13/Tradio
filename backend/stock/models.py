@@ -19,4 +19,7 @@ class Stock(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
- 
+
+    def soft_delete(self):
+        self.is_active = False
+        self.save()

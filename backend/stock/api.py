@@ -7,3 +7,5 @@ class StockViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny] # De momento AllowAny, al tener Users se modificará la lógica
     serializer_class = StockSerializer
 
+    def perform_destroy(self, instance):
+        instance.soft_delete()
