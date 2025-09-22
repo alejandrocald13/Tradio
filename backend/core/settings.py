@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     # Local Apps
-
+    "apps.users"
 ]
 
 MIDDLEWARE = [
