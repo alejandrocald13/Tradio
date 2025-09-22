@@ -2,6 +2,18 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.apps import apps
+
+def get_default_user_state():
+    ProfileState = apps.get_model("users", "UserState")
+    return ProfileState.objects.get(name="pendiente").id
+
+class ProfileState(models.Model):
+    name = models.CharField(max_length=50, unique=True)       # ex. pending, active, inactive
+    description = models.CharField(max_length=150, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Profile(models.Model):
@@ -14,8 +26,15 @@ class Profile(models.Model):
     referral_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+    state = models.ForeignKey(
+        ProfileState,
+        on_delete=models.PROTECT,     # no se puede borrar un estado si está en uso
+        related_name="profiles",
+        default=get_default_user_state,
+    )
+
     def __str__(self):
-        return f"Perfil de {self.user.username}"
+        return f"Profile of {self.user.username}"
 
     @property
     def is_deleted(self):
@@ -24,6 +43,7 @@ class Profile(models.Model):
     def soft_delete(self):
         self.deleted_at = timezone.now()
         self.save(update_fields=["deleted_at"])
+    
 
 
 class UserAction(models.Model):
@@ -53,5 +73,7 @@ class SecurityLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        u = self.user.username if self.user else "usuario eliminado"
+        u = self.user.username if self.user else "deleted user"
         return f"[{self.timestamp}] {u} - {self.action} ({self.ip})"
+
+
