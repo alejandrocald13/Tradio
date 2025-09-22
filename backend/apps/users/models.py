@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.apps import apps
 
 def get_default_user_state():
-    ProfileState = apps.get_model("users", "UserState")
+    ProfileState = apps.get_model("users", "ProfileState")
     return ProfileState.objects.get(name="pendiente").id
 
 class ProfileState(models.Model):
