@@ -1,12 +1,13 @@
-
 "use client";
 
 import { useState } from "react";
 import styles from "./referrals.module.css";
+import Sidebar from "../components/Sidebar"; 
 
 export default function ReferralsPage() {
   const [generatedCode, setGeneratedCode] = useState("");
   const [referralInput, setReferralInput] = useState("");
+  const [tab, setTab] = useState("referrals"); 
 
   const handleGenerateCode = () => {
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -24,43 +25,19 @@ export default function ReferralsPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      {/* SIDEBAR */}
-      <aside className={styles.sidebar}>
-        <div className={styles.logo}>
-          <div className={styles.logoCircle}>CP</div>
-          <div className={styles.logoText}>MiCuenta</div>
-        </div>
-
-        <nav className={styles.nav}>
-          <button className={styles.navItem}>
-            <span className={styles.icon}>👤</span>
-            <span>Profile</span>
-          </button>
-
-          <button className={styles.navItem}>
-            <span className={styles.icon}>🧾</span>
-            <span>Purchases / Sales</span>
-          </button>
-
-          <button className={`${styles.navItem} ${styles.active}`}>
-            <span className={styles.icon}>👥</span>
-            <span>Referrals</span>
-          </button>
-        </nav>
-      </aside>
+      {/* Sidebar reutilizable */}
+      <Sidebar activeTab={tab} setTab={setTab} />
 
       {/* MAIN */}
       <main className={styles.main}>
         <div className={styles.headerRow}>
-          <h1 className={styles.title}>Codigo de referidos</h1>
-          {/* Si quieres mostrar la ilustración, coloca un archivo en /public/next.svg */}
+          <h1 className={styles.title}>Código de referidos</h1>
           <div className={styles.illustration}>
             <img
               src="/next.svg"
               alt="Ilustración"
               className={styles.illustrationImg}
               onError={(e) => {
-                // si no hay imagen disponible, ocultar <img>
                 e.currentTarget.style.display = "none";
               }}
             />
@@ -81,7 +58,6 @@ export default function ReferralsPage() {
             <button className={styles.greenBtn} onClick={handleGenerateCode}>
               Generar código
             </button>
-
             <div className={styles.codePill}>
               {generatedCode ? generatedCode : ""}
             </div>
@@ -116,5 +92,3 @@ export default function ReferralsPage() {
     </div>
   );
 }
-
-
