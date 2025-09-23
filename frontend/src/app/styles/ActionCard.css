@@ -1,0 +1,80 @@
+.action-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eeeeee;
+    border-radius: 14px;
+    padding: 14px 16px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    width: 500px;
+    height: 165px;
+    margin: 10px;
+}
+
+.action-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+}
+
+.ac-container-up {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.ac-title span {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+}
+
+.ac-variant {
+    font-size: 14px;
+    margin-bottom: 12px;
+
+    max-height: 75px;
+    width: 230px;
+}
+
+.ac-variant span {
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.ac-variant.positive span {
+    color: #2e7d32;
+}
+
+.ac-variant.negative span {
+    color: #c62828;
+}
+
+.ac-variant.neutral span {
+    color: #333;
+}
+
+.ac-container-down {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+
+.ac-price {
+    margin-bottom: 12px;
+}
+
+.ac-price span {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.ac-graphic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 230px;
+}
