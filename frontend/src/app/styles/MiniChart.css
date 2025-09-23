@@ -1,0 +1,21 @@
+
+.sparkline { 
+    width: 180px; 
+    height: 60px; 
+}
+
+.sparkline.green { 
+    color: #2e7d32; 
+}
+
+.sparkline.red   { 
+    color: #c62828; 
+}
+
+.sparkline.green path { 
+    fill: rgba(46,125,50,.12); 
+}
+
+.sparkline.red path { 
+    fill: rgba(198,40,40,.12); 
+}
