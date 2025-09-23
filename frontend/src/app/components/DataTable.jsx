@@ -4,8 +4,8 @@ import styles from "../purchases-sales/purchases-sales.module.css";
 
 export default function DataTable({ tab, data }) {
   return (
-    <div className={styles.tableContainer}>
-      <div className={styles.tableHeader}>
+    <div className={styles.tableContainer }>
+      <div className={styles.tableHeader} data-mode={tab}>
         {tab === "compras" ? (
           <>
             <div>Accion</div>
@@ -25,7 +25,7 @@ export default function DataTable({ tab, data }) {
         )}
       </div>
 
-      <div className={styles.tableScroll}>
+      <div className={styles.tableScroll} data-mode={tab}>
         <table className={styles.table}>
           <tbody>
             {data.map((r, i) =>
