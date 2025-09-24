@@ -5,7 +5,7 @@
     background-color: white;
     padding: 16px 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    width: 300px;
+    width: 325px;
 }
 
 .main-container-cap:hover {
@@ -15,11 +15,17 @@
 .main-container-cap h1 {
     font-size: 20px;
     margin: 0 0 6px 0;
-    color: #222;
+    color: #222222;
 }
 
 .main-container-cap p {
     margin: 4px 0;
     font-size: 14px;
-    color: #555;
+    color: #555555;
+}
+
+.info-cap-portfolio{
+    display: flex;
+    align-items: end;
+    flex-direction: column;
 }
