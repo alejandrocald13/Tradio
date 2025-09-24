@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
-from .models import Stock
-from .serializers import StockSerializer
+from .models import Stock, Category
+from .serializers import StockSerializer, CategorySerializer
 from .permissions import IsAdminOrReadOnly
 
 
@@ -15,3 +15,9 @@ class StockViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.soft_delete()
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
