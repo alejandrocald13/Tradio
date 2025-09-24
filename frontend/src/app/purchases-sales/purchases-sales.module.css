@@ -195,37 +195,54 @@
   overflow-x: auto;
 }
 
-.tableHeader{
-  display:grid;
-  grid-template-columns: repeat(6, 1fr);
-  padding: 8px 14px;
-  align-items:center;
+/* Table Head */
+.table thead tr {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  background: var(--card-bg);
+  font-weight: bold;
   color: #465a56;
   border-bottom: 3px solid rgba(63,94,86,0.12);
-  font-weight:bold;
-  border-bottom: 1px solid #ccc;
-}
-.tableHeader > div {
-  padding: 10px 6px;
-}
-.tableHeader > div:nth-child(n+5) { text-align: center; }
-
-/* Ajustar columnas según tab */
-.tableHeader[data-mode="ventas"] {
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  padding: 12px 0;
 }
 
+/* Columns alignment */
+.table[data-mode="ventas"] thead tr,
+.table[data-mode="ventas"] tbody tr {
+  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
+}
 
-
-.tableHeader[data-mode="compras"] {
+.table[data-mode="compras"] thead tr,
+.table[data-mode="compras"] tbody tr {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-.tableScroll[data-mode="ventas"] .tableHeader > div:nth-child(4),
-.tableScroll[data-mode="ventas"] td:nth-child(4) {
-  text-align: center;
+/* Th spacing */
+.table thead th {
+  padding: 0 12px;
+  text-align: left;
 }
 
+/* Ajustar columnas centrales si quieres */
+.table[data-mode="ventas"] thead th:nth-child(3) { padding-left: 20px; }
+.table[data-mode="ventas"] thead th:nth-child(4) { padding-left: 40px; }
+.table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 14px; }
+/* Para el encabezado de compras */
+.table[data-mode="compras"] thead th:nth-child(3) {
+  padding-right: 5rem; /* ajusta el valor a tu gusto */
+}
+
+/* Para las filas de compras */
+.table[data-mode="compras"] tbody td:nth-child(3) {
+  padding-left: 2.5rem; /* mismo valor para alinear */
+}
+
+
+/* Para las filas de ventas */
+.table[data-mode="ventas"] tbody td:nth-child(4) {
+  padding-left: 2rem; /* mismo valor para alinear */
+}
 
 /* Scrollable table body */
 .tableScroll {
@@ -268,42 +285,11 @@
 }
 
 
-.tableScroll[data-mode="ventas"] .tableHeader,
-.tableScroll[data-mode="ventas"] table tr {
-  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr; 
-  gap: 1rem;
-  align-items: center;
-}
 
 
-.tableHeader[data-mode="ventas"] > div:nth-child(5) {
-  text-align: left;   /* alinea a la izquierda dentro de su columna */
-  padding-left:14px;  /* ajusta con valores pequeños */
-}
-
-.tableHeader[data-mode="ventas"] > div:nth-child(4) {
-  text-align: left;   
-  padding-left:40px;  
-}
-
-.tableHeader[data-mode="ventas"] > div:nth-child(3) {
-  text-align: left;   
-  padding-left:20px;  
-}
-
-.tableScroll[data-mode="compras"] .tableHeader,
-.tableScroll[data-mode="compras"] table tr {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 1.4fr 1.7fr; /* 4 columnas */
-  gap: 1rem;
-  align-items: center;
-}
 
 
-.tableScroll[data-mode="compras"] .tableHeader > div,
-.tableScroll[data-mode="compras"] td {
-  padding-left: 1.5rem; /* mueve todo un poco a la derecha */
-}
+
 
 /* table rows */
 .table {
