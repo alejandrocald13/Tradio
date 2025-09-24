@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     # Local Apps
+    "stock",
     "apps.users"
 ]
 
