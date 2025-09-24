@@ -1,13 +1,17 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, filters
 from .models import Stock
 from .serializers import StockSerializer
 from .permissions import IsAdminOrReadOnly
 
 
 class StockViewSet(viewsets.ModelViewSet):
-    queryset = Stock.objects.all()
+    queryset = Stock.objects.all() # para devolver únicamente stocks activos
     permission_classes = [IsAdminOrReadOnly] 
     serializer_class = StockSerializer
+
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'symbol', 'category__name'] # /api/stocks/?search=<valor>
+    ordering_fields = ['current_price', 'name']  # /api/stocks/?ordering=-<valor>
 
     def perform_destroy(self, instance):
         instance.soft_delete()
