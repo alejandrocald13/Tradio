@@ -1,4 +1,4 @@
-.card-info-container-portafolio{
+.card-info-container-portafolio {
     display: flex;
     width: 100%;
     height: 20rem;
@@ -8,30 +8,34 @@
     gap: 30px;
 }
 
-.graph{
+.graph {
+    display: flex;
     width: 50%;
-    height: 100%;
-    background-color: bisque; 
-}
-.more-Info-portafolio{
-    display: flex;
+    align-items: center;
     justify-content: center;
-    flex-direction: column;
-    align-items: end;
-    width: 70%;
-    gap: 20px;
 }
 
-.data-container-portafolio{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: start;
-    width: 100%;
+.more-Info-portafolio {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
 }
 
-.data-portafolio{
-    font-size: 20px;
+
+.data-portafolio {
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+.data-portafolio .label {
+  color: #888;   /* gris para el texto descriptivo */
+  font-weight: 500;
+}
+
+.data-portafolio .value {
+  color: #000;   /* negro para el número/valor */
+  font-weight: 600;
 }
 
 

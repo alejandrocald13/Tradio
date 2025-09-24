@@ -1,5 +1,5 @@
 import "../styles/GeneralBalancePortfolio.css";
-//import CircularGraph from "./DoughnutGraph";
+import CircularGraph from "./DoughnutGraph";
 
 export default function CardInfoPortafolio(){
     const dataL = {
@@ -12,8 +12,8 @@ export default function CardInfoPortafolio(){
         clasificacion: ['Activos', 'Efectivo'],
         name: 'Balance General',
         dataL: [30, 70],
-        widthSend: 200,
-        heightSend: 200,
+        widthSend: 250,
+        heightSend: 250,
         backgroundColor: ["#729c8775", "#729c87ff"]
     }
 
@@ -21,32 +21,33 @@ export default function CardInfoPortafolio(){
         <>
             <div className="card-info-container-portafolio">
                 <div className="graph">
-                    {/*<CircularGraph 
+                    *<CircularGraph 
                         graphData={graphData}
-                    />*/}
+                    />
                 </div>
                 <div className="more-Info-portafolio">
                     <div className="data-container-portafolio">
                         <p className="data-portafolio">
-                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3v-3h18v3z"></path></svg>
-                            Total En Activos  ${dataL.activo}
+                        <span className="label">Total En Activos</span>
+                        <span className="value"> ${dataL.activo}</span>
                         </p>
                     </div>
 
                     <div className="data-container-portafolio">
                         <p className="data-portafolio">
-                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3v-3h18v3z"></path></svg>
-                            Total En Efectivo  ${dataL.efectivo}
+                        <span className="label">Total En Efectivo</span>
+                        <span className="value"> ${dataL.efectivo}</span>
                         </p>
                     </div>
 
                     <div className="data-container-portafolio">
                         <p className="data-portafolio">
-                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3v-3h18v3z"></path></svg>
-                            Resultado Acumulado  ${dataL.resultado}
+                        <span className="label">Resultado Acumulado</span>
+                        <span className="value"> ${dataL.resultado}</span>
                         </p>
                     </div>
                 </div>
+
             </div>
         </>
     )
