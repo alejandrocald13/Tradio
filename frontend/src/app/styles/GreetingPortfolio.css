@@ -1,0 +1,47 @@
+.greeting-main-container-portafolio{
+    display: flex;
+    width: 100%;
+    height: 8rem;
+    background-color: #e0e3de;
+    border-radius: 25px;
+    padding: 40px;
+    justify-content: space-between;
+}
+
+.greeting-container-portafolio{
+    display: flex;
+    flex-direction: column;
+}
+
+.message-portafolio{
+    color: #535352;
+}
+
+
+.image-container-portafolio{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.getPDF{
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-get-pdf {
+    background-color: #4E635E;
+    color: #fff;
+    height: 35px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-get-pdf:hover {
+    background-color: #40524e; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
