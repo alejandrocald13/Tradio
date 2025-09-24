@@ -230,12 +230,26 @@
 .table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 14px; }
 /* Para el encabezado de compras */
 .table[data-mode="compras"] thead th:nth-child(3) {
-  padding-right: 5rem; /* ajusta el valor a tu gusto */
+  padding-right: 5rem; 
+}
+
+/* Para el encabezado de compras */
+.table[data-mode="compras"] thead th:nth-child(1) {
+  padding-left: 1.5rem; 
+}
+
+/* Para el encabezado de compras */
+.table[data-mode="ventas"] thead th:nth-child(1) {
+  padding-left: 1.5rem; 
+}
+
+.table[data-mode="compras"] thead th:nth-child(3) {
+  padding-right: 5rem; 
 }
 
 /* Para las filas de compras */
 .table[data-mode="compras"] tbody td:nth-child(3) {
-  padding-left: 2.5rem; /* mismo valor para alinear */
+  padding-left: 2.5rem; 
 }
 
 
