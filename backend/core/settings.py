@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     # Local Apps
     "stock",
-
-
+    "apps.users"
 ]
 
 MIDDLEWARE = [
