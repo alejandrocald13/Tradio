@@ -1,9 +1,9 @@
 "use client";
 
 import './portfolio.css'
-import GreetingPortafolio from '../components/GreetingPortafolio'
-import CardInfoPortafolio from '../components/CardInfoPortafolio'
-import CardActionPortafolio from '../components/CardActionPortafolio'
+import GreetingPortafolio from '../components/GreetingPortfolio'
+import CardInfoPortafolio from '../components/GeneralBalancePortfolio'
+import CardActionPortafolio from '../components/ActionPortfolio'
 
 
 export default function Portafolio (){
