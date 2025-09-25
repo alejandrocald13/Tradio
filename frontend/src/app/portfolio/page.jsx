@@ -5,6 +5,7 @@ import GreetingPortafolio from '../components/GreetingPortfolio'
 import CardInfoPortafolio from '../components/GeneralBalancePortfolio'
 import CardActionPortafolio from '../components/ActionPortfolio'
 import { useState } from 'react';
+import SidebarNav from '../components/SidebarNav-Auth';
 
 
 export default function Portafolio (){
@@ -63,6 +64,7 @@ export default function Portafolio (){
 
     return (
         <>
+            <SidebarNav/>
             <div className="main-container-portafolio">
                 <div className="horizontal-container-portafolio">
                     <div className="vertical-container-info-portafolio">
