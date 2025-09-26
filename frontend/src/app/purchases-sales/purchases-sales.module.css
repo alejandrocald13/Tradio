@@ -211,6 +211,7 @@
   .table[data-mode="ventas"] thead tr,
   .table[data-mode="ventas"] tbody tr {
     grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
+    
   }
 
   .table[data-mode="compras"] thead tr,
@@ -222,6 +223,8 @@
   .table thead th {
     padding: 0 12px;
     text-align: left;
+    position: sticky;
+    top: 0;     
   }
 
   /* Ajustar columnas centrales si quieres */
@@ -500,3 +503,41 @@ html, body {
   overflow-y: auto;    
   max-height: none;   
 }
+/* Hacer thead/block y tbody scrollable */
+.table thead {
+  display: block;
+}
+
+.table tbody {
+  display: block;
+  max-height: 420px;   /* ajusta a tu altura deseada */
+  overflow-y: auto;
+}
+
+/* Mantener el grid en las filas del head y body para alinear columnas */
+.table thead tr,
+.table tbody tr {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Reaplicar tus plantillas por modo (ventas/compras) */
+.table[data-mode="ventas"] thead tr,
+.table[data-mode="ventas"] tbody tr {
+  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
+}
+
+.table[data-mode="compras"] thead tr,
+.table[data-mode="compras"] tbody tr {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* Styling del th (ya fijos por estar fuera del scroll del tbody) */
+.table thead th {
+  padding: 20px;
+  background: var(--card-bg);
+  color: #465a56;
+  font-weight: 700;
+  text-align: left;
+}
+
