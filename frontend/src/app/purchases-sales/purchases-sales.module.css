@@ -339,7 +339,7 @@
     right: 0;
     bottom: 0;
     height: 0.1px;          
-    background: #666;     /* color */
+    background: #d0d0d0;     /* color */
     pointer-events: none;
   }
 
