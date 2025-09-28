@@ -17,6 +17,7 @@
 
 .more-Info-portafolio {
   display: flex;
+  width: 100%;
   flex-direction: column;
   justify-content: center;
   gap: 12px;
@@ -29,12 +30,12 @@
 }
 
 .data-portafolio .label {
-  color: #888;   /* gris para el texto descriptivo */
+  color: #888;   
   font-weight: 500;
 }
 
 .data-portafolio .value {
-  color: #000;   /* negro para el número/valor */
+  color: #000;   
   font-weight: 600;
 }
 
