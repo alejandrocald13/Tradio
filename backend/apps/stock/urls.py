@@ -4,7 +4,7 @@ from .api import StockViewSet, CategoryViewSet
 
 router = routers.DefaultRouter()
 
-router.register('api/stocks', StockViewSet, 'stocks')
-router.register('api/categories', CategoryViewSet, 'categories')
+router.register('stocks', StockViewSet, 'stocks')
+router.register('categories', CategoryViewSet, 'categories')
 
 urlpatterns = router.urls
