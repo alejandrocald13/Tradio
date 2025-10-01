@@ -1,9 +1,11 @@
 # users/views.py
+from django.db import transaction
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from apps.users.models import ProfileState
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -20,24 +22,37 @@ from apps.users.utils_perms import assert_owner_or_admin
 from apps.users.serializers import UserListSerializer, UserDetailSerializer
 
 User = get_user_model()
+from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
+from rest_framework import serializers
 
+# --- REGISTER ---
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={
+            201: OpenApiResponse(
+                description="Usuario creado",
+            ),
+            400: OpenApiResponse(description="Errores de validación"),
+        },
+        tags=["auth"],
+        summary="Registro de usuario",
+    )
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # security logs
             log_action(request, user, Action.AUTH_REGISTER_REQUESTED)
             return Response(
                 {"id": user.id, "username": user.username, "email": user.email},
                 status=status.HTTP_201_CREATED,
             )
-        # unknown user
         log_action(request, None, Action.AUTH_REGISTER_REQUESTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LoggedTokenObtainPairView(TokenObtainPairView):
     """
@@ -46,7 +61,6 @@ class LoggedTokenObtainPairView(TokenObtainPairView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # Dejamos a la superclase validar credenciales
         response = super().post(request, *args, **kwargs)
 
         try:
@@ -77,13 +91,18 @@ class LoggedTokenRefreshView(TokenRefreshView):
             log_action(request, user, Action.AUTH_TOKEN_REFRESHED)
         return response
 
-
 class LogoutView(APIView):
     """
     Enviar en el cuerpo: {"refresh": "<REFRESH_TOKEN>"}.
     """
     permission_classes = [IsUser]
 
+    @extend_schema(
+        request=serializers.Serializer,
+        responses={204: OpenApiResponse(description="Logout ok")},
+        tags=["auth"],
+        summary="Logout (blacklist opcional del refresh)",
+    )
     def post(self, request):
         refresh = request.data.get("refresh")
         if refresh:
@@ -93,23 +112,28 @@ class LogoutView(APIView):
                 pass
         log_action(request, request.user, Action.AUTH_LOGOUT)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 class MeView(APIView):
     permission_classes = [IsUser]
 
+    @extend_schema(
+        responses=UserDetailSerializer,
+        tags=["users"],
+        summary="Ver perfil propio",
+    )
     def get(self, request):
-        """Devuelve el usuario autenticado + profile."""
         data = UserDetailSerializer(request.user).data
         return Response(data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        request=UserDetailSerializer,
+        responses=UserDetailSerializer,
+        tags=["users"],
+        summary="Actualizar perfil propio",
+        description="Admite cambios en email (User) y campos de profile (p. ej. name, age, state_id).",
+    )
+
     def patch(self, request):
-        """
-        Actualiza datos del usuario autenticado.
-        Admite cambios en:
-        - email (User)
-        - profile.name, profile.referral_code
-        - profile.state_id (FK de ProfileState)  <-- write-only
-        """
         serializer = UserDetailSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -117,23 +141,24 @@ class MeView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema_view(
+    list=extend_schema(tags=["users"], summary="Listar usuarios (admin)"),
+    retrieve=extend_schema(tags=["users"], summary="Detalle de usuario"),
+    update=extend_schema(tags=["users"], summary="Actualizar usuario"),
+    partial_update=extend_schema(tags=["users"], summary="Actualizar parcialmente usuario"),
+)
+
 class UserViewSet(viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin):
-    """
-    Reglas:
-    - list: solo admin
-    - retrieve/update/partial_update: owner o admin
-    - enable/disable: solo admin
-    """
     queryset = User.objects.all().order_by("-date_joined")
 
     def get_permissions(self):
         if self.action == "list":
             return [IsAdmin()]
         elif self.action in ("retrieve", "update", "partial_update"):
-            return [IsUser()]  # objeto se valida abajo con assert_owner_or_admin
+            return [IsUser()]
         elif self.action in ("enable", "disable"):
             return [IsAdmin()]
         return [IsUser()]
@@ -141,20 +166,17 @@ class UserViewSet(viewsets.GenericViewSet,
     def get_serializer_class(self):
         return UserListSerializer if self.action == "list" else UserDetailSerializer
 
-    # --- LIST (solo admin) ---
     def list(self, request, *args, **kwargs):
         log_action(request, request.user if request.user.is_authenticated else None, Action.SEARCH_BY_FILTER)
         return super().list(request, *args, **kwargs)
 
-    # --- RETRIEVE (owner/admin) ---
     def retrieve(self, request, *args, **kwargs):
         obj = self.get_object()
-        assert_owner_or_admin(request, obj)  # <- chequeo sin mixin
+        assert_owner_or_admin(request, obj)
         log_action(request, request.user, Action.PORTFOLIO_VIEWED)
         serializer = self.get_serializer(obj)
         return Response(serializer.data)
 
-    # --- UPDATE/PATCH (owner/admin) ---
     def update(self, request, *args, **kwargs):
         obj = self.get_object()
         assert_owner_or_admin(request, obj)
@@ -169,19 +191,43 @@ class UserViewSet(viewsets.GenericViewSet,
         log_action(request, request.user, Action.PROFILE_UPDATED)
         return resp
 
-    # --- ENABLE/DISABLE (solo admin) ---
-    @action(detail=True, methods=["post"])
-    def enable(self, request, pk=None):
-        user = self.get_object()
-        user.is_active = True
-        user.save(update_fields=["is_active"])
-        log_action(request, request.user, Action.ADMIN_USER_ENABLED)
-        return Response({"status": "enabled"})
+    def _get_state(self, name: str) -> ProfileState:
+        # Busca por nombre EXACTO según tu tabla: "pendiente", "habilitado", "deshabilitado"
+        return ProfileState.objects.get(name=name)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        responses={200: OpenApiResponse(description="Usuario habilitado (profile.state = 'habilitado')")},
+        tags=["users"],
+        summary="Habilitar usuario (admin)",
+    )
+    def enable(self, request, pk=None):
+        user = self.get_object()
+        with transaction.atomic():
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+            prof = getattr(user, "profile", None)
+            if prof:
+                prof.state = self._get_state("habilitado")
+                prof.save(update_fields=["state"])
+        log_action(request, request.user, Action.ADMIN_USER_ENABLED)
+        return Response({"status": "enabled"})
+    
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        responses={200: OpenApiResponse(description="Usuario deshabilitado (profile.state = 'deshabilitado')")},
+        tags=["users"],
+        summary="Deshabilitar usuario (admin)",
+    )
+
     def disable(self, request, pk=None):
         user = self.get_object()
-        user.is_active = False
-        user.save(update_fields=["is_active"])
+        with transaction.atomic():
+            user.is_active = False
+            user.save(update_fields=["is_active"])
+            prof = getattr(user, "profile", None)
+            if prof:
+                prof.state = self._get_state("deshabilitado")
+                prof.save(update_fields=["state"])
         log_action(request, request.user, Action.ADMIN_USER_DISABLED)
         return Response({"status": "disabled"})

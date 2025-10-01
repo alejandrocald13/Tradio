@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from apps.users.models import Profile, ProfileState
 from apps.users.utils import assign_unique_referral_code
+from django.utils.timezone import localtime
 
 User = get_user_model()
 
@@ -16,14 +17,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         name = validated_data.pop("name")
         user = User.objects.create_user(**validated_data)
-        profile = Profile.objects.create(user=user, name=name)
+        profile = Profile.objects.create(user=user, name=name, age=validated_data.pop("age"))
         assign_unique_referral_code(profile, length=6)
         return user
 
 class ProfileStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileState
-        fields = ["id", "name", "description"]
+        fields = ["name"]
 
 class ProfileSerializer(serializers.ModelSerializer):
     # Lectura: estado anidado
@@ -38,26 +39,25 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["id", "name", "referral_code", "deleted_at", "state", "state_id"]
+        fields = ["age", "name", "state", "state_id"]
         read_only_fields = ["deleted_at"]
 
+
 class UserListSerializer(serializers.ModelSerializer):
-    """
-    Para listados (admin). Incluye perfil en solo lectura.
-    """
-    profile = ProfileSerializer(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(source="profile.name", read_only=True)
+    age = serializers.IntegerField(source="profile.age", read_only=True)
+
+    date = serializers.SerializerMethodField()
+    enable = serializers.BooleanField(source="is_active", read_only=True)
 
     class Meta:
         model = User
-        fields = [
-            "id",
-            "username",
-            "email",
-            "is_active",
-            "is_staff",
-            "date_joined",
-            "profile",
-        ]
+        fields = ["id","name", "email", "age", "date", "enable"]
+
+    def get_date(self, obj):
+        dt = localtime(obj.date_joined)  # usa tu TZ si USE_TZ=True
+        return dt.strftime("%d-%m-%Y %H:%M:%S")
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
