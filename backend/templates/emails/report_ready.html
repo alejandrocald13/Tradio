@@ -1,0 +1,27 @@
+{% extends "emails/_base.html" %}
+{% block subject %}Tradio | Tu reporte está listo: {{ report.title }}{% endblock %}
+
+{% block content %}
+  <!-- Preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Tu reporte ya fue generado. Descárgalo desde el enlace.
+  </div>
+
+  <h2 style="margin:0 0 8px;font-size:20px;">Reporte generado</h2>
+  <p style="margin:0 0 12px;">
+    Hola {{ user.first_name|default:user.username }}, tu reporte <strong>{{ report.title }}</strong> ya está disponible.
+  </p>
+
+  <p style="margin:0 0 12px;">
+    Rango de fechas: {{ report.from }} — {{ report.to }}
+  </p>
+
+  <p style="margin:16px 0;">
+    <a class="btn" href="{{ report.download_url|default:'#' }}">Descargar reporte</a>
+  </p>
+
+  <div class="hr"></div>
+  <p class="muted">
+    Este enlace es personal y solo estará disponible por tiempo limitado.
+  </p>
+{% endblock %}

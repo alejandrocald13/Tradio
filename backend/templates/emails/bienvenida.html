@@ -1,0 +1,29 @@
+{% extends "emails/_base.html" %}
+{% block subject %}Tradio | Tu cuenta fue aprobada{% endblock %}
+
+{% block content %}
+  <!-- Preheader (vista previa en inbox) -->
+  <div style="display:none;max-height:0;overflow:hidden;">Tu acceso ya está activo. Entra al dashboard para empezar.</div>
+
+  <p class="pill pill-ok" aria-label="Estado">Aprobada</p>
+  <h2 style="margin:12px 0 8px;font-size:22px;">¡Bienvenido/a!</h2>
+  <p style="margin:0 0 12px;">Hola {{ user.first_name|default:user.username }}, tu cuenta ha sido aprobada y ya puedes operar en la plataforma.</p>
+  <p style="margin:0 0 20px;">Compra y vende activos, gestiona tu wallet y recibe reportes bajo demanda desde tu panel.</p>
+
+  <p style="margin:20px 0;">
+    <a class="btn" href="{{ dashboard_url|default:'#' }}">Ir al dashboard</a>
+  </p>
+
+  <div class="hr"></div>
+
+  <table class="table" role="table" aria-label="Datos de alta">
+    <tr>
+      <th scope="row">Usuario</th>
+      <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Fecha de alta</th>
+      <td>{{ now|date:"Y-m-d H:i" }}</td>
+    </tr>
+  </table>
+{% endblock %}
