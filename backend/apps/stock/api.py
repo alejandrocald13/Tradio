@@ -90,7 +90,6 @@ class StockViewSet(viewsets.ModelViewSet):
             )
         
         # Restricciones de yfinance para datos intradiarios
-        # Los intervalos de minutos solo están disponibles para los últimos 60 días
         if interval in ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h']:
             if days > 60:
                 return Response(
@@ -102,6 +101,16 @@ class StockViewSet(viewsets.ModelViewSet):
                 )
         
         try:
+            # Obtener el stock de la base de datos
+            try:
+                stock_db = Stock.objects.get(symbol=symbol.upper(), is_active=True)
+                current_price_db = float(stock_db.current_price)
+            except Stock.DoesNotExist:
+                return Response(
+                    {"error": "Stock not found in database"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
             stock = yf.Ticker(symbol.upper())
             end_date = datetime.now()
             start_date = end_date - timedelta(days=days)
@@ -115,13 +124,18 @@ class StockViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
+            # Preparar timestamps y precios de cierre
+            timestamps = [int(date.timestamp()) for date in hist.index]
+            close_prices = hist['Close'].tolist()
+            
+            # Agregar timestamp actual y precio de la base de datos
+            current_timestamp = int(datetime.now().timestamp())
+            timestamps.append(current_timestamp)
+            close_prices.append(current_price_db)
+            
             data = {
-                "t": [int(date.timestamp()) for date in hist.index],    # Timestamps en formato Unix
-                "o": hist['Open'].tolist(),                             # Open (precio de apertura)
-                "h": hist['High'].tolist(),                             # High (precio máximo del día)
-                "l": hist['Low'].tolist(),                              # Low (precio más bajo del día)
-                "c": hist['Close'].tolist(),                            # Close (precio de cierre)
-                "v": hist['Volume'].tolist()                            # Volume (volumen de acciones negociadas)
+                "t": timestamps,
+                "c": close_prices 
             }
             
             return Response(
