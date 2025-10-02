@@ -13,7 +13,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Portfolio.objects.filter(user=self.request.user, is_active=True)
+        return Portfolio.objects.filter(user=self.request.user, is_active=True).select_related('stock')
 
     @action(detail=False, methods=['get'])
     def total(self, request):
