@@ -1,0 +1,142 @@
+/* Fondo gris global */
+.background {
+  background-color: #f5f5f5;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Contenedor principal (ventana blanca) */
+.container {
+  display: flex;
+  background: #fff;
+  width: 70%;   /* ligeramente más pequeño */
+  height: 90%;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Lado izquierdo */
+.left {
+  flex: 1;
+  background-color: #4d5d58;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.logo {
+  width: 180px;
+  margin-bottom: 20px;
+}
+
+.pageName {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* Lado derecho */
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.title {
+  color: #455a55;
+  margin-bottom: 25px;
+  font-size: 28px;
+  text-align: center;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 90%;
+  margin: 0 auto;
+}
+/* Inputs */
+.inputGroup {
+  display: flex;
+  align-items: center;
+  background: #f1f1f1;
+  border-radius: 25px;
+  padding: 12px 13px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
+  margin-bottom: 20px;
+  width: 100%;       /* Para que sea responsivo dentro del max-width */
+  min-height: 50px; 
+}
+
+.inputGroup input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 16px;
+  color: #000;
+}
+
+
+
+.icon {
+  margin-right: 12px;
+  font-size: 18px;
+  color: gray;
+}
+
+.inputGroup input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 16px;
+  color: #000;
+}
+
+.eyeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: gray;
+}
+
+/* Botón centrado */
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn {
+  background: #455a55;
+  color: white;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  background: #2e3d3a;
+  transform: scale(1.05);
+  box-shadow: 0px 5px 10px rgba(0,0,0,0.3);
+}
+
+.btn:active {
+  transform: scale(0.95);
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+}
