@@ -63,7 +63,7 @@ class StockViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
     
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'])
     def history(self, request):
         symbol = request.query_params.get('symbol', None)
         days = int(request.query_params.get('days', 7))

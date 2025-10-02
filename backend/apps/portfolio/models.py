@@ -13,10 +13,13 @@ class Portfolio(models.Model):
     quantity = models.FloatField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    total_cost = models.FloatField(default=0)
 
-    def buy(self, amount):
+    def buy(self, amount, current_price):
+        self.total_cost += amount * current_price
         self.quantity += amount
         self.is_active = True
+
         self.save()
 
     def sell(self, amount):
@@ -25,3 +28,8 @@ class Portfolio(models.Model):
             self.quantity = 0
             self.is_active = False
         self.save()
+
+    def get_average_price(self):
+        if self.quantity > 0:
+            return self.total_cost / self.quantity
+        return 0
