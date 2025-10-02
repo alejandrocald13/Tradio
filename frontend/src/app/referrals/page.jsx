@@ -51,10 +51,7 @@ export default function ReferralsPage() {
           se registren con él recibirán automáticamente $5 de regalo en su cuenta al crearla, 
           lo que les permitirá comenzar a disfrutar de nuestros servicios con una ventaja inicial. 
           Al mismo tiempo, tú también recibirás beneficios especiales por cada referido que utilice 
-          tu código, lo que convierte cada invitación en una oportunidad de ganar más. Todas estas 
-          transacciones se registran de forma automática en el sistema, garantizando transparencia y 
-          facilitando la generación de reportes para que siempre tengas un control claro de tus recompensas. 
-          Con este programa, buscamos reconocer la confianza y el apoyo de nuestros clientes.
+          tu código, lo que convierte cada invitación en una oportunidad de ganar más. 
         </p>
 
         <section className={styles.cards}>
