@@ -82,6 +82,7 @@
     color: #40524e;
     cursor: pointer;
     width: 100%;
+    background-color: #f0f0f0;
 }
 
 .btn-get-date-email-portfolio .btn-title {
