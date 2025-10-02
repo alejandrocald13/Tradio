@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client";
+
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import "../styles/SidebarNav-Auth.css";
@@ -79,16 +80,27 @@ export default function SidebarNav() {
     ),
   };  
 
+  // Acá se detecta si en las acciones hay un tushito mas (/NFLX o cualquier otro), para activar el boton
+  // y para que la barra se haga mas pequeña de la normal
+  const isSectionActive = (href, path) => {
+    if (!path) return false;
+    if (href === "/") return path === "/";
+    return path === href || path.startsWith(href + "/");
+  };
+
+  const isCollapsed  = pathname?.startsWith("/actions/");
+
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isCollapsed ? "is-collapsed" : ""}`}>
       <div className="sidebar-panel">
         {items.map((it) => {
-          const isActive = pathname?.startsWith(it.href);
+          const isActive = isSectionActive(it.href, pathname);
           return (
             <Link
               key={it.id}
               href={it.href}
               className={`sidebar-item ${isActive ? "is-active" : ""}`}
+              title={it.label} aria-label={it.label}
             >
               <span className="sidebar-item-leftBar" />
               <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
@@ -99,12 +111,15 @@ export default function SidebarNav() {
       </div>
 
       <div className="sidebar-logout">
-        <Link href={logoutItem.href} className="sidebar-item logout-item">
+        <Link
+          href={logoutItem.href}
+          className="sidebar-item logout-item"
+          title={logoutItem.label} aria-label={logoutItem.label}
+        >
           <span className="sidebar-icon">{DefaultIcons[logoutItem.id]}</span>
           <span className="sidebar-label">{logoutItem.label}</span>
         </Link>
       </div>
-
     </div>
   );
 }

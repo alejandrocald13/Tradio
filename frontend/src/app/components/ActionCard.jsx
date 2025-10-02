@@ -1,21 +1,28 @@
+"use client";
+import Link from "next/link";
 import "../styles/ActionCard.css";
 
 
 
 
-export default function ActionCard({ actionName, price, priceVariant, graphic }) {
-    const numericVariant = parseFloat(priceVariant);
-    const variantType= numericVariant > 0 ? "positive" : numericVariant < 0 ? "negative" : "neutral";
+export default function ActionCard({ symbol, actionName, price, changeText, variantClass, graphic }) {
+
+    const finalClass = variantClass || variantType;
+    const symbolFromName = (name = "") =>
+        name.match(/\(([^)]+)\)$/)?.[1] || name.trim(); // "Tesla Inc. (TSLA)" -> "TSLA"
+
+    const sym = symbol || symbolFromName(actionName);
 
     return (
-        <div className="action-card">
+        <Link href={`/actions/${sym}`} className="action-card" prefetch>
+            {/* <div className="action-card"> */}
 
-            <div className="ac-container-up ">
+            <div className="ac-container-up">
                 <div className="ac-title">
                     <span>{actionName}</span>
                 </div>
-                <div className={`ac-variant ${variantType}`}>
-                    <span>{priceVariant}</span>
+                <div className={`ac-variant ${finalClass}`}>
+                    <span className="ac-amount">{changeText}</span>
                 </div>
             </div>
 
@@ -28,7 +35,8 @@ export default function ActionCard({ actionName, price, priceVariant, graphic })
                 </div>
             </div>
 
-        </div>
+            {/* </div> */}
+        </Link>
     )
 
 }

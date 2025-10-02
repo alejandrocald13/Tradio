@@ -104,3 +104,32 @@
 .sidebar-item:hover {
   background: #edf3ef;
 }
+
+
+
+.sidebar.is-collapsed {
+  width: 72px;              
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.sidebar.is-collapsed .sidebar-panel { 
+  gap: 20px; 
+}
+
+.sidebar.is-collapsed .sidebar-item {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  height: 50px;
+  padding: 0;
+}
+
+.sidebar.is-collapsed .sidebar-icon { 
+  width: 30px; 
+  height: 30px; 
+  margin-left: 0; 
+}
+
+.sidebar.is-collapsed .sidebar-label { 
+  display: none !important;
+}

@@ -1,0 +1,115 @@
+.td-card {
+  background-color: #f5f5f5;
+  /* border: 1px solid #e5e7eb; */
+  padding: 16px 16px 16px 16px;
+}
+
+.td-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.td-subtitle {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.td-title {
+  margin-top: 0.8rem;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.td-transactions {
+  display: flex;
+  gap: 10px;
+}
+
+.td-button-bs {
+  padding: 6px 12px 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  font-weight: 500;
+  cursor: pointer;
+  width: 80px;
+}
+
+.td-button-bs:hover { 
+  background: #354642;
+  color: #fff; 
+}
+
+.td-button-bs-primary {
+  background: #4e635e;
+  color: #fff;
+  border-color: #4e635e;
+}
+
+.td-button-bs-primary:hover { 
+  background: #354642; 
+}
+
+.td-data-prices {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.td-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.td-change {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.td-up { 
+  color: #22c55e; 
+}
+
+.td-down { 
+  color: #ef4444; 
+}
+
+.td-neutral { 
+  color: #6b7280; 
+}
+
+.td-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0 6px;
+}
+
+.td-tab {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #2c3542;
+  padding: 4px 10px 4px 10px;
+  border-radius: 11px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.td-tab:hover { 
+  background: #a6b29e; 
+}
+
+.td-active {
+  background: #4e635e;
+  color: #fff;
+  border-color: #4e635e;
+}
+
+.td-chartBox {
+  margin-top: 2rem;
+}
