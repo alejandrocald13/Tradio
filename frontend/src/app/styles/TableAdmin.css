@@ -4,7 +4,6 @@
 
 .table-TA {
     width: 100%;
-    border-collapse: separate; 
     border-spacing: 0 8px;
     table-layout: fixed;
 }
@@ -19,19 +18,27 @@
     z-index: 10 ;
 }
 
+.table-TA tbody td:hover {
+    border-bottom: 0.5px solid #40524e84;
+}
+
 .table-TA  td {
     padding: 5px;
     text-align: center;
     background-color: #fcfcfc;
-    color: #8a8a8a;
+    color: #797878;
+}
+
+.table-TA tbody tr:hover {
+    border-bottom: 1px solid #40524e;
 }
 
 .table-TA td:first-child {
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
 }
 
 .table-TA td:last-child {
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
