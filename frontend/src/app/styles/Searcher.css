@@ -1,0 +1,33 @@
+.container-searcher{
+    width: 20%;
+    border-radius: 13px;
+    position: relative;
+    color: #f5f6f4;
+    box-shadow: 1px 0 5px 0 rgb(0, 0, 0, 0.12);
+}
+
+.container-searcher input {
+    width: 100%;
+    border: none;
+    outline: none;
+    border-radius: 13px;
+    height: 30px;
+    padding: 0 60px 0 20px;
+}
+
+.container-searcher .btn-searcher {
+    position: absolute;
+    cursor: pointer;
+    top: 6px;
+    right: 10px;
+    border: none;
+    background-color: none;
+    background: none;
+}
+
+.container-searcher .btn-searcher svg {
+    width: 18px;
+    height: 18px;
+    color: #4E635E;
+}
+
