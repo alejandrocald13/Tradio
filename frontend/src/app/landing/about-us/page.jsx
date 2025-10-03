@@ -10,7 +10,7 @@ export default function AboutUsPage() {
         <div className={styles.logo}></div>
         <nav>
           <ul className={styles.menu}>
-            <li><a href="/" className={styles.link}>HOME</a></li>
+            <li><a href="/landing" className={styles.link}>HOME</a></li>
             <li><a href="/landing/actions" className={styles.link}>ACTION</a></li>
             <li><a href="/landing/about-us" className={`${styles.link} ${styles.active}`}>ABOUT US</a></li>
           </ul>
