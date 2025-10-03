@@ -17,7 +17,6 @@
     color: #222;
   }
 
-  /* SIDEBAR (lado izquierdo con ilustraciones) */
   .sidebar {
     width: 240px;
     background: var(--card-bg);
@@ -31,7 +30,7 @@
     overflow: hidden;
   }
 
-  /* top-left decorative illustration area (mockup tiene un gran radio) */
+  
   .sidebarTopIllustration {
     position: absolute;
     left: -60px;
@@ -228,21 +227,21 @@
     top: 0;     
   }
 
-  /* Ajustar columnas centrales si quieres */
+
   .table[data-mode="ventas"] thead th:nth-child(3) { padding-left: 20px; }
   .table[data-mode="ventas"] thead th:nth-child(4) { padding-left: 40px; }
   .table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 14px; }
-  /* Para el encabezado de compras */
+
   .table[data-mode="compras"] thead th:nth-child(3) {
     padding-right: 5rem; 
   }
 
-  /* Para el encabezado de compras */
+  
   .table[data-mode="compras"] thead th:nth-child(1) {
     padding-left: 1.5rem; 
   }
 
-  /* Para el encabezado de compras */
+  
   .table[data-mode="ventas  "] thead th:nth-child(1) {
     padding-left: 1.5rem; 
   }
@@ -251,20 +250,20 @@
     padding-right: 5rem; 
   }
 
-  /* Para las filas de compras */
+  
   .table[data-mode="compras"] tbody td:nth-child(3) {
     padding-left: 2.5rem; 
   }
 
 
-  /* Para las filas de ventas */
+
   .table[data-mode="ventas"] tbody td:nth-child(4) {
-    padding-left: 2rem; /* mismo valor para alinear */
+    padding-left: 2rem; 
   }
 
-  /* Scrollable table body */
+
   .tableScroll {
-    max-height: 500px; /* ajusta según diseño */
+    max-height: 500px; 
     
     overflow-y: auto;
     padding-right: 8px;
@@ -274,7 +273,6 @@
     box-shadow: 0 6px 18px rgba(18,24,28,0.04);
   }
 
-  /* custom scrollbar */
   .tableScroll::-webkit-scrollbar {
     width: 10px;
   }
@@ -469,17 +467,16 @@
   }
 
 
-/* fuerza que el layout no sobrepase la pantalla */
 html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* <- evita scroll vertical global */
+  overflow: hidden; 
 }
 
 .pageWrapper {
   display: flex;
-  height: 100vh;       /* ocupa toda la ventana */
-  overflow: hidden;    /* bloquea scroll vertical extra */
+  height: 100vh;      
+  overflow: hidden;    
 }
 
 .main {
@@ -487,15 +484,15 @@ html, body {
   display: flex;
   flex-direction: column;
   padding: 36px 60px;
-  min-height: 0;       /* <- CRUCIAL: deja que los hijos con scroll se encojan */
-  overflow: hidden;    /* <- evita que se desborde */
+  min-height: 0;       
+  overflow: hidden;    
 }
 
 .tableContainer {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;       /* <- permite que tableScroll se ajuste */
+  min-height: 0;      
 }
 
 .tableScroll {
@@ -504,25 +501,23 @@ html, body {
   overflow-y: hidden;    
   max-height: none;   
 }
-/* Hacer thead/block y tbody scrollable */
+
 .table thead {
   display: block;
 }
 
 .table tbody {
   display: block;
-  max-height: 420px;   /* ajusta a tu altura deseada */
+  max-height: 420px;  
   overflow-y: auto;
 }
 
-/* Mantener el grid en las filas del head y body para alinear columnas */
 .table thead tr,
 .table tbody tr {
   display: grid;
   gap: 1rem;
 }
 
-/* Reaplicar tus plantillas por modo (ventas/compras) */
 .table[data-mode="ventas"] thead tr,
 .table[data-mode="ventas"] tbody tr {
   grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
@@ -533,7 +528,7 @@ html, body {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-/* Styling del th (ya fijos por estar fuera del scroll del tbody) */
+
 .table thead th {
   padding: 20px;
   background: var(--card-bg);
