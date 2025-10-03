@@ -247,7 +247,7 @@ class StockViewSet(viewsets.ModelViewSet):
         
     @action(detail=False, methods=['get'])
     def top_gainers(self, request):
-        """Devuelve las 3 acciones que más han crecido del día"""
+        # Devuelve las 3 acciones que más han crecido del día
         stocks = Stock.objects.filter(is_active=True)
         
         if not stocks.exists():
@@ -271,14 +271,15 @@ class StockViewSet(viewsets.ModelViewSet):
                     if open_price > 0:
                         change_percentage = ((current_price - open_price) / open_price) * 100
                         
-                        gainers.append({
-                            "id": stock.id,
-                            "name": stock.name,
-                            "symbol": stock.symbol,
-                            "open_price": round(open_price, 2),
-                            "current_price": round(current_price, 2),
-                            "change_percentage": round(change_percentage, 2)
-                        })
+                        if current_price > open_price:
+                            gainers.append({
+                                "id": stock.id,
+                                "name": stock.name,
+                                "symbol": stock.symbol,
+                                "open_price": round(open_price, 2),
+                                "current_price": round(current_price, 2),
+                                "change_percentage": round(change_percentage, 2)
+                            })
             except Exception:
                 continue
         
@@ -288,6 +289,53 @@ class StockViewSet(viewsets.ModelViewSet):
         return Response({
             "top_gainers": top_3_gainers
         }, status=status.HTTP_200_OK)
+    
+
+    @action(detail=False, methods=['get'])
+    def top_losers(self, request):
+        # Devuelve las 3 acciones que más han bajado del día
+        stocks = Stock.objects.filter(is_active=True)
+        
+        if not stocks.exists():
+            return Response(
+                {"error": "No active stocks found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        losers = []
+
+        for stock in stocks:
+            try:
+                ticker = yf.Ticker(stock.symbol)
+                # Obtener datos del día actual
+                hist = ticker.history(period='1d', interval='1d')
+                
+                if not hist.empty:
+                    open_price = hist['Open'].iloc[0]
+                    current_price = float(stock.current_price)  # se usa el precio de bd para mantener consistencia
+                    
+                    if open_price > 0:
+                        change_percentage = ((current_price - open_price) / open_price) * 100
+
+                        if open_price > current_price:
+                            losers.append({
+                                "id": stock.id,
+                                "name": stock.name,
+                                "symbol": stock.symbol,
+                                "open_price": round(open_price, 2),
+                                "current_price": round(current_price, 2),
+                                "change_percentage": round(change_percentage, 2)
+                            })
+            except Exception:
+                continue
+        
+        # Ordenar por cambio porcentual ascendente y tomar los 3 primeros
+        top_3_losers = sorted(losers, key=lambda x: x['change_percentage'])[:3]
+        
+        return Response({
+            "top_losers": top_3_losers
+        }, status=status.HTTP_200_OK)
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
