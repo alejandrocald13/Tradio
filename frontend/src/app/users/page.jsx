@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import TableAdmin from "../components/TableAdmin"
 import Modal from '../components/Modal'
+import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
 import "./users.css"
 
 export default function users() {
@@ -140,6 +141,7 @@ export default function users() {
 
 
     const getValueInput = (value) => {
+        console.log("Valor", value.value)
         setStatusValue(value)
         setIsOpen(true)
     }
@@ -153,9 +155,9 @@ export default function users() {
     
     return(
         <>
+            <SidebarNavAdmin/>
             <div className="main-container-users">
                 <div className="header-users">
-                    <h1>Users</h1>
                     <p>Searcher</p>
                 </div>
                 <div className="table-TA-container">
@@ -164,13 +166,23 @@ export default function users() {
 
 
                 <Modal isOpen={isOpen} title={'Cambiar Estado de Usuario'} isClose={false}>
-                    <p>¿Estas seguro de cambiar el estado del Usuario?</p>
-                    <button className="changeStatus" onClick={closeModal}>
-                                Confirmar
-                    </button>
-                    <button className="changeStatus" onClick={closeModal}>
-                                Cancelar
-                    </button>
+                    <div className="container-modal">
+                        <div className="p-cpntainer">
+                            <p className="p">¿Estas seguro de cambiar el estado del Usuario?</p>
+                            {statusValue?.value === true && (<p className="p-switch">El usuario {statusValue.id} se va a habilitar</p>)}
+                            {statusValue?.value === false && (<p className="p-switch" >El usuario {statusValue.id} se va a deshabilitar</p>)}
+                        </div>
+
+                        <div className="btns">
+                            <button className="changeStatus-confirmation" onClick={closeModal}>
+                                    Confirmar
+                            </button>
+                            <button className="changeStatus-cancel" onClick={closeModal}>
+                                    Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
                 </Modal>
             </div>
         </>
