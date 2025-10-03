@@ -51,8 +51,8 @@ INSTALLED_APPS = [
     # Local Apps
     "apps.stock",
     "apps.users",
-    "apps.finance",
-    "apps.reports"
+    "apps.notifications",
+    "apps.reports",
     "apps.portfolio",
     "apps.wallet",
     "apps.transactions"
@@ -74,7 +74,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

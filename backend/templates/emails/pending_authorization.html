@@ -1,0 +1,25 @@
+{% extends "emails/_base.html" %}
+{% block subject %}Tradio | Tu cuenta está pendiente de autorización{% endblock %}
+
+{% block content %}
+  <!-- Preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Un administrador debe aprobar tu cuenta antes de que puedas operar.
+  </div>
+
+  <h2 style="margin:0 0 8px;font-size:20px;">Tu cuenta aún no está activa</h2>
+  <p style="margin:0 0 12px;">Hola {{ user.first_name|default:user.username }}, gracias por registrarte en Tradio.</p>
+  <p style="margin:0 0 20px;">
+    Tu cuenta se encuentra en estado <strong>pendiente de autorización</strong>.  
+    Un administrador revisará tu solicitud y te notificaremos por correo cuando sea aprobada.
+  </p>
+
+  <p style="margin:20px 0;">
+    <a class="btn-outline" href="{{ home_url|default:'#' }}">Volver al inicio</a>
+  </p>
+
+  <div class="hr"></div>
+  <p class="muted">
+    Si tienes dudas, contáctanos en {{ support_email|default:"soporte@tradio.com" }}.
+  </p>
+{% endblock %}

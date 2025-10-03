@@ -1,0 +1,27 @@
+{% extends "emails/_base.html" %}
+{% block subject %}Tradio | Confirmación de {{ trade.type|title }} – {{ trade.symbol }}{% endblock %}
+
+{% block content %}
+  <div style="display:none;max-height:0;overflow:hidden;">Tu orden se ejecutó correctamente.</div>
+
+  <h2 style="margin:0 0 8px;font-size:20px;">Orden ejecutada</h2>
+  <p style="margin:0 0 12px;">Hola {{ user.first_name|default:user.username }}, tu operación ha sido confirmada.</p>
+
+  <table class="table" role="table" aria-label="Resumen de la operación">
+    <tr><th scope="row">Tipo</th><td>{{ trade.type|upper }}</td></tr>
+    <tr><th scope="row">Símbolo</th><td>{{ trade.symbol }}</td></tr>
+    <tr><th scope="row">Cantidad</th><td>{{ trade.qty }}</td></tr>
+    <tr><th scope="row">Precio</th><td>{{ trade.price }}</td></tr>
+    <tr><th scope="row">Comisión</th><td>{{ trade.fee }}</td></tr>
+    <tr><th scope="row">Total</th><td>{{ trade.total }}</td></tr>
+    <tr><th scope="row">Fecha/hora</th><td>{{ trade.executed_at }}</td></tr>
+    <tr><th scope="row">ID operación</th><td>{{ trade.id }}</td></tr>
+  </table>
+
+  <p style="margin:16px 0 0;">
+    <a class="btn" href="{{ trade_detail_url|default:'#' }}">Ver detalle de la operación</a>
+  </p>
+
+  <div class="hr"></div>
+  <p class="muted">Este registro queda disponible en tu historial con fines de auditoría.</p>
+{% endblock %}

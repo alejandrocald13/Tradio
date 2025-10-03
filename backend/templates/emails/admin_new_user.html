@@ -1,0 +1,40 @@
+{% extends "emails/_base.html" %}
+{% block subject %}Tradio | Nuevo usuario pendiente de aprobación{% endblock %}
+
+{% block content %}
+  <!-- Preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Hay un nuevo registro en la plataforma que requiere revisión.
+  </div>
+
+  <h2 style="margin:0 0 8px;font-size:20px;">Nuevo usuario pendiente</h2>
+  <p style="margin:0 0 12px;">
+    Estimado administrador, se ha registrado un nuevo usuario en Tradio.  
+    Su cuenta está en estado <strong>pendiente de autorización</strong>.
+  </p>
+
+  <table class="table" role="table" aria-label="Datos del usuario">
+    <tr>
+      <th scope="row">Nombre</th>
+      <td>{{ user.first_name|default:user.username }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Correo</th>
+      <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Fecha de registro</th>
+      <td>{{ now|date:"Y-m-d H:i" }}</td>
+    </tr>
+  </table>
+
+  <p style="margin:20px 0;">
+    <a class="btn" href="{{ admin_url|default:'#' }}">Ir al panel de administración</a>
+  </p>
+
+  <div class="hr"></div>
+  <p class="muted">
+    Este correo fue generado automáticamente por Tradio.  
+    Si no eres el administrador responsable, puedes ignorarlo.
+  </p>
+{% endblock %}
