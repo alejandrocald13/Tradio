@@ -1,7 +1,7 @@
 .main-container-users {
     display: flex;
     background-color: #F5F5F5;
-    align-items: center;
+    align-items: end;
     justify-content: center;   
     flex-direction: column;
     overflow: hidden;  
