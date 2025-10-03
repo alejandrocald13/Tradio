@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./actions.module.css";
 
-// Importa tus componentes reutilizables
+
 import ActionCard from "@/app/components/ActionCard";
 import MiniChart from "@/app/components/MiniChart";
 import { MOCK } from "@/app/data/mockQuotes";
@@ -87,46 +87,47 @@ export default function ActionsPage() {
       {/* MARKET DATA - LAYOUT VERTICAL IZQUIERDA Y DERECHA */}
       <section className={styles.marketSection}>
         <div className={styles.marketColumns}>
-          {/* Columna Izquierda - 3 componentes */}
-          <div className={styles.column}>
-            {marketData.slice(0, 3).map((item, index) => (
-              <div key={index} className={styles.marketCard}>
-                <div className={styles.cardHeader}>
-                  <div className={styles.stockName}>{item.name}</div>
-                  <div className={styles.stockValue}>{item.value}</div>
-                </div>
-                <div className={styles.cardFooter}>
-                  <div className={styles.stockExchange}>{item.exchange}</div>
-                  <div className={styles.stockChange}>
-                    <span className={item.change.includes('+') ? styles.positive : styles.negative}>
-                      {item.change} ({item.changePercent})
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Columna Derecha - 3 componentes */}
-          <div className={styles.column}>
-            {marketData.slice(3, 6).map((item, index) => (
-              <div key={index} className={styles.marketCard}>
-                <div className={styles.cardHeader}>
-                  <div className={styles.stockName}>{item.name}</div>
-                  <div className={styles.stockValue}>{item.value}</div>
-                </div>
-                <div className={styles.cardFooter}>
-                  <div className={styles.stockExchange}>{item.exchange}</div>
-                  <div className={styles.stockChange}>
-                    <span className={item.change.includes('+') ? styles.positive : styles.negative}>
-                      {item.change} ({item.changePercent})
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+  {/* Bloque Izquierdo */}
+  <div className={styles.marketBlock}>
+    {marketData.slice(0, 3).map((item, index) => (
+      <div key={index} className={styles.marketCard}>
+        <div className={styles.cardHeader}>
+          <div className={styles.stockName}>{item.name}</div>
+          <div className={styles.stockValue}>{item.value}</div>
+        </div>
+        <div className={styles.cardFooter}>
+          <div className={styles.stockExchange}>{item.exchange}</div>
+          <div className={styles.stockChange}>
+            <span className={item.change.includes('+') ? styles.positive : styles.negative}>
+              {item.change} ({item.changePercent})
+            </span>
           </div>
         </div>
+      </div>
+    ))}
+  </div>
+
+  {/* Bloque Derecho */}
+  <div className={styles.marketBlock}>
+    {marketData.slice(3, 6).map((item, index) => (
+      <div key={index} className={styles.marketCard}>
+        <div className={styles.cardHeader}>
+          <div className={styles.stockName}>{item.name}</div>
+          <div className={styles.stockValue}>{item.value}</div>
+        </div>
+        <div className={styles.cardFooter}>
+          <div className={styles.stockExchange}>{item.exchange}</div>
+          <div className={styles.stockChange}>
+            <span className={item.change.includes('+') ? styles.positive : styles.negative}>
+              {item.change} ({item.changePercent})
+            </span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
 
         <div className={styles.actionCardsGrid}>
   {symbols.map((sym) => {

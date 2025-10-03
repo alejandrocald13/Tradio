@@ -113,17 +113,30 @@
   gap: 50px;
 }
 
+
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
 .marketColumns {
   display: flex;
   justify-content: space-between;
   gap: 30px;
 }
 
-.column {
+.marketBlock {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  
   flex: 1;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
 }
 
 .marketCard {
@@ -261,19 +274,19 @@
   color: var(--main-color);
 }
 
-/* Contenedor de ActionCards - 2 por fila */
+
 .actionCardsGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
-  gap: 30px; /* separación entre cards */
-  justify-items: center; /* centra las cards en su columna */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 30px; 
+  justify-items: center; 
   margin-top: 40px;
 }
 
-/* Wrapper de cada ActionCard */
+
 .actionCardWrapper {
-  width: 100%; /* ocupa el 100% de la columna */
-  max-width: 400px; /* opcional: evita que se estiren demasiado */
+  width: 100%; 
+  max-width: 400px; 
 }
 
 
