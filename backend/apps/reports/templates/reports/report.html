@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    }
+    h1 { color: #111827; }
+    p { color: #374151; }
+    .box {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+    }
+    </style>
+</head>
+<body>
+    <h1>Reporte financiero</h1>
+    <p>Usuario: {{ user.email }}</p>
+    <p>Rango: {{ from_date }} — {{ to_date }}</p>
+
+    <div class="box">
+        <p><strong>Total compras:</strong> {{ compras }}</p>
+        <p><strong>Total ventas:</strong> {{ ventas }}</p>
+        <p><strong>Saldo final:</strong> {{ saldo }}</p>
+    </div>
+
+    <p style="margin-top:40px; font-size:12px; color:#6B7280;">
+        Generado automáticamente por Tradio.
+    </p>
+</body>
+</html>

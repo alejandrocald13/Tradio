@@ -1,4 +1,5 @@
 # users/models.py
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -25,6 +26,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=150)
     referral_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    age = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(120)], default=0)
 
     state = models.ForeignKey(
         ProfileState,
@@ -75,5 +77,4 @@ class SecurityLog(models.Model):
     def __str__(self):
         u = self.user.username if self.user else "deleted user"
         return f"[{self.timestamp}] {u} - {self.action} ({self.ip})"
-
 

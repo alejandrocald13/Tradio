@@ -1,4 +1,3 @@
-
 :root{
   --bg: #f2f2f0;
   --card-bg: #ffffff;
@@ -198,19 +197,19 @@
 
 /* TABLE area */
 .tableContainer {
-  margin-top:22px;
-  background:transparent;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .tableHeader{
   display:grid;
   grid-template-columns: repeat(6, 1fr);
-  gap:6px;
   padding: 8px 14px;
   align-items:center;
   color: #465a56;
   border-bottom: 3px solid rgba(63,94,86,0.12);
-  font-weight:700;
+  font-weight:bold;
+  border-bottom: 1px solid #ccc;
 }
 .tableHeader > div {
   padding: 10px 6px;
@@ -218,16 +217,26 @@
 .tableHeader > div:nth-child(n+5) { text-align: center; }
 
 /* Ajustar columnas según tab */
-.tableHeader {
+.tableHeader[data-mode="ventas"] {
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
+
+
+
 .tableHeader[data-mode="compras"] {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
+.tableScroll[data-mode="ventas"] .tableHeader > div:nth-child(4),
+.tableScroll[data-mode="ventas"] td:nth-child(4) {
+  text-align: center;
+}
+
+
 /* Scrollable table body */
 .tableScroll {
-  max-height: 400px; /* ajusta según diseño */
+  max-height: 500px; /* ajusta según diseño */
+  
   overflow-y: auto;
   padding-right: 8px;
   margin-top: 12px;
@@ -254,6 +263,54 @@
   scrollbar-color: rgba(120,130,125,0.35) transparent;
 }
 
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableScroll td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+
+.tableScroll[data-mode="ventas"] .tableHeader,
+.tableScroll[data-mode="ventas"] table tr {
+  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr; 
+  gap: 1rem;
+  align-items: center;
+}
+
+
+.tableHeader[data-mode="ventas"] > div:nth-child(5) {
+  text-align: left;   /* alinea a la izquierda dentro de su columna */
+  padding-left:14px;  /* ajusta con valores pequeños */
+}
+
+.tableHeader[data-mode="ventas"] > div:nth-child(4) {
+  text-align: left;   
+  padding-left:40px;  
+}
+
+.tableHeader[data-mode="ventas"] > div:nth-child(3) {
+  text-align: left;   
+  padding-left:20px;  
+}
+
+.tableScroll[data-mode="compras"] .tableHeader,
+.tableScroll[data-mode="compras"] table tr {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1.4fr 1.7fr; /* 4 columnas */
+  gap: 1rem;
+  align-items: center;
+}
+
+
+.tableScroll[data-mode="compras"] .tableHeader > div,
+.tableScroll[data-mode="compras"] td {
+  padding-left: 1.5rem; /* mueve todo un poco a la derecha */
+}
+
 /* table rows */
 .table {
   width:100%;
@@ -277,6 +334,7 @@
 
 /* For compras rows adjust grid columns to 4 */
 .table[data-mode="compras"] tbody tr {
+  
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
@@ -392,4 +450,5 @@
   .main { padding:18px; }
   .tableScroll { max-height: 300px; }
 }
+
 
