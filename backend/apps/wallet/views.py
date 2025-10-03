@@ -21,7 +21,8 @@ class WalletMovementsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Movement.objects.filter(user=self.request.user).order_by("-fecha_creacion")
+        return Movement.objects.filter(user=self.request.user).order_by("-created_at")
+
 
 class WalletTopupView(generics.CreateAPIView):
     serializer_class = MovementSerializer
