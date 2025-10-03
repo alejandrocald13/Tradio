@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "apps.stock",
     "apps.users",
     "apps.finance",
+    "apps.reports"
     "apps.portfolio",
     "apps.wallet",
     "apps.transactions"
