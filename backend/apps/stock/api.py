@@ -231,6 +231,7 @@ class StockViewSet(viewsets.ModelViewSet):
                 {
                     "stock": stock_name,
                     "symbol": symbol.upper(),
+                    "last": current_price_db,
                     "days": days,
                     "interval": interval,
                     "data": data
@@ -243,7 +244,49 @@ class StockViewSet(viewsets.ModelViewSet):
                 {"error": f"Error fetching data: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+        
+    @action(detail=False, methods=['get'])
+    def top_gainers(self, request):
+        """Devuelve las 3 acciones que más han crecido del día"""
+        stocks = Stock.objects.filter(is_active=True)
+        
+        if not stocks.exists():
+            return Response(
+                {"error": "No active stocks found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        gainers = []
+        
+        for stock in stocks:
+            try:
+                url = f"https://finnhub.io/api/v1/quote?symbol={stock.symbol}&token={API_KEY}"
+                response = requests.get(url)
+                data = response.json()
+                
+                open_price = data.get('o')  # Precio de apertura
+                current_price = data.get('c')  # Precio actual/cierre
+                
+                if open_price and current_price and open_price > 0:
+                    change_percentage = ((current_price - open_price) / open_price) * 100
+                    
+                    gainers.append({
+                        "id": stock.id,
+                        "name": stock.name,
+                        "symbol": stock.symbol,
+                        "open_price": open_price,
+                        "current_price": current_price,
+                        "change_percentage": round(change_percentage, 2)
+                    })
+            except Exception:
+                continue
+        
+        # Ordenar por cambio porcentual descendente y tomar los 3 primeros
+        top_3_gainers = sorted(gainers, key=lambda x: x['change_percentage'], reverse=True)[:3]
+        
+        return Response({
+            "top_gainers": top_3_gainers
+        }, status=status.HTTP_200_OK)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
