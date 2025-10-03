@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import TableAdmin from "../components/TableAdmin"
 import Modal from '../components/Modal'
+import Searcher from "../components/Searcher";
 import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
 import "./users.css"
 
@@ -151,6 +152,9 @@ export default function users() {
         setConfirmaton(true)
     }
 
+    const getValueInputSearcher = (value) => {
+        console.log("Hola desde getValueInput ", value)
+    }
     const columns = ['Name', 'UserName', 'Email', 'Age', 'Fecha', 'Enable']
     
     return(
@@ -158,7 +162,7 @@ export default function users() {
             <SidebarNavAdmin/>
             <div className="main-container-users">
                 <div className="header-users">
-                    <p>Searcher</p>
+                    <Searcher placeholderI={'Ingresa nombre'} getValue={getValueInputSearcher} />
                 </div>
                 <div className="table-TA-container">
                     <TableAdmin  columns={columns} data={users} btnVerification={true} getValueInputP={getValueInput}/>
