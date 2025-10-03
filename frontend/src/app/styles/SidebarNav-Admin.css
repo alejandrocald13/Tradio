@@ -106,8 +106,9 @@
 
 .sidebar.is-collapsed {
     width: 72px;              
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
 }
 
 .sidebar.is-collapsed .sidebar-panel { 
