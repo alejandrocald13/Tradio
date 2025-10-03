@@ -1,3 +1,4 @@
+import os
 """
 Django settings for core project.
 
@@ -13,6 +14,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 import dj_database_url
 
 load_dotenv()
@@ -49,7 +51,10 @@ INSTALLED_APPS = [
     # Local Apps
     "apps.stock",
     "apps.users",
-    "apps.finance"
+    "apps.finance",
+    "apps.portfolio",
+    "apps.wallet",
+    "apps.transactions"
 ]
 
 MIDDLEWARE = [
@@ -151,3 +156,27 @@ SPECTACULAR_SETTINGS = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # duración del token 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
+
+#Celery
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+
+
+WALLET_COMMISSION_PERCENT = '0.02'
+MARKET_DAYS = [0,1,2,3,4]
+MARKET_START = '09:30'
+MARKET_END = '16:00'

@@ -1,0 +1,30 @@
+
+.main-container-cap {
+    border-radius: 20px;
+    background-color: white;
+    padding: 16px 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 33%;
+}
+
+.main-container-cap:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.main-container-cap h1 {
+    font-size: 20px;
+    margin: 0 0 6px 0;
+    color: #222222;
+}
+
+.main-container-cap p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #555555;
+}
+
+.info-cap-portfolio{
+    display: flex;
+    align-items: end;
+    flex-direction: column;
+}

@@ -78,4 +78,3 @@ class SecurityLog(models.Model):
         u = self.user.username if self.user else "deleted user"
         return f"[{self.timestamp}] {u} - {self.action} ({self.ip})"
 
-

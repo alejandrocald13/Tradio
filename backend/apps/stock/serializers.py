@@ -3,9 +3,11 @@ from .models import Stock, Category
 
 
 class StockSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+
     class Meta:
         model = Stock
-        fields = ('id', 'name', 'symbol', 'category', 'current_price', 'is_active', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'symbol', 'category', 'category_name', 'current_price', 'is_active', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at')
 
 

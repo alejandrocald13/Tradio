@@ -69,9 +69,13 @@ export default function ComprasVentasPage() {
 
           <div className={styles.headerControls}>
             <div className={styles.dateFilter}>
-              <label className={styles.dateLabel}>Date</label>
+              <label className={styles.dateLabel}>Desde:</label>
+              <input type="date" className={styles.dateInput} />
+
+              <label className={styles.dateLabel}>Hasta:</label>
               <input type="date" className={styles.dateInput} />
             </div>
+
 
             <div className={styles.switcher}>
               <button
@@ -88,9 +92,7 @@ export default function ComprasVentasPage() {
               </button>
             </div>
 
-            <button className={styles.addBtn} onClick={openModal}>
-              + Agregar
-            </button>
+           
           </div>
         </div>
 
