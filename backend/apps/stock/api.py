@@ -260,24 +260,25 @@ class StockViewSet(viewsets.ModelViewSet):
         
         for stock in stocks:
             try:
-                url = f"https://finnhub.io/api/v1/quote?symbol={stock.symbol}&token={API_KEY}"
-                response = requests.get(url)
-                data = response.json()
+                ticker = yf.Ticker(stock.symbol)
+                # Obtener datos del día actual
+                hist = ticker.history(period='1d', interval='1d')
                 
-                open_price = data.get('o')  # Precio de apertura
-                current_price = data.get('c')  # Precio actual/cierre
-                
-                if open_price and current_price and open_price > 0:
-                    change_percentage = ((current_price - open_price) / open_price) * 100
+                if not hist.empty:
+                    open_price = hist['Open'].iloc[0]
+                    current_price = float(stock.current_price)  # se usa el precio de bd para mantener consistencia
                     
-                    gainers.append({
-                        "id": stock.id,
-                        "name": stock.name,
-                        "symbol": stock.symbol,
-                        "open_price": open_price,
-                        "current_price": current_price,
-                        "change_percentage": round(change_percentage, 2)
-                    })
+                    if open_price > 0:
+                        change_percentage = ((current_price - open_price) / open_price) * 100
+                        
+                        gainers.append({
+                            "id": stock.id,
+                            "name": stock.name,
+                            "symbol": stock.symbol,
+                            "open_price": round(open_price, 2),
+                            "current_price": round(current_price, 2),
+                            "change_percentage": round(change_percentage, 2)
+                        })
             except Exception:
                 continue
         
