@@ -33,7 +33,7 @@ urlpatterns = [
     path('api/', include('apps.users.urls')),
 
     # Portfolio
-    path('', include('apps.portfolio.urls')),
+    path('api/', include('apps.portfolio.urls')),
     
     #Wallet
     path("api/wallet/", include("apps.wallet.urls")),
