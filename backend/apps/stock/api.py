@@ -24,6 +24,94 @@ class StockViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.soft_delete()
 
+    @action(detail=False, methods=['post'])
+    def add_stock(self, request):
+        # Agregar una acción por símbolo. Si no existe en BD, la busca en Finnhub
+        symbol = request.data.get("symbol", "").upper().strip()
+        
+        if not symbol:
+            return Response(
+                {"error": "Symbol is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verificar si ya existe en la BD
+        try:
+            stock = Stock.objects.get(symbol=symbol)
+            return Response(
+                {
+                    "message": "Stock already exists in database",
+                    "stock": {
+                        "id": stock.id,
+                        "name": stock.name,
+                        "symbol": stock.symbol,
+                        "current_price": float(stock.current_price),
+                        "category": stock.category.name if stock.category else None
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        except Stock.DoesNotExist:
+            pass
+        
+        # Buscar en Finnhub
+        try:
+            # Obtener información del perfil de la empresa
+            profile_url = f"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={API_KEY}"
+            profile_response = requests.get(profile_url)
+            profile_data = profile_response.json()
+            
+            # Obtener el precio actual
+            quote_url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={API_KEY}"
+            quote_response = requests.get(quote_url)
+            quote_data = quote_response.json()
+            
+            current_price = quote_data.get('c')
+            company_name = profile_data.get('name')
+            industry = profile_data.get('finnhubIndustry', 'General')
+            
+            if not current_price or not company_name:
+                return Response(
+                    {"error": "Stock not found in Finnhub or incomplete data"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Obtener o crear categoría basada en la industria de Finnhub
+            category, _ = Category.objects.get_or_create(
+                name=industry,
+                defaults={"description": f"Industry: {industry}"}
+            )
+            
+            # Crear el stock en la BD
+            stock = Stock.objects.create(
+                name=company_name,
+                symbol=symbol,
+                category=category,
+                current_price=current_price,
+                is_active=True
+            )
+            
+            return Response(
+                {
+                    "message": "Stock added successfully",
+                    "stock": {
+                        "id": stock.id,
+                        "name": stock.name,
+                        "symbol": stock.symbol,
+                        "current_price": float(stock.current_price),
+                        "category": stock.category.name
+                    }
+                },
+                status=status.HTTP_201_CREATED
+            )
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error fetching stock from Finnhub: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
     @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
     def update_prices(self, request):
         activos = Stock.objects.filter(is_active=True)
@@ -105,6 +193,7 @@ class StockViewSet(viewsets.ModelViewSet):
             try:
                 stock_db = Stock.objects.get(symbol=symbol.upper(), is_active=True)
                 current_price_db = float(stock_db.current_price)
+                stock_name = str(stock_db.name)
             except Stock.DoesNotExist:
                 return Response(
                     {"error": "Stock not found in database"},
@@ -140,6 +229,7 @@ class StockViewSet(viewsets.ModelViewSet):
             
             return Response(
                 {
+                    "stock": stock_name,
                     "symbol": symbol.upper(),
                     "days": days,
                     "interval": interval,
