@@ -223,7 +223,7 @@
   margin-bottom: 30px;
 }
 .actionCardContainer {
-  padding: 10px; /* separa un poco el contenido dentro de cada ActionCard */
+  padding: 10px; 
 }
 
 
@@ -278,15 +278,15 @@
 .actionCardsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); 
-  gap: 30px; 
+  gap: 3px; 
   justify-items: center; 
-  margin-top: 40px;
+  margin-top: 4px;
 }
 
 
 .actionCardWrapper {
   width: 100%; 
-  max-width: 400px; 
+  max-width: 500px; 
 }
 
 

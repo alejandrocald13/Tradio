@@ -12,14 +12,13 @@ export default function ActionsPage() {
   const [marketData, setMarketData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Usar los símbolos del MOCK para las ActionCards de gráficos
-  const symbols = Object.keys(MOCK); // ["TSLA","NVDA","AMZN","META","MSFT","GOOGL"]
+  const symbols = Object.keys(MOCK); 
   const trendClass = { up: styles.positive, down: styles.negative, neutral: styles.neutral };
 
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
-        // Simulamos usando MOCK para las ActionCards de gráficos
+        
         const formatted = symbols.map((sym) => {
           const data = MOCK[sym];
           const changeAbs = data.last - data.prevClose;
@@ -130,30 +129,30 @@ export default function ActionsPage() {
 
 
         <div className={styles.actionCardsGrid}>
-  {symbols.map((sym) => {
-    const data = MOCK[sym];
-    const changeAbs = data.last - data.prevClose;
-    const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
-    const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
-    const amountText = `${sign}${Math.abs(changeAbs).toFixed(2)}`;
-    const pctText = `(${sign}${Math.abs(changePct).toFixed(2)}%)`;
-    const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
+          {symbols.map((sym) => {
+            const data = MOCK[sym];
+            const changeAbs = data.last - data.prevClose;
+            const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
+            const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
+            const amountText = `${sign}${Math.abs(changeAbs).toFixed(2)}`;
+            const pctText = `(${sign}${Math.abs(changePct).toFixed(2)}%)`;
+            const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
 
-    return (
-      <div key={sym} className={styles.actionCardWrapper}>
-        <ActionCard
-          symbol={sym}
-          actionName={data.name}
-          price={`$${data.last.toLocaleString()}`}
-          changeText={`${amountText} ${pctText}`}   
-          variantClass={trendClass[trend]}           
-          graphic={<MiniChart data={data.intraday} />}
-        />
-      </div>
-    );
-  })}
-</div>
-y
+            return (
+              <div key={sym} className={styles.actionCardWrapper}>
+                <ActionCard
+                  symbol={sym}
+                  actionName={data.name}
+                  price={`$${data.last.toLocaleString()}`}
+                  changeText={`${amountText} ${pctText}`}   
+                  variantClass={trendClass[trend]}           
+                  graphic={<MiniChart data={data.intraday} />}
+                />
+              </div>
+            );
+          })}
+        </div>
+
       </section>
     </div>
   );
