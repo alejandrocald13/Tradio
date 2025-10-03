@@ -3,7 +3,7 @@
   --card-bg: #fff;
   --muted: #55605a;
   --green-deep: #4e635e;      
-  --green-pill: #dfeeee;      /* fondo del título pill */
+  --green-pill: #dfeeee;      
   --shadow: 0 6px 18px rgba(18,24,28,0.06);
 }
 
@@ -16,17 +16,17 @@
     "Helvetica Neue", Arial, "Noto Sans";
 }
 
-/* MAIN: alineamos al inicio para que coincida con la imagen (cards grandes a la izquierda) */
+
 .main {
   flex: 1;
-  padding: 10px 72px;   /* deja espacio en la derecha para la ilustración visual */
+  padding: 10px 72px;   
   display: flex;
   flex-direction: column;
-  align-items: flex-start;  /* important: no centrar; queremos que las cards queden alineadas con el título */
-  margin-left: 100px; /* <-- nuevo: igual al ancho del sidebar */
+  align-items: flex-start; 
+  margin-left: 100px; 
 }
 
-/* header: título pill a la izquierda y ilustración a la derecha */
+
 .headerRow {
   width: 100%;
   max-width: 1160px;
@@ -50,11 +50,11 @@
 
 .sidebar {
   width: 240px;
-  flex-shrink: 0; /* evita que se reduzca */
+  flex-shrink: 0; 
 }
 
 
-/* ilustración top-right (no afecta tarjetas) */
+
 .illustration {
   flex-shrink: 0;
   width: 160px;
@@ -69,7 +69,7 @@
   display: block;
 }
 
-/* texto explicativo bajo el título */
+
 
 .description {
   margin-top: 1px;
@@ -83,10 +83,10 @@
 .cards {
   margin-top: 50px;
   width: 100%;
-  max-width: 900px;   /* ancho grande como en la foto */
+  max-width: 900px;   
   display: flex;
   flex-direction: column;
-  gap: 60px;          /* separación vertical entre cards */
+  gap: 60px;         
 }
 
 /* cada card: fondo blanco grande y centrado verticalmente su contenido */
@@ -98,18 +98,16 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  min-height: 80px;    /* alto similar a la referencia */
+  min-height: 80px;    
 }
 
-/* Left area for first card (button) */
 .cardLeft {
-  flex: 0 0 400px;   /* ancho fijo izquierdo (botón) para que quede igual a la foto */
+  flex: 0 0 400px;  
   display: flex;
 
   align-items: center;
 }
 
-/* Left label for second card */
 .cardLeftLabel {
   flex: 0 0 400px;
   font-size: 18px;
@@ -119,7 +117,7 @@
   align-items: center;
 }
 
-/* Right area occupies el resto */
+
 .cardRight {
   flex: 1 1 auto;
   display: flex;
@@ -143,7 +141,7 @@
 
 /* Pill para mostrar el código (primer card, a la derecha) */
 .codeDisplay {
-  width: 420px;              /* largo grande como en la imagen */
+  width: 420px;            
   height: 48px;
   border-radius: 28px;
   border: 1px solid #eee;
@@ -156,7 +154,7 @@
   padding: 0 18px;
 }
 
-/* Input wrap for second card: input largo + boton pequeño a la derecha */
+
 .inputWrap {
   display: flex;
   align-items: center;
@@ -164,7 +162,7 @@
   width: 100%;
 }
 
-/* input estilo pill grande */
+
 .codeInput {
   flex: 1 1 auto;
   height: 48px;
@@ -181,7 +179,6 @@
   border-color: var(--green-deep);
 }
 
-/* botón enviar pequeño */
 .sendBtn {
   background: #4e635e;
   color: #fff;

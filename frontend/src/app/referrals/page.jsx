@@ -25,7 +25,7 @@ export default function ReferralsPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      {/* Sidebar (no tocar) */}
+      
       <Sidebar activeTab={tab} setTab={setTab} />
 
       {/* MAIN */}
@@ -55,7 +55,7 @@ export default function ReferralsPage() {
         </p>
 
         <section className={styles.cards}>
-          {/* Card 1 - Generar código (botón a la izquierda, pill a la derecha) */}
+          
           <div className={styles.card}>
             <div className={styles.cardLeft}>
               <button
@@ -73,7 +73,7 @@ export default function ReferralsPage() {
             </div>
           </div>
 
-          {/* Card 2 - Ingresar código (label izquierda, input grande derecha + botón) */}
+         
           <div className={styles.card}>
             <div className={styles.cardLeftLabel}>
               Ingresar código de <br /> referido
