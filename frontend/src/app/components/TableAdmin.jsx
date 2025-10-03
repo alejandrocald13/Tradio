@@ -8,6 +8,7 @@ import ButtonSwitch from './ButtonSwitch';
 // columns, arreglo con los nombres de cada columna
 // data, los datos :) no importa la cantidad
 // btnVerification (true/false) si queremos que haya un btn verficación (input:checkbox) en la ultima columna
+// getValueInputP: Si se activo el btnVerification por medio de esta función obtenemos el valor
 export default function TableAdmin({columns, data, btnVerification, getValueInputP}){
     const getValueInput = (value) => {
         console.log("Checkeando ", value)

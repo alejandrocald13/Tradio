@@ -1,0 +1,19 @@
+.main-container-users {
+    display: flex;
+    background-color: #F5F5F5;
+    align-items: center;
+    justify-content: center;   
+    flex-direction: column;
+    overflow: hidden;  
+    height: 100vh;
+}
+
+
+.table-TA-container {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin: 1rem 1.5rem 0 14rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
