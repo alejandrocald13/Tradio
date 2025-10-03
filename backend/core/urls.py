@@ -21,26 +21,30 @@ from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshVie
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     # OpenAPI/Swagger
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+
     # Stocks
-    path('', include('apps.stock.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-  
+    path('api/', include('apps.stock.urls')),
+
     # Users
     path('api/', include('apps.users.urls')),
 
-
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    # Finance (Transactions)
-    path('api/', include('apps.finance.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
+    # Portfolio
+    path('', include('apps.portfolio.urls')),
+  
+    #Finance
+    path("api/wallet/", include("apps.wallet.urls")),
+    path("api/transacciones/", include("apps.transactions.urls")),
+  
+  
     # Reports (PDFs)
     path('api/', include('apps.reports.urls'))
+  
+    #Tokens
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
 ]
