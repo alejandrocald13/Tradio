@@ -1,3 +1,4 @@
+import os
 """
 Django settings for core project.
 
@@ -49,7 +50,8 @@ INSTALLED_APPS = [
     # Local Apps
     "apps.stock",
     "apps.users",
-    "apps.finance"
+    "apps.wallet",
+    "apps.transactions"
 ]
 
 MIDDLEWARE = [
@@ -151,3 +153,13 @@ SPECTACULAR_SETTINGS = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Celery
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+
+
+WALLET_COMMISSION_PERCENT = '0.02'
+MARKET_DAYS = [0,1,2,3,4]
+MARKET_START = '09:30'
+MARKET_END = '16:00'
