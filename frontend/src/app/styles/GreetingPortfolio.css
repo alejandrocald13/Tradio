@@ -1,0 +1,29 @@
+.greeting-main-container-portafolio{
+    display: flex;
+    width: 100%;
+    height: 8rem;
+    background-color: #e0e3de;
+    border-radius: 25px;
+    padding: 40px;
+    justify-content: space-between;
+}
+
+.greeting-container-portafolio{
+    display: flex;
+    flex-direction: column;
+}
+
+.message-portafolio{
+    color: #535352;
+}
+
+
+.image-container-portafolio{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.welcome-message-portafolio{
+    color: #4e635e;
+}
