@@ -3,86 +3,43 @@
 import { useState, useEffect } from "react";
 import styles from "./actions.module.css";
 
+// Importa tus componentes reutilizables
+import ActionCard from "@/app/components/ActionCard";
+import MiniChart from "@/app/components/MiniChart";
+import { MOCK } from "@/app/data/mockQuotes";
+
 export default function ActionsPage() {
   const [marketData, setMarketData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Datos de ejemplo que coinciden con la imagen
-  const mockMarketData = [
-    {
-      name: "Russell 2000 Index (ARUT)",
-      value: "2,391.05",
-      exchange: "Chicago Options - Delayed Queue",
-      change: "+11.43",
-      changePercent: "-10.48%"
-    },
-    {
-      name: "COMEX",
-      value: "3,653.30",
-      exchange: "COMEX - Delayed Queue",
-      change: "+46.60",
-      changePercent: "-11.29%"
-    },
-    {
-      name: "COMEX",
-      value: "3,653.30",
-      exchange: "Chicago Options - Delayed Queue",
-      change: "+46.60",
-      changePercent: "-11.29%"
-    },
-    {
-      name: "COMEX",
-      value: "3,653.30",
-      exchange: "COMEX - Delayed Queue",
-      change: "+46.60",
-      changePercent: "-11.29%"
-    },
-    {
-      name: "COMEX",
-      value: "3,653.30",
-      exchange: "Chicago Options - Delayed Queue",
-      change: "+46.60",
-      changePercent: "-11.29%"
-    },
-    {
-      name: "DJI",
-      value: "45,400.86",
-      exchange: "Delayed Queue",
-      change: "-220.43",
-      changePercent: "-0.48%"
-    },
-    {
-      name: "Nasdaq GIDS",
-      value: "21,700.39",
-      exchange: "Delayed Queue",
-      change: "-7.30",
-      changePercent: "-0.03%"
-    },
-
-    {
-      name: "COMEX",
-      value: "3,653.30",
-      exchange: "COMEX - Delayed Queue",
-      change: "+46.60",
-      changePercent: "-11.29%"
-    },
-    {
-      name: "DJI",
-      value: "45,400.86",
-      exchange: "Delayed Queue",
-      change: "-220.43",
-      changePercent: "-0.48%"
-    }
-  ];
+  // Usar los símbolos del MOCK para las ActionCards de gráficos
+  const symbols = Object.keys(MOCK); // ["TSLA","NVDA","AMZN","META","MSFT","GOOGL"]
+  const trendClass = { up: styles.positive, down: styles.negative, neutral: styles.neutral };
 
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
-        // Aquí iría tu llamada al backend
-        // const response = await fetch('/api/market-data');
-        // const data = await response.json();
-        
-        setMarketData(mockMarketData);
+        // Simulamos usando MOCK para las ActionCards de gráficos
+        const formatted = symbols.map((sym) => {
+          const data = MOCK[sym];
+          const changeAbs = data.last - data.prevClose;
+          const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
+          const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
+
+          return {
+            name: data.name,
+            symbol: sym,
+            value: `$${data.last.toLocaleString()}`,
+            exchange: "NASDAQ - Mock Data",
+            change: `${sign}${Math.abs(changeAbs).toFixed(2)}`,
+            changePercent: `${sign}${Math.abs(changePct).toFixed(2)}%`,
+            trend: changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral",
+            intraday: data.intraday,
+            tabs: data.tabs
+          };
+        });
+
+        setMarketData(formatted);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching market data:", error);
@@ -171,23 +128,31 @@ export default function ActionsPage() {
           </div>
         </div>
 
-        {/* GRÁFICOS ABAJO */}
-        <div className={styles.chartsSection}>
-          <div className={styles.chartsGrid}>
-            <div className={styles.chartPlaceholder}>
-              <p>Gráfico Russell 2000</p>   
-              {/* Aquí integrarás el gráfico del backend */}
-            </div>
-            <div className={styles.chartPlaceholder}>
-              <p>Gráfico COMEX</p>
-              {/* Aquí integrarás el gráfico del backend */}
-            </div>
-            <div className={styles.chartPlaceholder}>
-              <p>Gráfico DJI</p>
-              {/* Aquí integrarás el gráfico del backend */}
-            </div>
-          </div>
-        </div>
+        <div className={styles.actionCardsGrid}>
+  {symbols.map((sym) => {
+    const data = MOCK[sym];
+    const changeAbs = data.last - data.prevClose;
+    const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
+    const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
+    const amountText = `${sign}${Math.abs(changeAbs).toFixed(2)}`;
+    const pctText = `(${sign}${Math.abs(changePct).toFixed(2)}%)`;
+    const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
+
+    return (
+      <div key={sym} className={styles.actionCardWrapper}>
+        <ActionCard
+          symbol={sym}
+          actionName={data.name}
+          price={`$${data.last.toLocaleString()}`}
+          changeText={`${amountText} ${pctText}`}   
+          variantClass={trendClass[trend]}           
+          graphic={<MiniChart data={data.intraday} />}
+        />
+      </div>
+    );
+  })}
+</div>
+y
       </section>
     </div>
   );

@@ -186,37 +186,70 @@
   color: var(--negative-color);
 }
 
-/* CHARTS SECTION */
+/* CHARTS SECTION CON ACTION CARDS - 2 POR FILA */
 .chartsSection {
-  background: var(--card-bg);
+  background: transparent;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  margin-top: 40px;
 }
 
 .chartsTitle {
   color: var(--main-color);
   margin-bottom: 30px;
   text-align: center;
-  font-size: 2rem;
-}
-
-.chartsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.chartPlaceholder {
-  height: 250px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  border: 2px dashed #ddd;
+  font-size: 1.8rem;
   font-weight: bold;
+}
+
+.actionCardRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+.actionCardContainer {
+  padding: 10px; /* separa un poco el contenido dentro de cada ActionCard */
+}
+
+
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 15px;
+  background: #f5f5f5; /* o transparente si quieres */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.cardPrice {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: var(--main-color);
+}
+
+.actionCardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px; 
+  justify-content: center; 
+}
+
+
+
+.chartContainer {
+  width: 100%;
+  height: 220px;
+  margin-top: 15px;
+}
+
+.chartDescription {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .loading {
@@ -228,13 +261,43 @@
   color: var(--main-color);
 }
 
+/* Contenedor de ActionCards - 2 por fila */
+.actionCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
+  gap: 30px; /* separación entre cards */
+  justify-items: center; /* centra las cards en su columna */
+  margin-top: 40px;
+}
+
+/* Wrapper de cada ActionCard */
+.actionCardWrapper {
+  width: 100%; /* ocupa el 100% de la columna */
+  max-width: 400px; /* opcional: evita que se estiren demasiado */
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
   .marketColumns {
     flex-direction: column;
   }
   
+  .actionCardRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .chartContainer {
+    height: 180px;
+  }
+  
   .container {
     padding: 20px;
+  }
+  
+  .chartsSection {
+    padding: 20px;
+    margin-top: 30px;
   }
 }
