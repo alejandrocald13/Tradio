@@ -163,7 +163,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
-    'UPDATE_LAST_LOGIN': False,
+    'UPDATE_LAST_LOGIN': True,
     
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
@@ -181,3 +181,8 @@ WALLET_COMMISSION_PERCENT = '0.02'
 MARKET_DAYS = [0,1,2,3,4]
 MARKET_START = '09:30'
 MARKET_END = '16:00'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'apps.users.backends.EmailBackend', 
+]
