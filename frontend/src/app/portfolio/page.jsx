@@ -15,7 +15,8 @@ export default function Portafolio (){
     const [getInforme, setGetInforme] = useState(false)
     const [date1, setdate1] = useState("");
     const [date2, setdate2] = useState("");
-
+    const [seeAction, setSeeAction] = useState(false)
+    
     const hoy = new Date().toISOString().split("T")[0];
     const handleChangeD1 = (e) => {
         setdate1(e.target.value);
@@ -69,13 +70,37 @@ export default function Portafolio (){
                 <div className="horizontal-container-portafolio">
                     <div className="vertical-container-info-portafolio">
                         <GreetingPortafolio/>
-                        <CardInfoPortafolio/>
+                        
+                        <div className={seeAction ? "card-info-container-portafolio2" : "card-info-container-portafolio3"}>
+                            <div className="all-content">
+                                <div className="btnContainers">
+                                    <button className={seeAction ? 'waiting': 'selected'} onClick={() => setSeeAction(false)}>
+                                        GeneralBalance
+                                    </button>
+                                    <button className={!seeAction ? 'waiting': 'selected'} onClick={() => setSeeAction(true)}>
+                                        Action
+                                    </button>
+                                </div>
+                                {seeAction && (
+                                    <>
+                                        <p>Algo muy cool</p>
+                                    </>
+                                )}
 
-                        {<div className="cap-container-portafolio">
+                                {!seeAction && (
+                                    <CardInfoPortafolio/>
+                                )}
+                            </div>
+                        </div>
+
+                        
+                        
+
+                        {!seeAction &&(<div className="cap-container-portafolio">
                             {dataGeneral.map((dat, index) =>(
                                 <CardActionPortafolio key={index} data={dat}/>))
                             }
-                        </div>}
+                        </div>)}
                     </div>
                     
                     {<div className="vertical-container-actions-portafolio">
