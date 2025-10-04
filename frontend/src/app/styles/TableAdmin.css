@@ -18,10 +18,6 @@
     z-index: 10 ;
 }
 
-.table-TA tbody td:hover {
-    border-bottom: 0.5px solid #40524e84;
-}
-
 .table-TA  td {
     padding: 5px;
     text-align: center;
