@@ -1,0 +1,86 @@
+.main-container-users {
+    display: flex;
+    background-color: #F5F5F5;
+    align-items: end;
+    justify-content: center;   
+    flex-direction: column;
+    overflow: hidden;  
+    height: 100vh;
+}
+
+.header-users{
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin: 2.5rem 6rem 0 16rem;
+}
+
+.table-TA-container {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin: 2rem 4rem 3rem 16rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.container-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+/*P para modal*/
+.p-switch {
+    color: #5b5a5a;
+    font-size: 15px;
+}
+
+.p {
+    font-size: 18px;
+}
+
+/*Btn para el modal*/
+.btns {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.btns button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    width: 100px;
+    height: 30px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 1;
+
+}
+.changeStatus-confirmation {
+    color: #fff;
+    background-color: #4E635E;
+}
+
+.changeStatus-cancel {
+    background-color: #e5e5e5;
+}
+
+.changeStatus-cancel:hover {
+    background-color: #d6d6d6; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+
+.changeStatus-confirmation:hover {
+    background-color: #40524e; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
