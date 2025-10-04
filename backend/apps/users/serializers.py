@@ -1,4 +1,7 @@
 # users/serializers.py
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
+
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from rest_framework import serializers
@@ -130,6 +133,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         return user
 
 class UserNameSerializer(serializers.ModelSerializer):
+
     """
     Para obtener el nombre del usuario.
     """
@@ -138,3 +142,22 @@ class UserNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ["name"]
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'email'
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(request=self.context.get("request"), email=email, password=password)
+
+            if not user:
+                raise serializers.ValidationError("Credenciales inválidas, verifica tu correo y contraseña.")
+        else:
+            raise serializers.ValidationError("Debes proporcionar correo y contraseña.")
+
+        data = super().validate(attrs)
+
+        return data
