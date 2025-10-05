@@ -5,10 +5,11 @@ import styles from "./purchases-sales.module.css";
 import { ArrowLeft } from "lucide-react";
 
 // Importar los componentes
-import Sidebar from "../components/Sidebar";
+
 import DataTable from "../components/DataTable";
 import RightPanel from "../components/RightPanel";
 import ModalForm from "../components/ModalForm";
+import SidebarNavAuth from "../components/SidebarNav-Auth";
 
 export default function ComprasVentasPage() {
   const [tab, setTab] = useState("compras"); // "compras" | "ventas"
@@ -46,6 +47,17 @@ export default function ComprasVentasPage() {
     "Total comprado": "$100",
   };
 
+  const graphData = {
+  clasificacion: ['Activos', 'Efectivo'],
+  name: 'Balance General',
+  dataL: [30, 70],
+  widthSend: 200,
+  heightSend: 200,
+  backgroundColor: ["#729c8775", "#729c87ff"]
+};
+
+
+
   const openModal = () => setModalOpen(true);
   const closeModal = () => {
     setModalOpen(false);
@@ -61,7 +73,7 @@ export default function ComprasVentasPage() {
   return (
     <div className={styles.pageWrapper}>
       {/* Sidebar */}
-      <Sidebar activeTab={tab} setTab={setTab} />
+      <SidebarNavAuth activeTab={tab} setTab={setTab} />
 
       {/* MAIN */}
       <main className={styles.main}>
@@ -108,7 +120,7 @@ export default function ComprasVentasPage() {
       </main>
 
       {/* Panel derecho */}
-      <RightPanel metrics={metrics} />
+      <RightPanel metrics={metrics} graphData={graphData} />
 
       {/* Modal */}
       {modalOpen && (

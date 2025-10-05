@@ -417,12 +417,17 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap: 12px;
+    gap: 60px;
     box-shadow: var(--shadow);
   }
   .metrics {
     width:100%;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* más espaciado entre cada fila de métricas */
+    margin-bottom: 3rem; /* espacio entre métricas y el gráfico */
+}
+
   .metricRow {
     display:flex;
     justify-content:space-between;
@@ -436,24 +441,10 @@
     font-weight:700;
   }
 
-  /* circular chart simulated with border */
-  .circleChart {
-    width:130px;
-    height:130px;
-    border-radius:50%;
-    background: #fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: inset 0 -6px 0 rgba(79,93,87,0.18);
-    border: 14px solid rgba(79,93,87,0.7);
-    margin-top: 6px;
-  }
-  .circleChart span{
-    font-size:26px;
-    font-weight:700;
-    color:#2b3b36;
-  }
+.graph {
+  margin-top: 7rem; /* espacio antes del gráfico */
+}
+
   .balanceLabel {
     color:#6d716d;
     margin-top:6px;
@@ -529,7 +520,8 @@ html, body {
 
 .pageWrapper {
   display: flex;
-  height: 100vh;      
+  height: 100vh;  
+
   overflow: hidden;    
 }
 
@@ -539,7 +531,8 @@ html, body {
   flex-direction: column;
   padding: 36px 60px;
   min-height: 0;       
-  overflow: hidden;    
+  overflow: hidden;   
+  margin-left: 13rem; 
 }
 
 .tableContainer {
