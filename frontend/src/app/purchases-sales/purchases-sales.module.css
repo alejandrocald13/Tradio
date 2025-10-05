@@ -264,13 +264,14 @@
     color: #465a56;
     font-weight: 700;
     text-align: center;
-    overflow-y: hidden;
+
   }
 
 
   .table[data-mode="ventas"] thead th:nth-child(3) { padding-left: 20px; }
-  .table[data-mode="ventas"] thead th:nth-child(4) { padding-left: 40px; }
-  .table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 14px; }
+  .table[data-mode="ventas"] thead th:nth-child(4) { padding-left: 20px; }
+  .table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 1px; }
+ .table[data-mode="ventas"] thead th:nth-child(6) { padding-right: 60px; }
 
   .table[data-mode="compras"] thead th:nth-child(3) {
     padding-right: 5rem; 
@@ -286,13 +287,14 @@
     padding-left: 1.5rem; 
   }
 
-  .table[data-mode="compras"] thead th:nth-child(3) {
+  .table[data-mode="compras"] thead th:nth-child(4) {
     padding-right: 5rem; 
   }
 
+
   
   .table[data-mode="compras"] tbody td:nth-child(3) {
-    padding-left: 2.5rem; 
+    padding-right: 3rem; 
   }
 
 
@@ -300,6 +302,17 @@
   .table[data-mode="ventas"] tbody td:nth-child(4) {
     padding-left: 2rem; 
   }
+  .table[data-mode="ventas"] tbody td:nth-child(1) {
+    padding-right: 2.5rem; 
+  }
+
+    .table[data-mode="ventas"] tbody td:nth-child(2) {
+    padding-right: 2rem; 
+  }
+
+
+
+
 
 
   .tableScroll {
