@@ -117,20 +117,31 @@
     flex-direction:column;
   }
 
-  /* Header */
-  .headerRow {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-  }
 
-  .title{
-    font-size:34px;
-    font-weight:700;
-    margin:0;
-    color:#2a3b36;
-  }
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Flecha a la izquierda */
+.backArrow {
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  color: #2a3b36;
+}
+.title {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  color: #2a3b36;
+}
+
 
   /* controls at header */
   .headerControls {

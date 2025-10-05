@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styles from "./purchases-sales.module.css";
+import { ArrowLeft } from "lucide-react";
 
 // Importar los componentes
 import Sidebar from "../components/Sidebar";
@@ -65,7 +66,13 @@ export default function ComprasVentasPage() {
       {/* MAIN */}
       <main className={styles.main}>
         <div className={styles.headerRow}>
+          <ArrowLeft 
+            size={28} 
+            className={styles.backArrow} 
+            onClick={() => console.log("Volver")} 
+          />
           <h1 className={styles.title}>{tab === "compras" ? "Compras" : "Ventas"}</h1>
+          <div style={{ width: 28 }} /> {/* espacio para centrar el título */}
         </div>
         <div className={styles.contenedorFiltro}>
 
