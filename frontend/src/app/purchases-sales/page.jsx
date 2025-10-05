@@ -11,6 +11,7 @@ import RightPanel from "../components/RightPanel";
 import ModalForm from "../components/ModalForm";
 import SidebarNavAuth from "../components/SidebarNav-Auth";
 
+
 export default function ComprasVentasPage() {
   const [tab, setTab] = useState("compras"); // "compras" | "ventas"
   const [modalOpen, setModalOpen] = useState(false);
@@ -116,7 +117,10 @@ export default function ComprasVentasPage() {
           </div>
 
         {/* Tabla de datos */}
-        <DataTable tab={tab} data={tab === "compras" ? compras : ventas} />
+        <DataTable 
+          mode={tab} 
+          data={tab === "compras" ? compras : ventas} 
+        />
       </main>
 
       {/* Panel derecho */}
