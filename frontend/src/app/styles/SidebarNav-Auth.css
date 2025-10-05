@@ -1,0 +1,135 @@
+.sidebar {
+  position: fixed;
+  left: 0; 
+  top: 0;
+  width: 200px;                 
+  height: 100vh;
+  padding: 28px 0 0 0;
+  background: #fff;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+}
+
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logout-item {
+  background: transparent !important;
+}
+
+.logout-item:hover {
+  background: transparent !important;
+}
+
+.logout-item .sidebar-label,
+.logout-item .sidebar-icon svg {
+  color: #4e635e;
+  stroke: #4e635e;
+}
+
+.sidebar-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  column-gap: 17px;
+  height: 50px;
+  padding: 0 14px 0 5px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  margin-left: 5px;
+}
+
+.sidebar-icon svg {
+  width: 100%;
+  height: 95%;
+  color: #7e7e7e;
+  fill: currentColor;
+  stroke: none; 
+}
+
+
+.sidebar-label {
+  font-size: 17px;
+  color: #7e7e7e;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
+.sidebar-item-leftBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: transparent;
+}
+
+.sidebar-item.is-active {
+  background-color: rgba(166, 178, 158, 0.19);
+  border-radius: 2px;           
+}
+
+.sidebar-item.is-active .sidebar-item-leftBar {
+  background-color: #4e635e;
+}
+
+.sidebar-item.is-active .sidebar-icon svg {
+  fill: #4e635e;
+  stroke: none; 
+}
+
+.sidebar-item.is-active .sidebar-label {
+  color: #4e635e;
+  font-size: large;
+}
+
+.sidebar-item:hover {
+  background: #edf3ef;
+}
+
+
+
+.sidebar.is-collapsed {
+  width: 72px;              
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.sidebar.is-collapsed .sidebar-panel { 
+  gap: 20px; 
+}
+
+.sidebar.is-collapsed .sidebar-item {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  height: 50px;
+  padding: 0;
+}
+
+.sidebar.is-collapsed .sidebar-icon { 
+  width: 30px; 
+  height: 30px; 
+  margin-left: 0; 
+}
+
+.sidebar.is-collapsed .sidebar-label { 
+  display: none !important;
+}

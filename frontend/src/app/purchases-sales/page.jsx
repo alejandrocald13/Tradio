@@ -80,7 +80,6 @@ export default function ComprasVentasPage() {
               </button>
             </div>  
 
-
             <div className={styles.switcher}>
               <button
                 className={`${styles.switchBtn} ${tab === "compras" ? styles.switchActive : ""}`}
@@ -95,8 +94,7 @@ export default function ComprasVentasPage() {
                 Ventas
               </button>
             </div>
-
-        </div>
+          </div>
 
         {/* Tabla de datos */}
         <DataTable tab={tab} data={tab === "compras" ? compras : ventas} />

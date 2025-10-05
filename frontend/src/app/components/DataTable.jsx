@@ -26,7 +26,6 @@ export default function DataTable({ tab, data }) {
               </tr>
             )}
           </thead>
-
           <tbody>
             {data.map((r, i) =>
               tab === "compras" ? (
