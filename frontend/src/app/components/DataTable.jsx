@@ -4,29 +4,28 @@ import styles from "../purchases-sales/purchases-sales.module.css";
 
 export default function DataTable({ tab, data }) {
   return (
-    <div className={styles.tableContainer }>
-      <div className={styles.tableHeader} data-mode={tab}>
-        {tab === "compras" ? (
-          <>
-            <div>Accion</div>
-            <div>Compra</div>
-            <div># Acciones</div>
-            <div>Fecha compra</div>
-          </>
-        ) : (
-          <>
-            <div>Accion</div>
-            <div>Compra</div>
-            <div>Venta</div>
-            <div>%</div>
-            <div># Acciones</div>
-            <div>Fecha venta</div>
-          </>
-        )}
-      </div>
-
+    <div className={styles.tableContainer}>
       <div className={styles.tableScroll} data-mode={tab}>
-        <table className={styles.table}>
+        <table className={styles.table} data-mode={tab}>
+          <thead>
+            {tab === "compras" ? (
+              <tr>
+                <th>Acción</th>
+                <th>Compra</th>
+                <th># Acciones</th>
+                <th>Fecha compra</th>
+              </tr>
+            ) : (
+              <tr>
+                <th>Acción</th>
+                <th>Compra</th>
+                <th>Venta</th>
+                <th>%</th>
+                <th># Acciones</th>
+                <th>Fecha venta</th>
+              </tr>
+            )}
+          </thead>
           <tbody>
             {data.map((r, i) =>
               tab === "compras" ? (
@@ -53,4 +52,3 @@ export default function DataTable({ tab, data }) {
     </div>
   );
 }
-
