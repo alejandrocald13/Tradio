@@ -1,9 +1,9 @@
+from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-import os, uuid
+import uuid
 
 def generate_report_pdf(user, from_date, to_date, data):
-    
     html_string = render_to_string("reports/report.html", {
         "user": user,
         "from_date": from_date,
@@ -13,11 +13,10 @@ def generate_report_pdf(user, from_date, to_date, data):
         "saldo": data.get("saldo", 0),
     })
 
-    filename = f"report_{user.id}_{uuid.uuid4()}.pdf"
-    filepath = os.path.join("media", "reports", filename)
+    pdf_content = HTML(string=html_string).write_pdf()
 
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
-    HTML(string=html_string).write_pdf(filepath)
-
-    return filepath
+    filename = f"report_{user.id}_{uuid.uuid4().hex[:8]}.pdf"
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
