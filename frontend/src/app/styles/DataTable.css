@@ -39,11 +39,26 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; 
 }
 
-.table td, 
-.table th {
-  border: none;
+/* Header fijo - ESTO ES CLAVE */
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table thead tr {
+  background: var(--card-bg);
+}
+
+.table th, .table td {
+  padding: 18px 12px;
+  font-size: 18px;
+  color: #252525;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
 }
 
 /* Table Head */
@@ -63,6 +78,8 @@
   color: #465a56;
   font-weight: 700;
   text-align: center;
+  /* Asegurar que el fondo sea sólido */
+  background: var(--card-bg);
 }
 
 /* Columns alignment */
@@ -105,10 +122,10 @@
   pointer-events: none;
 }
 
-
 .table[data-mode="compras"] tbody tr {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
+
 .table[data-mode="ventas"] tbody td:nth-child(1) {
   padding-right: 3.5rem;
 }
