@@ -136,7 +136,7 @@ class MeView(APIView):
         responses=UserDetailSerializer,
         tags=["users"],
         summary="Actualizar perfil propio",
-        description="Admite cambios en email (User) y campos de profile (p. ej. name, age, state_id).",
+        description="Admite cambios en email (User) y campos de profile (p. ej. name, birth_date, state_id).",
     )
 
     def patch(self, request):

@@ -9,18 +9,20 @@ from apps.users.models import Profile, ProfileState
 from apps.users.utils import assign_unique_referral_code
 from django.utils.timezone import localtime
 
+from datetime import date
+
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only=True)
-    age = serializers.IntegerField(write_only=True)
+    birth_date = serializers.DateField(write_only=True)
     address = serializers.CharField(write_only=True)
     cellphone = serializers.CharField(write_only=True)
     dpi = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ["email", "password", "name", "age", "address", "cellphone", "dpi"]
+        fields = ["email", "password", "name", "birth_date", "address", "cellphone", "dpi"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def validate_dpi(self, value):
@@ -38,10 +40,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Ya existe un usuario con este correo electrónico.")
         
         return value
+    
+    def validate_birth_date(self, value):
+        """Evita registrar menores de edad"""
+        today = date.today()
+        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+        
+        if age < 18:
+            raise serializers.ValidationError("Menores de edad no están permitidos para registrarse.")
+        
+        return value
 
     def create(self, validated_data):
         name = validated_data.pop("name")
-        age = validated_data.pop("age")
+        birth_date = validated_data.pop("birth_date")
         address = validated_data.pop("address")
         cellphone = validated_data.pop("cellphone")
         dpi = validated_data.pop("dpi")
@@ -62,7 +74,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile = Profile.objects.create(
             user=user,
             name=name,
-            age=age,
+            birth_date=birth_date,
             address=address,
             cellphone=cellphone,
             dpi=dpi,
@@ -90,21 +102,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["age", "name", "state", "state_id"]
+        fields = ["birth_date", "name", "state", "state_id"]
         read_only_fields = ["deleted_at"]
 
 
 class UserListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(source="profile.name", read_only=True)
-    age = serializers.IntegerField(source="profile.age", read_only=True)
+    birth_date = serializers.DateField(source="profile.birth_date", read_only=True)
 
     date = serializers.SerializerMethodField()
     enable = serializers.BooleanField(source="is_active", read_only=True)
 
     class Meta:
         model = User
-        fields = ["id","name", "email", "age", "date", "enable"]
+        fields = ["id","name", "email", "birth_date", "date", "enable"]
 
     def get_date(self, obj):
         dt = localtime(obj.date_joined)  # usa tu TZ si USE_TZ=True
