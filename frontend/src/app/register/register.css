@@ -5,16 +5,18 @@
   justify-content: center;
   align-items: center;
   font-family: Arial, sans-serif;
+  padding: 20px; /* margen interno en pantallas pequeñas */
 }
 
 .container {
   display: flex;
-  width: 70%;   /* ligeramente más pequeño */
+  width: 75%;
   height: 90%;
   background: #fff;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0px 12px 30px rgba(0,0,0,0.25);
+  box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
 }
 
 /* Lado izquierdo */
@@ -41,44 +43,60 @@
 
 /* Lado derecho */
 .right {
-  flex: 1.2; /* un poco más angosto */
+  flex: 1.4;
   background: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px;
+  padding: 40px 50px;
 }
 
 .title {
   color: #4d5d58;
-  margin-bottom: 25px;
-  font-size: 28px;
+  margin-bottom: 20px;
+  font-size: 30px;
   text-align: center;
 }
 
+/* Formulario */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 18px; /* menos separación */
   width: 95%;
   margin: 0 auto;
 }
 
+.section {
+  background: #fafafa;
+  border-radius: 15px;
+  padding: 25px 30px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  color: #4d5d58;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* Inputs */
 .inputGroup {
   display: flex;
   align-items: center;
   background: #f1f1f1;
   border-radius: 25px;
-  padding: 12px 18px; /* más compacto */
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  padding: 12px 18px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   width: 100%;
-  min-height: 44px; 
+  margin-bottom: 14px;
 }
 
 .icon {
   margin-right: 12px;
   font-size: 18px;
-  color: #777; /* gris más claro */
+  color: #777;
 }
 
 .inputGroup input {
@@ -90,33 +108,192 @@
   color: #000;
 }
 
-/* Botón */
+/* Botones */
 .buttonWrapper {
   display: flex;
-  justify-content: center; /* ahora centrado */
-  margin-top: 20px; /* un poco más de espacio arriba */
+  justify-content: center;
+  margin-top: 15px;
 }
 
+.stepsButtons {
+  justify-content: space-between;
+}
 
 .btn {
   background: #4d5d58;
   color: white;
-  padding: 10px 28px;
+  padding: 10px 30px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   font-size: 16px;
-  box-shadow: 0px 4px 8px rgba(0,0,0,0.25);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease-in-out;
 }
 
 .btn:hover {
   background: #3b4844;
   transform: scale(1.05);
-  box-shadow: 0px 6px 12px rgba(0,0,0,0.3);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .btn:active {
   transform: scale(0.95);
-  box-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.backBtn {
+  background: #ccc;
+  color: #333;
+}
+
+.backBtn:hover {
+  background: #bbb;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .container {
+    width: 90%;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+    border-radius: 15px;
+  }
+
+  .left {
+    flex: none;
+    width: 100%;
+    padding: 30px 0;
+  }
+
+  .logo {
+    width: 130px;
+  }
+
+  .pageName {
+    font-size: 22px;
+  }
+
+  .right {
+    flex: none;
+    width: 100%;
+    padding: 25px 20px 40px;
+  }
+
+  .section {
+    padding: 20px;
+  }
+
+  .inputGroup {
+    padding: 10px 14px;
+  }
+
+  .btn {
+    font-size: 15px;
+    padding: 10px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .background {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+  }
+
+  .inputGroup {
+    flex-direction: row;
+  }
+
+  .icon {
+    font-size: 16px;
+  }
+
+  .inputGroup input {
+    font-size: 14px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 8px 22px;
+  }
+}
+/* --- Barra de progreso --- */
+.progressContainer {
+  margin-bottom: 25px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #4d5d58;
+  width: 50%;
+  transition: width 0.4s ease;
+}
+
+.progressSteps {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #777;
+  font-weight: 500;
+}
+
+.activeStep {
+  color: #4d5d58;
+  font-weight: bold;
+}
+
+/* Ícono de mostrar/ocultar contraseña */
+.passwordGroup {
+  position: relative;
+}
+
+.toggleIcon {
+  position: absolute;
+  right: 18px;
+  color: #777;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.2s;
+}
+
+.toggleIcon:hover {
+  color: #333;
 }
