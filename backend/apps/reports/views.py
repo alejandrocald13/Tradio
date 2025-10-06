@@ -9,10 +9,7 @@ from drf_spectacular.types import OpenApiTypes
 from apps.users.utils import log_action
 from apps.users.actions import Action
 
-# models
-# portafolio
-from apps.portfolio.models import Portfolio
-
+from apps.reports.reports import get_financial_report_data
 
 class ReportesEstadoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -49,6 +46,7 @@ class ReportesEstadoView(APIView):
             401: OpenApiResponse(description="No autenticado."),
         },
     )
+
     def post(self, request):
         user = request.user
         from_date = request.data.get("from")
@@ -56,9 +54,9 @@ class ReportesEstadoView(APIView):
 
         validate_dates(from_date, to_date)
 
+        pdf_data = get_financial_report_data(user, from_date, to_date)
 
-
-        response = generate_report_pdf(user, from_date, to_date, data)
+        response = generate_report_pdf(user, from_date, to_date, pdf_data)
 
         log_action(request, user, Action.REPORTS_REQUESTED)
 
