@@ -8,22 +8,25 @@ from rest_framework import status
 from apps.users.models import ProfileState, Profile
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.serializers import RegisterSerializer
+
+# no-repudio
 from apps.users.utils import log_action
 from apps.users.actions import Action
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 
-from apps.users.permissions import IsUser, IsAdmin, IsOwnerOrAdmin
+from apps.users.permissions import IsUser, IsAdmin
 from apps.users.utils_perms import assert_owner_or_admin
 from apps.users.serializers import UserListSerializer, UserDetailSerializer, UserNameSerializer, EmailTokenObtainPairSerializer
 
 User = get_user_model()
 from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
 from rest_framework import serializers
+
+from rest_framework_simplejwt.tokens import AccessToken
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -38,6 +41,7 @@ class RegisterView(APIView):
         tags=["auth"],
         summary="Registro de usuario",
     )
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
 
@@ -45,6 +49,11 @@ class RegisterView(APIView):
             user = serializer.save()
 
             log_action(request, user, Action.AUTH_REGISTER_REQUESTED)
+
+            # send_email(pending_authorization.html) al usuario recién registrado
+
+            # send_email(admin_new_user.html) a todos los admins
+
 
             return Response(
                 {
@@ -98,25 +107,24 @@ class LoggedTokenRefreshView(TokenRefreshView):
         return response
 
 class LogoutView(APIView):
-    """
-    Enviar en el cuerpo: {"refresh": "REFRESH_TOKEN"}.
-    """
     permission_classes = [IsUser]
 
     @extend_schema(
         request=serializers.Serializer,
         responses={204: OpenApiResponse(description="Logout ok")},
         tags=["auth"],
-        summary="Logout (blacklist opcional del refresh)",
+        summary="Logout del usuario",
     )
     def post(self, request):
-        refresh = request.data.get("refresh")
-        if refresh:
-            try:
-                token = RefreshToken(refresh)
-            except Exception:
-                pass
-        log_action(request, request.user, Action.AUTH_LOGOUT)
+        token_str = request.auth
+
+        try:
+            token = AccessToken(token_str)
+            token.blacklist()
+            log_action(request, request.user, Action.AUTH_LOGOUT)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class MeView(APIView):
