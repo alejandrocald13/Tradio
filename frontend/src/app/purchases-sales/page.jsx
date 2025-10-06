@@ -42,16 +42,15 @@ export default function ComprasVentasPage() {
   ];
 
   const metrics = {
-    Ganancias: "$100",
-    Perdidas: "$100",
-    "Total vendido": "$100",
+    "Total vendido": "$110",
     "Total comprado": "$100",
+    "Balance General": "$10",
   };
 
   const graphData = {
-  clasificacion: ['Activos', 'Efectivo'],
-  name: 'Balance General',
-  dataL: [30, 70],
+  clasificacion: ['Compra', 'Venta'],
+  name: 'Compras/Ventas',
+  dataL: [100, 110],
   widthSend: 200,
   heightSend: 200,
   backgroundColor: ["#729c8775", "#729c87ff"]
