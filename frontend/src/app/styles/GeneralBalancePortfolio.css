@@ -1,6 +1,9 @@
 .card-info-container-portafolio {
-    display: flex;
-    width: 100%;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 15px;
 }
 
 .graph {
@@ -12,7 +15,6 @@
 
 .more-Info-portafolio {
   display: flex;
-  width: 100%;
   flex-direction: column;
   justify-content: center;
   gap: 12px;
