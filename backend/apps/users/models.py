@@ -26,7 +26,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=150)
     referral_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-    age = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(120)], default=0)
+    birth_date = models.DateField(blank=False, default=None, null=True)
     address = models.CharField(max_length=100, default='', blank=False)
     cellphone = models.CharField(max_length=20, default='', blank=False)
     dpi = models.CharField(max_length=20, default='', blank=False, unique=True)
