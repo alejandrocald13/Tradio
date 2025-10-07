@@ -16,11 +16,12 @@ export default function RightPanel({ metrics, graphData }) {
         ))}
       </div>
       
-       <DoughnutGraph graphData={graphData} className={styles.graph} />
-
-
-      {/* Etiqueta abajo */}
-      <div className={styles.balanceLabel}>Balance General</div>
+       <div className={styles.graphContainer}>
+        <DoughnutGraph graphData={graphData} className={styles.graph} />
+        
+        {/* Etiqueta abajo */}
+        <div className={styles.balanceLabel}>Balance General</div>
+      </div>
     </aside>
   );
 }

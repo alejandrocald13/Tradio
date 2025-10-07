@@ -234,10 +234,21 @@
     padding: 20px;
     display:flex;
     flex-direction:column;
+    justify-content: space-between;
     align-items:center;
-    gap: 90px;
+    min-height: 400px; 
     box-shadow: var(--shadow);
   }
+  
+.graphContainer {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; 
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
   .metrics {
     width:100%;
     display: flex;
@@ -259,15 +270,15 @@
     font-weight:700;
   }
 
-.graph {
-  margin-top: 7rem; /* espacio antes del gráfico */
-}
 
-  .balanceLabel {
-    color:#6d716d;
-    margin-top:6px;
-    font-weight:600;
-  }
+
+.balanceLabel {
+  color: #6d716d;
+  font-weight: 600;
+  margin-top: 1rem; 
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem; 
+}
 
   /* MODAL */
   .modalOverlay{
