@@ -47,6 +47,7 @@ export default function ActionsManage() {
     const [filteredActions, setFilteredActions] = useState(ACTIONS_MOCK);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionPending, setActionPending] = useState(null);
+    const [actionPendingName, setActionPendingName] = useState("");
 
     useEffect(() => {
     if (activeId === "all") {
@@ -67,7 +68,11 @@ export default function ActionsManage() {
     };
 
     const handleSwitchAttempt = ({ id, value }) => {
+        const foundAction = actions.find((a) => a.id === id);
+
         setActionPending({ id, value });
+        setActionPendingName(foundAction ? foundAction.name : "Acción desconocida");
+
         setIsModalOpen(true);
     };
 
@@ -115,7 +120,19 @@ export default function ActionsManage() {
                         </ActionAdminCard>
                         ))
                     ) : (
-                        <p>No hay acciones en esta categoría.</p>
+                        <div className="no-actions">
+                            <svg
+                                className="no-actions-icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 1024 1024"
+                            >
+                                <path d="M888 792H200V168c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v688c0 4.4 3.6 8 8 
+                                8h752c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM305.8 637.7c3.1 3.1 8.1 3.1 11.3 0l138.3-137.6L583 628.5c3.1 3.1 8.2 3.1 11.3 
+                                0l275.4-275.3c3.1-3.1 3.1-8.2 0-11.3l-39.6-39.6a8.03 8.03 0 0 0-11.3 0l-230 229.9L461.4 404a8.03 8.03 0 0 0-11.3 0L266.3 
+                                586.7a8.03 8.03 0 0 0 0 11.3l39.5 39.7z" />
+                            </svg>
+                            <p>No hay acciones en esta categoría.</p>
+                        </div>
                     )}
                 </div>
 
@@ -129,11 +146,12 @@ export default function ActionsManage() {
         >
             <p>
                 ¿Seguro que deseas{" "}
-                {actionPending?.value ? "habilitar" : "deshabilitar"} esta acción?
+                {actionPending?.value ? "habilitar" : "deshabilitar"} {" "}
+                la acción <strong>{actionPendingName}</strong>?
             </p>
-            <div>
-                <button onClick={handleSwitchChange}>Confirmar</button>
-                <button onClick={cancelSwitchChange}>Cancelar</button>
+            <div className="buttons-modal">
+                <button className="primary-btn" onClick={handleSwitchChange}>Confirmar</button>
+                <button className="cancel-btn" onClick={cancelSwitchChange}>Cancelar</button>
             </div>
         </Modal>
         </>
