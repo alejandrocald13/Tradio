@@ -1,9 +1,10 @@
 .page-container {
-    position: relative;
-    min-height: 100dvh;
-    background: #f5f5f5;
     display: flex;
     flex-direction: row;
+    position: relative;
+    height: 100dvh; 
+    background: #f5f5f5;
+    overflow: hidden; 
 }
 
 .div-category {
@@ -22,8 +23,10 @@
     /* justify-content: space-between; */
     border-left: 2px solid #4e635e;
     align-items: center;
-    align-self: center;
+    align-self: flex-start;
     text-align: center;
+    position: sticky;
+    top: 0;
 }
 
 .div-category h2 {
@@ -99,4 +102,19 @@
 .capsule-number-active {
     background: #a6b29e;              
     color: #fff;
+}
+
+.actions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    overflow-y: auto; 
+}
+
+.action-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
 }
