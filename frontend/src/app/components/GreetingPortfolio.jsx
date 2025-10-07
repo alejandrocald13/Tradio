@@ -11,8 +11,8 @@ export default function GreetingPortafolio(){
         <>
             <div className="greeting-main-container-portafolio">
                 <div className="greeting-container-portafolio">
-                    <h1 className="welcome-message-portafolio">Hola {name}!!</h1>
-                    <p className="message-portafolio">Veamos cómo crece tu portafolio hoy.</p>
+                    <h1 className="welcome-message-portafolio">Hi {name}!!</h1>
+                    <p className="message-portafolio">Let’s see how your portfolio is growing today.</p>
                 </div>
                 <div className="image-container-portafolio"> 
                 </div>
