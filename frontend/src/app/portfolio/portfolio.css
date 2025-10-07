@@ -48,8 +48,70 @@
     flex-wrap: wrap;
 }
 
+
+/* Aqui empieza componente donde estan las acciones*/
 .vertical-container-actions-portafolio{
     position: fixed;
+}
+
+.aux-conteiner-p{
+    border-left: 1px solid rgba(107, 119, 111, .224);
+    flex-direction: column;
+    align-items: center;
+    min-width: 250px;
+    margin: 20px auto;
+    display: flex
+}
+
+.btn-container{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.btn-container a{
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 200px;
+    gap: 10px;
+    margin: 30px 0 0 0;
+    background-color: #e0e3de;
+    border: none;
+    bottom: 1px 0 1px 0 #40524e;
+    color: #40524e;
+    cursor: pointer;
+    width: 100%;
+    max-height: 48.8px;
+}
+
+
+.btn-get-date-email-portfolio {
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 200px;
+    gap: 10px;
+    margin: 30px 0 0 0;
+    background-color: #e0e3de;
+    border: none;
+    color: #40524e;
+    cursor: pointer;
+    width: 100%;
+}
+
+
+
+.btn-get-date-email-portfolio .btn-title {
+    font-size: 14px;
+    color: #4e635e;
+    margin: 0;
 }
 
 .inputs-date-portfolio{
@@ -64,18 +126,24 @@
 .date-inputs-portfolio{
     display:flex;
     align-items:center;
+    justify-content: center;
     gap:8px;
     width: 200px;
-    background: #ffffff;
+    min-height: 30px;
+    background-color: transparent;
     padding:8px 10px;
     border-radius:8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
 .vertical-container-actions-portafolio input {
     border:none;
     outline:none;
     font-size:14px;
+    background-color: transparent;
+}
+
+.date-inputs-portfolio p{
+    
 }
 
 .vertical-container-actions-portafolio .date-inputs-portfolio p{
@@ -83,51 +151,6 @@
     color: #6b776f;
 }
 
-.algo {
-    display: flex;
-    width: 100%;
-}
-.btn-get-date-email-portfolio {
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 200px;
-    gap: 10px;
-    box-shadow: 0 2px 6px #40524e31;
-    margin: 30px 0 0 20px;
-    border: none;
-    color: #40524e;
-    cursor: pointer;
-    width: 100%;
-    background-color: #f0f0f0;
-}
-
-.btn-get-date-email-portfolio .btn-title {
-    font-size: 14px;
-    color: #4e635e;
-    margin: 0;
-}
-
-
-.algo a{
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 200px;
-    gap: 10px;
-    box-shadow: 0 2px 6px #40524e31;
-    margin: 30px 0 0 20px;
-    border: none;
-    color: #40524e;
-    cursor: pointer;
-    width: 100%;
-    background-color: #f0f0f0;
-    max-height: 48.8px;
-}
 
 
 .getPDF{
@@ -195,14 +218,4 @@
     color: #40524e;
     height: 40px;
     cursor: pointer;
-}
-
-.aux-conteiner-p{
-    border-left: 1px solid rgba(107, 119, 111, .224);
-    flex-direction: column;
-    align-items: center;
-    min-width: 250px;
-    margin: 20px auto;
-    display: flex
-
 }
