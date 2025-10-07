@@ -1,51 +1,41 @@
 "use client";
 
-import styles from "../purchases-sales/purchases-sales.module.css";
+import "../styles/DataTable.css";
 
-export default function DataTable({ tab, data }) {
+export default function DataTable({ mode, data, columns, colKeys }) {
+  // columnas por defecto
+  const defaultColumns = {
+    compras: ["Acción", "Compra", "# Acciones", "Fecha compra"],
+    ventas: ["Acción", "Compra", "Venta", "%", "# Acciones", "Fecha venta"],
+  };
+
+  const defaultColKeys = {
+    compras: ["accion", "compra", "cantidad", "fecha"],
+    ventas: ["accion", "compra", "venta", "pct", "cantidad", "fecha"],
+  };
+
+  const cols = columns || defaultColumns[mode] || Object.keys(data[0] || {});
+  const keys = colKeys || defaultColKeys[mode] || cols.map(c => c.toLowerCase());
+
   return (
-    <div className={styles.tableContainer}>
-      <div className={styles.tableScroll} data-mode={tab}>
-        <table className={styles.table} data-mode={tab}>
+    <div className="tableContainer">
+      <div className="tableScroll" data-mode={mode}>
+        <table className="table" data-mode={mode}>
           <thead>
-            {tab === "compras" ? (
-              <tr>
-                <th>Acción</th>
-                <th>Compra</th>
-                <th># Acciones</th>
-                <th>Fecha compra</th>
-              </tr>
-            ) : (
-              <tr>
-                <th>Acción</th>
-                <th>Compra</th>
-                <th>Venta</th>
-                <th>%</th>
-                <th># Acciones</th>
-                <th>Fecha venta</th>
-              </tr>
-            )}
+            <tr>
+              {cols.map((c, i) => (
+                <th key={i}>{c}</th>
+              ))}
+            </tr>
           </thead>
           <tbody>
-            {data.map((r, i) =>
-              tab === "compras" ? (
-                <tr key={i}>
-                  <td>{r.accion}</td>
-                  <td>{r.compra}</td>
-                  <td>{r.cantidad}</td>
-                  <td>{r.fecha}</td>
-                </tr>
-              ) : (
-                <tr key={i}>
-                  <td>{r.accion}</td>
-                  <td>{r.compra}</td>
-                  <td>{r.venta}</td>
-                  <td>{r.pct}</td>
-                  <td>{r.cantidad}</td>
-                  <td>{r.fecha}</td>
-                </tr>
-              )
-            )}
+            {data.map((row, i) => (
+              <tr key={i}>
+                {keys.map((k, j) => (
+                  <td key={j}>{row[k] !== undefined ? row[k] : ""}</td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

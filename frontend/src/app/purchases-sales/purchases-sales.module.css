@@ -117,20 +117,31 @@
     flex-direction:column;
   }
 
-  /* Header */
-  .headerRow {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-  }
 
-  .title{
-    font-size:34px;
-    font-weight:700;
-    margin:0;
-    color:#2a3b36;
-  }
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Flecha a la izquierda */
+.backArrow {
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  color: #2a3b36;
+}
+.title {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  color: #2a3b36;
+}
+
 
   /* controls at header */
   .headerControls {
@@ -214,175 +225,6 @@
     box-shadow: 0 4px 10px rgba(63,94,86,0.12);
   }
 
-
-  /* TABLE area */
-  .tableContainer {
-    padding: 20px;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  /* Table Head */
-  .table thead tr {
-    display: grid;
-    gap: 1rem;
-    align-items: center;
-    background: var(--card-bg);
-    font-weight: bold;
-    color: #465a56;
-    border-bottom: 3px solid rgba(63,94,86,0.12);
-    padding: 12px 0;
-    
-  }
-
-  /* Columns alignment */
-  .table[data-mode="ventas"] thead tr,
-  .table[data-mode="ventas"] tbody tr {
-    grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
-    
-  }
-
-  .table[data-mode="compras"] thead tr,
-  .table[data-mode="compras"] tbody tr {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-
-  /* Th spacing */
-  .table thead th {
-    padding: 20px;
-    color: #465a56;
-    font-weight: 700;
-    text-align: center;
-    overflow-y: hidden;
-  }
-
-
-  .table[data-mode="ventas"] thead th:nth-child(3) { padding-left: 20px; }
-  .table[data-mode="ventas"] thead th:nth-child(4) { padding-left: 40px; }
-  .table[data-mode="ventas"] thead th:nth-child(5) { padding-left: 14px; }
-
-  .table[data-mode="compras"] thead th:nth-child(3) {
-    padding-right: 5rem; 
-  }
-
-  
-  .table[data-mode="compras"] thead th:nth-child(1) {
-    padding-left: 1.5rem; 
-  }
-
-  
-  .table[data-mode="ventas  "] thead th:nth-child(1) {
-    padding-left: 1.5rem; 
-  }
-
-  .table[data-mode="compras"] thead th:nth-child(3) {
-    padding-right: 5rem; 
-  }
-
-  
-  .table[data-mode="compras"] tbody td:nth-child(3) {
-    padding-left: 2.5rem; 
-  }
-
-
-
-  .table[data-mode="ventas"] tbody td:nth-child(4) {
-    padding-left: 2rem; 
-  }
-
-
-  .tableScroll {
-    max-height: 500px; 
-    
-    overflow-y: auto;
-    padding-right: 8px;
-    margin-top: 12px;
-    background: var(--card-bg);
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(18,24,28,0.04);
-  }
-
-  .tableScroll::-webkit-scrollbar {
-    width: 10px;
-  }
-  .tableScroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .tableScroll::-webkit-scrollbar-thumb {
-    background: rgba(120,130,125,0.35);
-    border-radius: 8px;
-    border: 2px solid rgba(255,255,255,0.6);
-  }
-  /* firefox */
-  .tableScroll {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(120,130,125,0.35) transparent;
-  }
-
-  .tableScroll table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .tableScroll td {
-    padding: 0.5rem;
-    border-bottom: 1px solid #eee;
-  }
-
-
-
-
-
-
-
-
-  /* table rows */
-  .table {
-    width:100%;
-    border-collapse: collapse;
-  }
-  .table td, 
-  .table th {
-    border: none;
-  }
-
-
-  .table tbody tr {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    gap:6px;
-    align-items:center;
-    position: relative;
-    padding: 18px;
-    list-style: none;
-    border-bottom: 1px solid rgba(0,0,0,0.03);
-    text-align: center;
-  }
-  .table tbody tr td {
-    padding: 18px 12px;
-    font-size: 18px;
-    color: #252525;
-  }
-
-  .table tbody tr::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 0.1px;          
-    background: #d0d0d0;     /* color */
-    pointer-events: none;
-  }
-
-  .table tbody tr td:nth-child(n+5) { text-align:center; }
-
-  /* For compras rows adjust grid columns to 4 */
-  .table[data-mode="compras"] tbody tr {
-    
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-
   /* RIGHT panel */
   .rightPanel {
     width: 260px;
@@ -392,13 +234,29 @@
     padding: 20px;
     display:flex;
     flex-direction:column;
+    justify-content: space-between;
     align-items:center;
-    gap: 12px;
+    min-height: 400px; 
     box-shadow: var(--shadow);
   }
+  
+.graphContainer {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; 
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
   .metrics {
     width:100%;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* más espaciado entre cada fila de métricas */
+    margin-bottom: 3rem; /* espacio entre métricas y el gráfico */
+}
+
   .metricRow {
     display:flex;
     justify-content:space-between;
@@ -412,29 +270,15 @@
     font-weight:700;
   }
 
-  /* circular chart simulated with border */
-  .circleChart {
-    width:130px;
-    height:130px;
-    border-radius:50%;
-    background: #fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: inset 0 -6px 0 rgba(79,93,87,0.18);
-    border: 14px solid rgba(79,93,87,0.7);
-    margin-top: 6px;
-  }
-  .circleChart span{
-    font-size:26px;
-    font-weight:700;
-    color:#2b3b36;
-  }
-  .balanceLabel {
-    color:#6d716d;
-    margin-top:6px;
-    font-weight:600;
-  }
+
+
+.balanceLabel {
+  color: #6d716d;
+  font-weight: 600;
+  margin-top: 1rem; 
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem; 
+}
 
   /* MODAL */
   .modalOverlay{
@@ -505,7 +349,8 @@ html, body {
 
 .pageWrapper {
   display: flex;
-  height: 100vh;      
+  height: 100vh;  
+
   overflow: hidden;    
 }
 
@@ -515,46 +360,8 @@ html, body {
   flex-direction: column;
   padding: 36px 60px;
   min-height: 0;       
-  overflow: hidden;    
+  overflow: hidden;   
+  margin-left: 13rem; 
 }
 
-.tableContainer {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;      
-}
-
-.tableScroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: hidden;    
-  max-height: none;   
-}
-
-.table thead {
-  display: block;
-}
-
-.table tbody {
-  display: block;
-  max-height: 420px;  
-  overflow-y: auto;
-}
-
-.table thead tr,
-.table tbody tr {
-  display: grid;
-  gap: 1rem;
-}
-
-.table[data-mode="ventas"] thead tr,
-.table[data-mode="ventas"] tbody tr {
-  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
-}
-
-.table[data-mode="compras"] thead tr,
-.table[data-mode="compras"] tbody tr {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-}
 
