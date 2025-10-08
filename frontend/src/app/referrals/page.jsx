@@ -30,29 +30,14 @@ export default function ReferralsPage() {
 
       {/* MAIN */}
       <main className={styles.main}>
-        <div className={styles.headerRow}>
-          <h1 className={styles.title}>Codigo de referidos</h1>
-
-          <div className={styles.illustration}>
-            <img
-              src="/Gift.png"
-              alt="Ilustración"
-              className={styles.illustrationImg}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          </div>
+        <div className={styles.container}>
+          <div className={styles.headerRow}>
+            <h1 className={styles.title}>Codigo de referidos</h1>
         </div>
 
         <p className={styles.description}>
-          El sistema de códigos de referido ha sido creado para que invitar a amigos o clientes 
-          sea sencillo y beneficioso para todos. Al compartir tu código único, las personas que 
-          se registren con él recibirán automáticamente $5 de regalo en su cuenta al crearla, 
-          lo que les permitirá comenzar a disfrutar de nuestros servicios con una ventaja inicial. 
-          Al mismo tiempo, tú también recibirás beneficios especiales por cada referido que utilice 
-          tu código, lo que convierte cada invitación en una oportunidad de ganar más. 
-        </p>
+          Invita a tus amigos a unirse y ganas. <br />
+          Cada persona que se registre con tu código hará que recibas <strong>$5 de regalo.</strong></p>
 
         <section className={styles.cards}>
           
@@ -62,7 +47,7 @@ export default function ReferralsPage() {
                 className={styles.generateBtn}
                 onClick={handleGenerateCode}
               >
-                Generar código
+                Mostrar código
               </button>
             </div>
 
@@ -97,8 +82,11 @@ export default function ReferralsPage() {
               </div>
             </div>
           </div>
+          
         </section>
-      </main>
     </div>
+  </main>
+  </div>
   );
 }
+
