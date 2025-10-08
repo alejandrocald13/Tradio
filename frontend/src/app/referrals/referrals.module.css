@@ -24,6 +24,7 @@
   align-items: center; /* centra el contenido horizontalmente */
   justify-content: flex-start;
   z-index: 1;
+  margin-left: 13rem;
 }
 
 .main::before {
@@ -68,10 +69,7 @@
   border-radius: 2px;
 }
 
-.sidebar {
-  width: 240px;
-  flex-shrink: 0; 
-}
+
 
 
 
@@ -263,7 +261,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   padding: 50px 60px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 40px auto; /* centra el contenedor */
   display: flex;
   flex-direction: column;
