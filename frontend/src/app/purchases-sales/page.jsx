@@ -115,10 +115,29 @@ export default function ComprasVentasPage() {
           </div>
 
         {/* Tabla de datos */}
-        <DataTable 
+        <DataTable
           mode={tab} 
-          data={tab === "compras" ? compras : ventas} 
+          data={tab === "compras" ? compras : ventas}
+          columns={
+            tab === "compras"
+              ? [
+                  { key: "accion", label: "Acción" },
+                  { key: "compra", label: "Compra" },
+                  { key: "cantidad", label: "# Acciones" },
+                  { key: "fecha", label: "Fecha compra" },
+                ]
+              : [
+                  { key: "accion", label: "Acción" },
+                  { key: "compra", label: "Compra" },
+                  { key: "venta", label: "Venta" },
+                  { key: "pct", label: "%" },
+                  { key: "cantidad", label: "# Acciones" },
+                  { key: "fecha", label: "Fecha venta" },
+                ]
+          }
         />
+
+
       </main>
 
       {/* Panel derecho */}

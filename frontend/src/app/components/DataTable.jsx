@@ -2,20 +2,15 @@
 
 import "../styles/DataTable.css";
 
-export default function DataTable({ mode, data, columns, colKeys }) {
-  // columnas por defecto
-  const defaultColumns = {
-    compras: ["Acción", "Compra", "# Acciones", "Fecha compra"],
-    ventas: ["Acción", "Compra", "Venta", "%", "# Acciones", "Fecha venta"],
-  };
+export default function DataTable({ mode, data = [], columns = [] }) {
+  if (!data.length && !columns.length) {
+    return <p>No hay datos para mostrar</p>;
+  }
 
-  const defaultColKeys = {
-    compras: ["accion", "compra", "cantidad", "fecha"],
-    ventas: ["accion", "compra", "venta", "pct", "cantidad", "fecha"],
-  };
-
-  const cols = columns || defaultColumns[mode] || Object.keys(data[0] || {});
-  const keys = colKeys || defaultColKeys[mode] || cols.map(c => c.toLowerCase());
+  // Si no se pasan columnas, usamos las keys del primer objeto
+  const cols = columns.length
+    ? columns
+    : Object.keys(data[0]).map((k) => ({ key: k, label: k }));
 
   return (
     <div className="tableContainer">
@@ -24,15 +19,15 @@ export default function DataTable({ mode, data, columns, colKeys }) {
           <thead>
             <tr>
               {cols.map((c, i) => (
-                <th key={i}>{c}</th>
+                <th key={i}>{c.label || c.key}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {data.map((row, i) => (
               <tr key={i}>
-                {keys.map((k, j) => (
-                  <td key={j}>{row[k] !== undefined ? row[k] : ""}</td>
+                {cols.map((c, j) => (
+                  <td key={j}>{row[c.key] ?? ""}</td>
                 ))}
               </tr>
             ))}
