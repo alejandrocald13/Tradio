@@ -8,6 +8,7 @@
     table-layout: fixed;
 }
 
+
 .table-TA thead th {
     position: sticky;
     top: 0;
@@ -23,7 +24,9 @@
     text-align: center;
     background-color: #fcfcfc;
     color: #797878;
+    height: 60px;
 }
+
 
 .table-TA tbody tr:hover {
     border-bottom: 1px solid #40524e;
