@@ -23,9 +23,6 @@
 .tableScroll::-webkit-scrollbar {
   width: 10px;
 }
-.tableScroll::-webkit-scrollbar-track {
-  background: transparent;
-}
 .tableScroll::-webkit-scrollbar-thumb {
   background: rgba(120,130,125,0.35);
   border-radius: 8px;
@@ -39,77 +36,67 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; 
+  table-layout: fixed;
 }
 
-/* Header fijo - ESTO ES CLAVE */
+/* Header fijo */
 .table thead {
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.table thead tr {
-  background: var(--card-bg);
-}
-
-.table th, .table td {
-  padding: 18px 12px;
-  font-size: 18px;
-  color: #252525;
+/* === CENTRADO TOTAL === */
+.table th,
+.table td {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  border-bottom: 1px solid rgba(0,0,0,0.03);
+  padding: 16px 10px;
+  font-size: 17px;
+  color: #252525;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Table Head */
+/* === CABECERA === */
 .table thead tr {
   display: grid;
-  gap: 1rem;
   align-items: center;
+  justify-items: center;
+  gap: 1rem;
   background: var(--card-bg);
   font-weight: bold;
   color: #465a56;
   border-bottom: 3px solid rgba(63,94,86,0.12);
-  padding: 12px 0;
+  padding: 10px 0;
+  grid-template-columns: var(--cols);
 }
 
 .table thead th {
-  padding: 20px;
-  color: #465a56;
-  font-weight: 700;
-  text-align: center;
-  /* Asegurar que el fondo sea sólido */
   background: var(--card-bg);
+  font-weight: 700;
 }
 
-/* Columns alignment */
-.table[data-mode="ventas"] thead tr,
-.table[data-mode="ventas"] tbody tr {
-  grid-template-columns: 1fr 1fr 0.8fr 1fr 1fr 1fr;
-}
 
-.table[data-mode="compras"] thead tr,
-.table[data-mode="compras"] tbody tr {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-}
-
-/* Table Body */
 .table tbody tr {
   display: grid;
-  gap: 6px;
   align-items: center;
+  justify-items: center;
+  gap: 6px;
   position: relative;
-  padding: 18px;
+  padding: 10px 0;
   list-style: none;
   border-bottom: 1px solid rgba(0,0,0,0.03);
   text-align: center;
+  grid-template-columns: var(--cols);
 }
 
 .table tbody tr td {
-  padding: 18px 12px;
-  font-size: 18px;
-  color: #252525;
+  background: transparent;
+  font-size: 16px;
 }
+
 
 .table tbody tr::after {
   content: "";
@@ -117,40 +104,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 0.1px;          
-  background: #d0d0d0;
+  height: 0.5px;
+  background: rgba(0, 0, 0, 0.05);
   pointer-events: none;
 }
 
-.table[data-mode="compras"] tbody tr {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-}
-
-.table[data-mode="ventas"] tbody td:nth-child(1) {
-  padding-right: 3.5rem;
-}
-.table[data-mode="ventas"] tbody td:nth-child(2) {
-  padding-right: 2rem;
-}
-
-.table[data-mode="ventas"] tbody td:nth-child(3) {
-  padding-right: 1rem;
-}
-
-.table[data-mode="ventas"] tbody td:nth-child(4) {
-  padding-left: 2rem;
-}
-
-.table[data-mode="ventas"] tbody td:nth-child(6) {
-  padding-left: 2rem;
-}
-
-.table[data-mode="compras"] tbody td:nth-child(1) {
-  padding-right: 3rem;
-}
-.table[data-mode="compras"] tbody td:nth-child(2) {
-  padding-right: 1.5rem;
-}
-.table[data-mode="compras"] tbody td:nth-child(4) {
-  padding-left: 3rem;
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    font-size: 14px;
+    padding: 10px 6px;
+  }
 }

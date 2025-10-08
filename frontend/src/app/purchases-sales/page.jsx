@@ -137,7 +137,6 @@ export default function ComprasVentasPage() {
           }
         />
 
-
       </main>
 
       {/* Panel derecho */}
@@ -155,4 +154,4 @@ export default function ComprasVentasPage() {
       )}
     </div>
   );
-}
+} 

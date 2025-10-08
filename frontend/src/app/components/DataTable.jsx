@@ -2,7 +2,7 @@
 
 import "../styles/DataTable.css";
 
-export default function DataTable({ mode, data = [], columns = [] }) {
+export default function DataTable({ data = [], columns = [], tableName = "tabla" }) {
   if (!data.length && !columns.length) {
     return <p>No hay datos para mostrar</p>;
   }
@@ -12,10 +12,13 @@ export default function DataTable({ mode, data = [], columns = [] }) {
     ? columns
     : Object.keys(data[0]).map((k) => ({ key: k, label: k }));
 
+  // Calculamos grid dinámico según número de columnas
+  const gridStyle = { "--cols": `repeat(${cols.length}, 1fr)` };
+
   return (
     <div className="tableContainer">
-      <div className="tableScroll" data-mode={mode}>
-        <table className="table" data-mode={mode}>
+      <div className="tableScroll">
+        <table className="table" style={gridStyle}>
           <thead>
             <tr>
               {cols.map((c, i) => (
