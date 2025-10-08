@@ -1,0 +1,50 @@
+.main-container-CAP {
+    width: 100%;
+}
+
+.main-container-CAP .title-CAP{
+    font-size: 25px;
+    color: #40524e;
+    text-align: center;
+    margin: 20px 0 0 0;
+}
+
+
+.info-CAP-container {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+
+}
+
+.CAP-actions{
+    min-width: 50%;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.CAP-actions .h3 {
+    position: static;
+    top: 0;
+    background-color: white;
+    color: #40524e;
+}
+.CAP-graph {
+    width: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 1260px) {
+    .CAP-actions{
+    min-width: 100%;
+    height: 400px;
+    overflow-y: auto;
+    }
+}
