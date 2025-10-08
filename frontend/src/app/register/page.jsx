@@ -27,24 +27,76 @@ export default function RegisterPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateAge = (birthdate) => {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Limpiar error cuando el usuario empiece a escribir
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
+
+    // Validación en tiempo real para la fecha de nacimiento
+    if (name === "birthdate" && value) {
+      const age = validateAge(value);
+      if (age < 18) {
+        setErrors({ ...errors, birthdate: "Debes ser mayor de edad (18+ años)" });
+      } else {
+        const newErrors = { ...errors };
+        delete newErrors.birthdate;
+        setErrors(newErrors);
+      }
+    }
   };
 
   const handleNext = (e) => {
     e.preventDefault();
     const { email, password, confirmPassword } = formData;
+    const newErrors = {};
 
-    if (!email || !password || !confirmPassword) {
-      alert("Por favor, llena todos los campos antes de continuar.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden.");
-      return;
+    if (!email) {
+      newErrors.email = "El email es requerido";
+    } else if (!validateEmail(email)) {
+      newErrors.email = "Ingresa un email válido (debe contener @ y dominio)";
     }
 
+    if (!password) {
+      newErrors.password = "La contraseña es requerida";
+    } else if (password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirma tu contraseña";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Las contraseñas no coinciden";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
     setStep(2);
   };
 
@@ -56,13 +108,44 @@ export default function RegisterPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { fullName, birthdate, cellphone, dpi, address } = formData;
+    const newErrors = {};
 
-    if (!fullName || !birthdate || !cellphone || !dpi || !address) {
-      alert("Por favor, completa todos los campos para registrarte.");
+    if (!fullName) newErrors.fullName = "El nombre completo es requerido";
+    
+    if (!birthdate) {
+      newErrors.birthdate = "La fecha de nacimiento es requerida";
+    } else {
+      const age = validateAge(birthdate);
+      if (age < 18) {
+        newErrors.birthdate = "Debes ser mayor de edad (18+ años) para registrarte";
+      }
+    }
+
+    if (!cellphone) newErrors.cellphone = "El teléfono es requerido";
+    if (!dpi) newErrors.dpi = "El DPI es requerido";
+    if (!address) newErrors.address = "La dirección es requerida";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
+    setErrors({});
     alert("✅ Registro completado correctamente.");
+  };
+
+  // Calcular fecha máxima (18 años atrás desde hoy)
+  const getMaxBirthdate = () => {
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    return maxDate.toISOString().split('T')[0];
+  };
+
+  // Calcular fecha mínima (100 años atrás desde hoy)
+  const getMinBirthdate = () => {
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+    return minDate.toISOString().split('T')[0];
   };
 
   return (
@@ -106,9 +189,11 @@ export default function RegisterPage() {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
+                    className={errors.email ? "error" : ""}
                     required
                   />
                 </div>
+                {errors.email && <span className="error-message">{errors.email}</span>}
 
                 <div className="inputGroup passwordGroup">
                   <FaLock className="icon" />
@@ -118,6 +203,7 @@ export default function RegisterPage() {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
+                    className={errors.password ? "error" : ""}
                     required
                   />
                   <span
@@ -127,6 +213,7 @@ export default function RegisterPage() {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
+                {errors.password && <span className="error-message">{errors.password}</span>}
 
                 <div className="inputGroup passwordGroup">
                   <FaLock className="icon" />
@@ -136,6 +223,7 @@ export default function RegisterPage() {
                     placeholder="Confirm Password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    className={errors.confirmPassword ? "error" : ""}
                     required
                   />
                   <span
@@ -145,6 +233,7 @@ export default function RegisterPage() {
                     {showConfirm ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
+                {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
 
                 <div className="buttonWrapper">
                   <button className="btn nextBtn" onClick={handleNext}>
@@ -167,9 +256,11 @@ export default function RegisterPage() {
                     placeholder="Full Name"
                     value={formData.fullName}
                     onChange={handleChange}
+                    className={errors.fullName ? "error" : ""}
                     required
                   />
                 </div>
+                {errors.fullName && <span className="error-message">{errors.fullName}</span>}
 
                 <div className="inputGroup">
                   <FaBirthdayCake className="icon" />
@@ -178,9 +269,16 @@ export default function RegisterPage() {
                     name="birthdate"
                     value={formData.birthdate}
                     onChange={handleChange}
+                    className={errors.birthdate ? "error" : ""}
+                    min={getMinBirthdate()}
+                    max={getMaxBirthdate()}
                     required
                   />
+                  <span className="age-info">
+                    {formData.birthdate && `Edad: ${validateAge(formData.birthdate)} años`}
+                  </span>
                 </div>
+                {errors.birthdate && <span className="error-message">{errors.birthdate}</span>}
 
                 <div className="inputGroup">
                   <FaPhone className="icon" />
@@ -190,9 +288,11 @@ export default function RegisterPage() {
                     placeholder="Cellphone"
                     value={formData.cellphone}
                     onChange={handleChange}
+                    className={errors.cellphone ? "error" : ""}
                     required
                   />
                 </div>
+                {errors.cellphone && <span className="error-message">{errors.cellphone}</span>}
 
                 <div className="inputGroup">
                   <FaIdCard className="icon" />
@@ -202,9 +302,11 @@ export default function RegisterPage() {
                     placeholder="DPI"
                     value={formData.dpi}
                     onChange={handleChange}
+                    className={errors.dpi ? "error" : ""}
                     required
                   />
                 </div>
+                {errors.dpi && <span className="error-message">{errors.dpi}</span>}
 
                 <div className="inputGroup">
                   <FaMapMarkerAlt className="icon" />
@@ -214,9 +316,11 @@ export default function RegisterPage() {
                     placeholder="Address"
                     value={formData.address}
                     onChange={handleChange}
+                    className={errors.address ? "error" : ""}
                     required
                   />
                 </div>
+                {errors.address && <span className="error-message">{errors.address}</span>}
 
                 <div className="buttonWrapper stepsButtons">
                   <button className="btn backBtn" onClick={handleBack}>
