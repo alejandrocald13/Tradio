@@ -34,10 +34,11 @@ export default function AboutUsPage() {
           </div>
           <div className={styles.contentText}>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipiscing elit, lectus ultrices erat nisl
-              maecenas platea integer dis, metus mauris fringilla suscipit dictumst sagittis.
-              Elementum pharetra facilisis vitae nisi dis donec ullamcorper, tellus aptent class mattis
-              dapibus tristique quisque lacus, erat tempus lobortis metus scelerisque nunc.
+              Tradio es una aplicación web desarrollada como parte del proyecto de Programación Web 2025, 
+              creada con el objetivo de ofrecer una plataforma moderna para la compra y venta de acciones 
+              bursátiles. Inspirada en plataformas como Hapi, Tradio busca brindar una experiencia completa 
+              tanto para inversionistas como para administradores, combinando un diseño intuitivo con una 
+              infraestructura segura y eficiente.
             </p>
           </div>
         </div>
@@ -51,10 +52,10 @@ export default function AboutUsPage() {
           </div>
           <div className={styles.contentText}>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipiscing elit, lectus ultrices erat nisl
-              maecenas platea integer dis, metus mauris fringilla suscipit dictumst sagittis.
-              Elementum pharetra facilisis vitae nisi dis donec ullamcorper, tellus aptent class mattis
-              dapibus tristique quisque lacus, erat tempus lobortis metus scelerisque nunc.
+              El equipo detrás de Tradio está conformado por estudiantes apasionados por la tecnología, 
+              el desarrollo web y las finanzas. Nuestro propósito es aplicar los conocimientos adquiridos 
+              en programación full stack para crear una aplicación robusta, escalable y segura que refleje 
+              las exigencias del mundo real.
             </p>
           </div>
         </div>

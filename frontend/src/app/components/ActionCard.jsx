@@ -7,7 +7,7 @@ import "../styles/ActionCard.css";
 
 export default function ActionCard({ symbol, actionName, price, changeText, variantClass, graphic }) {
 
-    const finalClass = variantClass || variantType;
+    const finalClass = variantClass ;
     const symbolFromName = (name = "") =>
         name.match(/\(([^)]+)\)$/)?.[1] || name.trim(); // "Tesla Inc. (TSLA)" -> "TSLA"
 

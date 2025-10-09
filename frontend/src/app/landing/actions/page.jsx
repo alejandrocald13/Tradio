@@ -88,6 +88,7 @@ export default function ActionsPage() {
         <div className={styles.marketColumns}>
   {/* Bloque Izquierdo */}
   <div className={styles.marketBlock}>
+    <h2 className={styles.blockTitle}>Top: Ganancias</h2>
     {marketData.slice(0, 3).map((item, index) => (
       <div key={index} className={styles.marketCard}>
         <div className={styles.cardHeader}>
@@ -108,6 +109,7 @@ export default function ActionsPage() {
 
   {/* Bloque Derecho */}
   <div className={styles.marketBlock}>
+    <h2 className={styles.blockTitle}>Top: Pérdidas</h2>
     {marketData.slice(3, 6).map((item, index) => (
       <div key={index} className={styles.marketCard}>
         <div className={styles.cardHeader}>
@@ -126,8 +128,8 @@ export default function ActionsPage() {
     ))}
   </div>
 </div>
-
-
+      
+      <h2 className={styles.actionsTitle}>Acciones Disponibles</h2>
         <div className={styles.actionCardsGrid}>
           {symbols.map((sym) => {
             const data = MOCK[sym];
