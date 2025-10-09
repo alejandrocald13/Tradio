@@ -2,37 +2,35 @@
 
 import "../styles/DataTable.css";
 
-export default function DataTable({ mode, data, columns, colKeys }) {
-  // columnas por defecto
-  const defaultColumns = {
-    compras: ["Acción", "Compra", "# Acciones", "Fecha compra"],
-    ventas: ["Acción", "Compra", "Venta", "%", "# Acciones", "Fecha venta"],
-  };
+export default function DataTable({ data = [], columns = [], tableName = "tabla" }) {
+  if (!data.length && !columns.length) {
+    return <p>No hay datos para mostrar</p>;
+  }
 
-  const defaultColKeys = {
-    compras: ["accion", "compra", "cantidad", "fecha"],
-    ventas: ["accion", "compra", "venta", "pct", "cantidad", "fecha"],
-  };
+  // Si no se pasan columnas, usamos las keys del primer objeto
+  const cols = columns.length
+    ? columns
+    : Object.keys(data[0]).map((k) => ({ key: k, label: k }));
 
-  const cols = columns || defaultColumns[mode] || Object.keys(data[0] || {});
-  const keys = colKeys || defaultColKeys[mode] || cols.map(c => c.toLowerCase());
+  // Calculamos grid dinámico según número de columnas
+  const gridStyle = { "--cols": `repeat(${cols.length}, 1fr)` };
 
   return (
     <div className="tableContainer">
-      <div className="tableScroll" data-mode={mode}>
-        <table className="table" data-mode={mode}>
+      <div className="tableScroll">
+        <table className="table" style={gridStyle}>
           <thead>
             <tr>
               {cols.map((c, i) => (
-                <th key={i}>{c}</th>
+                <th key={i}>{c.label || c.key}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {data.map((row, i) => (
               <tr key={i}>
-                {keys.map((k, j) => (
-                  <td key={j}>{row[k] !== undefined ? row[k] : ""}</td>
+                {cols.map((c, j) => (
+                  <td key={j}>{row[c.key] ?? ""}</td>
                 ))}
               </tr>
             ))}

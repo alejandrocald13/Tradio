@@ -111,32 +111,48 @@ export default function ComprasVentasPage() {
                   onClick={() => setTab("ventas")}
                 >
                   Ventas
-                </button>
-              </div>
+              </button>
             </div>
+          </div>
 
-          {/* Tabla de datos */}
-          <DataTable 
-            mode={tab} 
-            data={tab === "compras" ? compras : ventas} 
-          />
-        </main>
+        {/* Tabla de datos */}
+        <DataTable
+          mode={tab} 
+          data={tab === "compras" ? compras : ventas}
+          columns={
+            tab === "compras"
+              ? [
+                  { key: "accion", label: "Acción" },
+                  { key: "compra", label: "Compra" },
+                  { key: "cantidad", label: "# Acciones" },
+                  { key: "fecha", label: "Fecha compra" },
+                ]
+              : [
+                  { key: "accion", label: "Acción" },
+                  { key: "compra", label: "Compra" },
+                  { key: "venta", label: "Venta" },
+                  { key: "pct", label: "%" },
+                  { key: "cantidad", label: "# Acciones" },
+                  { key: "fecha", label: "Fecha venta" },
+                ]
+          }
+        />
 
-        {/* Panel derecho */}
-        <RightPanel metrics={metrics} graphData={graphData} />
+      </main>
 
-        {/* Modal */}
-        {modalOpen && (
-          <ModalForm
-            tab={tab}
-            form={form}
-            setForm={setForm}
-            onSubmit={handleSubmit}
-            onClose={closeModal}
-          />
-        )}
-      </div>
-    
-    </>
+      {/* Panel derecho */}
+      <RightPanel metrics={metrics} graphData={graphData} />
+
+      {/* Modal */}
+      {modalOpen && (
+        <ModalForm
+          tab={tab}
+          form={form}
+          setForm={setForm}
+          onSubmit={handleSubmit}
+          onClose={closeModal}
+        />
+      )}
+    </div>
   );
-}
+} 
