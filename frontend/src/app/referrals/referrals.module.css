@@ -7,7 +7,6 @@
   --shadow: 0 6px 18px rgba(18,24,28,0.06);
 }
 
-
 .pageWrapper {
   display: flex;
   min-height: 100vh;
@@ -21,10 +20,12 @@
   padding: 60px 72px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* centra el contenido horizontalmente */
+  align-items: center;
   justify-content: flex-start;
   z-index: 1;
-  margin-left: 13rem;
+  /* Cambio importante: usar padding-left en lugar de margin-left */
+  padding-left: calc(13rem + 72px); /* Sidebar width + padding original */
+  padding-right: 72px;
 }
 
 .main::before {
@@ -47,7 +48,6 @@
   gap: 16px;
 }
 
-
 .title {
   font-size: 32px;
   font-weight: 700;
@@ -69,10 +69,6 @@
   border-radius: 2px;
 }
 
-
-
-
-
 .description {
   margin-top: 12px;
   color: #33413d;
@@ -80,9 +76,9 @@
   text-align: justify;
   font-size: 17px;
   line-height: 1.7;
-  margin-right: 19rem;
+  /* Corregido: eliminar margen derecho fijo */
+  width: 100%;
 }
-
 
 /* contenedor de cards (alineadas con el título) */
 .cards {
@@ -93,7 +89,6 @@
   flex-direction: column;
   gap: 60px;         
 }
-
 
 .card {
   background: linear-gradient(135deg, #ffffff 0%, #f5f8f7 100%);
@@ -113,7 +108,6 @@
 .cardLeft {
   flex: 0 0 400px;  
   display: flex;
-
   align-items: center;
 }
 
@@ -125,7 +119,6 @@
   display: flex;
   align-items: center;
 }
-
 
 .cardRight {
   flex: 1 1 auto;
@@ -163,14 +156,12 @@
   padding: 0 18px;
 }
 
-
 .inputWrap {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
 }
-
 
 .codeInput {
   flex: 1 1 auto;
@@ -200,28 +191,6 @@
 }
 .sendBtn:hover { background: #2a3335; }
 
-/* Responsive: en pantallas pequeñas mostramos las cards en columna y adaptamos anchos */
-@media (max-width: 920px) {
-  .main {
-    padding: 20px;
-  }
-  .headerRow { max-width: 100%; }
-  .cards { max-width: 100%; }
-  .cardLeft, .cardLeftLabel {
-    flex: 0 0 160px;
-  }
-  .codeDisplay { width: 260px; }
-}
-@media (max-width: 640px) {
-  .headerRow { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .illustration { align-self: flex-end; }
-  .card { flex-direction: column; align-items: stretch; gap: 12px; padding: 18px; }
-  .cardLeft, .cardLeftLabel { flex: none; width: 100%; }
-  .cardRight { justify-content: center; }
-  .codeDisplay { width: 100%; }
-  .inputWrap { width: 100%; }
-  .codeInput { width: 100%; }
-}
 .generateBtn, .sendBtn {
   background: linear-gradient(90deg, #4e635e, #2a3335);
   color: #fff;
@@ -262,8 +231,83 @@
   padding: 50px 60px;
   width: 100%;
   max-width: 1100px;
-  margin: 40px auto; /* centra el contenedor */
+  margin: 40px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Responsive mejorado */
+@media (max-width: 1200px) {
+  .main {
+    padding-left: calc(12rem + 40px);
+    padding-right: 40px;
+  }
+}
+
+@media (max-width: 920px) {
+  .main {
+    padding: 40px 30px;
+    padding-left: calc(11rem + 30px);
+  }
+  
+  .headerRow { max-width: 100%; }
+  .cards { max-width: 100%; }
+  .cardLeft, .cardLeftLabel {
+    flex: 0 0 160px;
+  }
+  .codeDisplay { width: 260px; }
+  
+  .container {
+    padding: 40px 30px;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 30px 20px;
+    padding-left: calc(10rem + 20px);
+  }
+  
+  .container {
+    padding: 30px 20px;
+    margin: 15px auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 20px 15px;
+    padding-left: 15px; /* En móvil, el sidebar probablemente se oculta */
+  }
+  
+  .headerRow { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 12px; 
+  }
+  
+  .illustration { align-self: flex-end; }
+  .card { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 12px; 
+    padding: 18px; 
+  }
+  
+  .cardLeft, .cardLeftLabel { 
+    flex: none; 
+    width: 100%; 
+  }
+  
+  .cardRight { justify-content: center; }
+  .codeDisplay { width: 100%; }
+  .inputWrap { width: 100%; }
+  .codeInput { width: 100%; }
+  
+  .container {
+    padding: 25px 15px;
+    margin: 10px auto;
+  }
 }
