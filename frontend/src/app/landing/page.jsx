@@ -28,14 +28,6 @@ export default function LandingPage() {
           <h1>Bienvenido!!!</h1>
           <p>Empieza a invertir con nosotros</p>
         </div>
-        <div className={styles.heroImage}>
-          <Image
-            src="/hero-img.png"
-            alt="Inversión"
-            width={280}
-            height={280}
-          />
-        </div>
       </section>
 
       {/* FEATURES */}

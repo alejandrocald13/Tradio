@@ -87,7 +87,7 @@
   justify-content: space-between;
   align-items: center;
   background: #e6ebe9;
-  padding: 80px;         /* más grande */
+  padding: 70px;         /* más grande */
   border-radius: 20px;
   margin-bottom: 50px;
 }
@@ -115,13 +115,13 @@
 .featureCard {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 55px;          /* más grande */
+  padding: 40px;          /* más grande */
   width: 650px;           /* más ancho */
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  font-size: 16px;        /* texto más grande */
+  font-size: 22px;        /* texto más grande */
 }
 
 .icon {
