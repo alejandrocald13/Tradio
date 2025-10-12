@@ -283,16 +283,19 @@
 
 .actionCardsGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); 
-  gap: 3px; 
+     
+  gap: 1px; 
   justify-items: center; 
-  margin-top: 4px;
+  transform: translateX(-35px);
+  
+
 }
 
 
 .actionCardWrapper {
   width: 100%; 
   max-width: 500px; 
+  
 }
 
 

@@ -25,41 +25,42 @@ export default function AboutUsPage() {
 
       {/* CONTENT SECTION */}
       <section className={styles.contentSection}>
-      {/* ¿Qué es Tradio? */}
-      <div className={`${styles.contentBlock} ${styles.card}`}>
-        <div className={styles.contentHeader}>
-          <div className={styles.divider}></div>
-          <h2 className={styles.sectionTitle}>¿Qué es Tradio?</h2>
-          <div className={styles.divider}></div>
+        {/* ¿Qué es Tradio? */}
+        <div className={styles.flipCard}>
+          <div className={styles.flipInner}>
+            <div className={`${styles.card} ${styles.front}`}>
+              <h2 className={styles.sectionTitle}>What is Tradio?</h2>
+            </div>
+            <div className={`${styles.card} ${styles.back}`}>
+              <p>
+                Tradio is a web application developed as part of the Web Programming 2025 project,
+                created with the goal of offering a modern platform for buying and selling stocks.
+                Inspired by platforms like Hapi, Tradio seeks to provide a complete experience
+                for both investors and managers, combining an intuitive design with a
+                secure and efficient infrastructure.
+              </p>
+            </div>
+          </div>
         </div>
-        <div className={styles.contentText}>
-          <p>
-            Tradio es una aplicación web desarrollada como parte del proyecto de Programación Web 2025, 
-            creada con el objetivo de ofrecer una plataforma moderna para la compra y venta de acciones 
-            bursátiles. Inspirada en plataformas como Hapi, Tradio busca brindar una experiencia completa 
-            tanto para inversionistas como para administradores, combinando un diseño intuitivo con una 
-            infraestructura segura y eficiente.
-          </p>
-        </div>
-      </div>
 
-      {/* Sobre Nosotros */}
-      <div className={`${styles.contentBlock} ${styles.card}`}>
-        <div className={styles.contentHeader}>
-          <div className={styles.divider}></div>
-          <h2 className={styles.sectionTitle}>Sobre Nosotros</h2>
-          <div className={styles.divider}></div>
+        {/* Sobre Nosotros */}
+        <div className={styles.flipCard}>
+          <div className={styles.flipInner}>
+            <div className={`${styles.card} ${styles.front}`}>
+              <h2 className={styles.sectionTitle}>About Us</h2>
+            </div>
+            <div className={`${styles.card} ${styles.back}`}>
+              <p>
+                The team behind Tradio is made up of students passionate about technology,
+                web development, and finance. Our goal is to apply the knowledge we have acquired
+                in full-stack programming to create a robust, scalable, and secure application that reflects
+                the demands of the real world.
+              </p>
+            </div>
+          </div>
         </div>
-        <div className={styles.contentText}>
-          <p>
-            El equipo detrás de Tradio está conformado por estudiantes apasionados por la tecnología, 
-            el desarrollo web y las finanzas. Nuestro propósito es aplicar los conocimientos adquiridos 
-            en programación full stack para crear una aplicación robusta, escalable y segura que refleje 
-            las exigencias del mundo real.
-          </p>
-        </div>
-      </div>
-    </section>
+      </section>
+
     </div>
   );
 }

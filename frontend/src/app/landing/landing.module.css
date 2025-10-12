@@ -115,13 +115,13 @@
 .featureCard {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 40px;          /* más grande */
-  width: 650px;           /* más ancho */
+  padding: 40px;          
+  width: 650px;           
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  font-size: 22px;        /* texto más grande */
+  font-size: 22px;        
 }
 
 .icon {

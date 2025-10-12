@@ -25,8 +25,8 @@ export default function LandingPage() {
       {/* HERO */}
       <section className={styles.hero}>
         <div className={styles.heroText}>
-          <h1>Bienvenido!!!</h1>
-          <p>Empieza a invertir con nosotros</p>
+          <h1>Welcome!!!</h1>
+          <p>Start investing with us</p>
         </div>
       </section>
 
@@ -37,9 +37,9 @@ export default function LandingPage() {
             <Rocket className={styles.icon} />
           </div>
           <p>
-            Tradio te permite comprar y vender acciones en tiempo real (simulado) con una
-              interfaz moderna e intuitiva, inspirada en plataformas líderes del
-              mercado. Controla tus movimientos con precisión y confianza.
+            Tradio allows you to buy and sell stocks in real-time (simulated) with a
+              modern and intuitive interface, inspired by leading platforms in the
+              market. Control your movements with precision and confidence.
           </p>
         </div>
         <div className={styles.featureCard}>
@@ -47,9 +47,8 @@ export default function LandingPage() {
             <Shield className={styles.icon} />
           </div>
           <p>
-            Cada transacción en Tradio está protegida con medidas de seguridad
-              avanzadas. Tus datos, movimientos y ganancias permanecen siempre
-              bajo control y respaldo constante.
+            Each transaction on Tradio is protected with advanced security measures.
+            Your data, movements, and profits are always under control and constant backup.
           </p>
         </div>
       </section>
