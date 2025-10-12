@@ -1,20 +1,23 @@
-.cardActionAdmin {
+.action-card-admin {
     display: flex;
-    flex-direction: column;
+    flex-direction: column;  
     background-color: #fff;
-    margin-left: 50px;
-    height: 10rem;
-    width: 10rem;
+    margin: 0px 15px 20px 15px;
+    height: 12rem;
+    width: 16rem;
     border-radius: 20px;
-    padding: 50px;
+    padding: 30px 20px 7px 20px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* .cardActionAdmin ::after {
-    content: "";
-    display: block;
-    height: 2px;
-    width: 100%;
-    margin: 12px auto 0;
-    background: #a3a3a3;
-    border-radius: 2px;
-} */
+.title-action-card-admin {
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+
+.children-action-card-admin {
+    height: 100%;
+    font-size: 18px;
+}
