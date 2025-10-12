@@ -3,7 +3,7 @@
 import "../styles/GreetingPortfolio.css";
 import { useState } from 'react'
 
-export default function GreetingPortafolio(){
+export default function GreetingPortafolio({message}){
     // Datos que necesito aca
     // Nombre
     const name = 'Daniela'
@@ -11,8 +11,8 @@ export default function GreetingPortafolio(){
         <>
             <div className="greeting-main-container-portafolio">
                 <div className="greeting-container-portafolio">
-                    <h1 className="welcome-message-portafolio">Hi {name}!!</h1>
-                    <p className="message-portafolio">Let’s see how your portfolio is growing today.</p>
+                    <h1 className="welcome-message-portafolio">Hi {name}!</h1>
+                    <p className="message-portafolio">{message}</p>
                 </div>
                 <div className="image-container-portafolio"> 
                 </div>
