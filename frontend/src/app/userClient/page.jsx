@@ -155,34 +155,34 @@ export default function users() {
     const getValueInputSearcher = (value) => {
         console.log("Hola desde getValueInput ", value)
     }
-    const columns = ['Name', 'UserName', 'Email', 'Age', 'Fecha', 'Enable']
+    const columns = ['Name', 'UserName', 'Email', 'Age', 'Date', 'Enable']
     
     return(
         <>
             <SidebarNavAdmin/>
             <div className="main-container-users">
                 <div className="header-users">
-                    <Searcher placeholderI={'Ingresa nombre'} getValue={getValueInputSearcher} />
+                    <Searcher placeholderI={'Enter name'} getValue={getValueInputSearcher} />
                 </div>
                 <div className="table-TA-container">
                     <TableAdmin  columns={columns} data={users} btnVerification={true} getValueInputP={getValueInput}/>
                 </div>
 
 
-                <Modal isOpen={isOpen} title={'Cambiar Estado de Usuario'} isClose={false}>
+                <Modal isOpen={isOpen} title={'Change User Status'} isClose={false}>
                     <div className="container-modal">
                         <div className="p-cpntainer">
-                            <p className="p">¿Estas seguro de cambiar el estado del Usuario?</p>
-                            {statusValue?.value === true && (<p className="p-switch">El usuario {statusValue.id} se va a habilitar</p>)}
-                            {statusValue?.value === false && (<p className="p-switch" >El usuario {statusValue.id} se va a deshabilitar</p>)}
+                            <p className="p">Are you sure you want to change the user's status?</p>
+                            {statusValue?.value === true && (<p className="p-switch">The user {statusValue.id} will be enabled</p>)}
+                            {statusValue?.value === false && (<p className="p-switch" >The user {statusValue.id} will be disabled</p>)}
                         </div>
 
                         <div className="btns">
                             <button className="changeStatus-confirmation" onClick={closeModal}>
-                                    Confirmar
+                                    Confirm
                             </button>
                             <button className="changeStatus-cancel" onClick={closeModal}>
-                                    Cancelar
+                                    Cancel
                             </button>
                         </div>
                     </div>
