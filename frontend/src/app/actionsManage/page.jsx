@@ -5,6 +5,7 @@ import "./actionsManage.css";
 import ActionAdminCard from "../components/ActionAdminCard";
 import ButtonSwitch from "../components/ButtonSwitch";
 import Modal from "../components/Modal";
+import Searcher from "../components/Searcher";
 
 
 
@@ -40,6 +41,24 @@ export default function ActionsManage() {
         { id: 8, name: "Procter & Gamble", price: 142.65, category: "consumer", active: true  },
         { id: 9, name: "ExxonMobil", price: 110.12, category: "energy", active: true  },
         { id: 10, name: "Chevron", price: 162.33, category: "energy", active: false  },
+        { id: 11, name: "Intel Corp.", price: 45.10, category: "tech", active: true },
+        { id: 12, name: "NVIDIA Corp.", price: 459.20, category: "tech", active: true },
+        { id: 15, name: "Wells Fargo", price: 42.38, category: "financials", active: false },
+        { id: 16, name: "Citigroup Inc.", price: 43.75, category: "financials", active: false },
+        { id: 17, name: "PepsiCo Inc.", price: 174.22, category: "consumer", active: true },
+        { id: 18, name: "Nike Inc.", price: 98.63, category: "consumer", active: false },
+        { id: 19, name: "3M Company", price: 92.17, category: "industrials", active: false },
+        { id: 20, name: "Caterpillar Inc.", price: 275.48, category: "industrials", active: true },
+        { id: 21, name: "Dow Inc.", price: 51.90, category: "materials", active: false },
+        { id: 22, name: "DuPont de Nemours", price: 71.12, category: "materials", active: true },
+        { id: 23, name: "NextEra Energy", price: 68.75, category: "utilities", active: false },
+        { id: 24, name: "Duke Energy", price: 92.44, category: "utilities", active: false },
+        { id: 25, name: "Simon Property Group", price: 127.50, category: "realestate", active: true },
+        { id: 26, name: "American Tower Corp.", price: 165.10, category: "realestate", active: false },
+        { id: 27, name: "General Electric", price: 114.80, category: "industrials", active: true },
+        { id: 28, name: "Shell plc", price: 65.90, category: "energy", active: false },
+        { id: 29, name: "Merck & Co.", price: 108.30, category: "healthcare", active: true },
+        { id: 30, name: "UnitedHealth Group", price: 526.25, category: "healthcare", active: false },
     ];
 
     const [activeId, setActiveId] = useState("all");
@@ -48,14 +67,47 @@ export default function ActionsManage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionPending, setActionPending] = useState(null);
     const [actionPendingName, setActionPendingName] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [categoryCounts, setCategoryCounts] = useState({});
+
+
+    const handleSearch = (value) => {
+        setSearchTerm(value.toLowerCase());
+    };
 
     useEffect(() => {
-    if (activeId === "all") {
-            setFilteredActions(actions);
-        } else {
-            setFilteredActions(actions.filter((a) => a.category === activeId));
+        let filteredList = actions;
+
+        if (searchTerm) {
+            filteredList = filteredList.filter((action) =>
+                action.name.toLowerCase().includes(searchTerm)
+            );
         }
-    }, [activeId, actions]);
+        
+        if (statusFilter === "enable") {
+            filteredList = filteredList.filter((action) => action.active);
+        } else if (statusFilter === "disable") {
+            filteredList  = filteredList .filter((action) => !action.active);
+        }
+        
+        const updatedCategoryCounts = filteredList.reduce((counts, action) => {
+            counts[action.category] = (counts[action.category] || 0) + 1;
+            return counts;
+        }, {});
+        
+        updatedCategoryCounts["all"] = filteredList.length;
+
+        setCategoryCounts(updatedCategoryCounts);
+        
+        if (activeId !== "all") {
+            filteredList = filteredList.filter((a) => a.category === activeId);
+        }
+
+        setFilteredActions(filteredList);
+    }, [activeId, actions, searchTerm, statusFilter]);
+
 
     const handleSwitchChange = () => {
     if (!actionPending) return;
@@ -99,23 +151,44 @@ export default function ActionsManage() {
                     >
                         <span className="category-name">{data.name}</span>
                         <span className={`capsule-number ${activeId === data.id ? "capsule-number-active" : ""}`}>
-                            {/* {data.count} */}
-                            {data.id === "all"
-                                ? ACTIONS_MOCK.length
-                                : ACTIONS_MOCK.filter((a) => a.category === data.id).length}
+                            {categoryCounts[data.id] ?? 0}
                         </span>
                     </button>
                     ))}
                 </div>
             </div>
+            <div className="div-actions">
+                <div className="searcher-container">
+                    <Searcher placeholderI="Search action by name..." getValue={handleSearch} />
+                    <div className="filter-btn">
+                        <button className="filter-btn-pattern" onClick={() => setShowDropdown(!showDropdown)}>Filter 
+                            <svg 
+                                stroke="currentColor" fill="currentColor" strokeWidth="0" 
+                                viewBox="0 0 16 16" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg"><path 
+                                fillRule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 
+                                0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 
+                                01-.5-.5z" clipRule="evenodd"></path>
+                            </svg>
+                        </button>
+                        {showDropdown && (
+                            <div className="dropdown-menu">
+                                <button onClick={() => {setStatusFilter("all"), setShowDropdown(false)} }>All</button>
+                                <button onClick={() => {setStatusFilter("enable"), setShowDropdown(false)}}>Enable</button>
+                                <button onClick={() => {setStatusFilter("disable"), setShowDropdown(false)}}>Disable</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <div className="actions-container">
                     {filteredActions.length > 0 ? (
                         filteredActions.map((action) => (
-                        <ActionAdminCard key={action.id}>
+                        <ActionAdminCard key={action.id}  title={action.name}>
                             <div className="action-card-content">
-                                <h3>{action.name}</h3>
-                                <p>Precio: ${action.price.toFixed(2)}</p>
-                                <ButtonSwitch  id={action.id} value={action.active} getValue={handleSwitchAttempt} />
+                                <p className="price-action-do">Price: ${action.price.toFixed(2)}</p>
+                                <div className="button-action-do">
+                                    <p>{action.active ? "Enable" : "Disable"}</p>
+                                    <ButtonSwitch  id={action.id} value={action.active} getValue={handleSwitchAttempt} />
+                                </div>
                             </div>
                         </ActionAdminCard>
                         ))
@@ -135,23 +208,23 @@ export default function ActionsManage() {
                         </div>
                     )}
                 </div>
-
+            </div>
         </div>
 
 
         <Modal
             isOpen={isModalOpen}
-            title="Confirmar cambio"
+            title="Confirm change"
             onClose={cancelSwitchChange}
         >
             <p>
-                ¿Seguro que deseas{" "}
-                {actionPending?.value ? "habilitar" : "deshabilitar"} {" "}
-                la acción <strong>{actionPendingName}</strong>?
+                Are you sure you want to {" "}
+                {actionPending?.value ? "enable" : "disable"} {" "}
+                the <strong>{actionPendingName}</strong> action?
             </p>
             <div className="buttons-modal">
-                <button className="primary-btn" onClick={handleSwitchChange}>Confirmar</button>
-                <button className="cancel-btn" onClick={cancelSwitchChange}>Cancelar</button>
+                <button className="primary-btn" onClick={handleSwitchChange}>Confirm</button>
+                <button className="cancel-btn" onClick={cancelSwitchChange}>Cancel</button>
             </div>
         </Modal>
         </>
