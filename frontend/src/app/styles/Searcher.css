@@ -1,5 +1,6 @@
 .container-searcher{
     min-width: 200px;
+    max-height: 40px;
     min-height: 40px;
     border-radius: 13px;
     position: relative;
