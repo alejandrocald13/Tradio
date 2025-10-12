@@ -22,11 +22,19 @@ class AddStockRequestSerializer(serializers.Serializer):
     symbol = serializers.CharField(help_text='Símbolo de la acción (ej: AAPL)')
 
 
-class DeleteStockSerializer(serializers.Serializer):
+class DisableStockSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
-class DeleteStockResponseSerializer(serializers.Serializer):
+class DisableStockResponseSerializer(serializers.Serializer):
     message = serializers.CharField()
+
+
+class EnableStockSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+class EnableStockResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
 
 class StockDataSerializer(serializers.Serializer):
     id = serializers.IntegerField()

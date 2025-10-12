@@ -23,3 +23,7 @@ class Stock(models.Model):
     def soft_delete(self):
         self.is_active = False
         self.save()
+
+    def enable(self):
+        self.is_active = True
+        self.save()

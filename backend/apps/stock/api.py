@@ -1,8 +1,8 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
 from drf_spectacular.types import OpenApiTypes
 import requests
 import os
@@ -14,8 +14,6 @@ from .serializers import (
     CategorySerializer,
     AddStockRequestSerializer,
     AddStockResponseSerializer,
-    DeleteStockSerializer,
-    DeleteStockResponseSerializer,
     UpdatePricesResponseSerializer,
     HistoryResponseSerializer,
     TopGainersResponseSerializer,
@@ -26,7 +24,7 @@ from .permissions import IsAdminOrReadOnly
 
 API_KEY = os.getenv("FINNHUB_API_KEY")
 
-class StockViewSet(viewsets.ModelViewSet):
+class StockViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Stock.objects.all()
     permission_classes = [IsAdminOrReadOnly] 
     serializer_class = StockSerializer
@@ -36,17 +34,46 @@ class StockViewSet(viewsets.ModelViewSet):
     ordering_fields = ['current_price', 'name']  # /api/stocks/?ordering=-<valor>
 
     @extend_schema(
-        summary="Aplicar soft-delete sobre una acción",
-        description="Busca la acción en BD y la desactiva",
-        request=DeleteStockSerializer,
+        summary="Desactivar una acción (soft delete)",
+        description="Desactiva una acción específica por su ID",
         responses={
-            204: DeleteStockResponseSerializer,
+            200: inline_serializer(
+                name='DisableStockResponse',
+                fields={'message': serializers.CharField()}
+            ),
+            404: ErrorResponseSerializer
         },
         tags=['stocks']
     )
-    def perform_destroy(self, instance):
-        instance.soft_delete()
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
+    def disable(self, request, pk=None):
+        stock = self.get_object()
+        stock.soft_delete()
+        return Response(
+            {"message": "La acción fue desactivada con éxito"},
+            status=status.HTTP_200_OK
+        )
 
+    @extend_schema(
+        summary="Activar una acción",
+        description="Activa una acción específica por su ID",
+        responses={
+            200: inline_serializer(
+                name='EnableStockResponse',
+                fields={'message': serializers.CharField()}
+            ),
+            404: ErrorResponseSerializer
+        },
+        tags=['stocks']
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
+    def enable(self, request, pk=None):
+        stock = self.get_object()
+        stock.enable()
+        return Response(
+            {"message": "La acción fue activada con éxito"},
+            status=status.HTTP_200_OK
+        )
 
     @extend_schema(
         summary="Agregar acción por símbolo",
