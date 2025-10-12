@@ -5,27 +5,29 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from apps.users.models import ProfileState
+from apps.users.models import ProfileState, Profile
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.serializers import RegisterSerializer
+
+# no-repudio
 from apps.users.utils import log_action
 from apps.users.actions import Action
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 
-from apps.users.permissions import IsUser, IsAdmin, IsOwnerOrAdmin
+from apps.users.permissions import IsUser, IsAdmin
 from apps.users.utils_perms import assert_owner_or_admin
-from apps.users.serializers import UserListSerializer, UserDetailSerializer
+from apps.users.serializers import UserListSerializer, UserDetailSerializer, UserNameSerializer, EmailTokenObtainPairSerializer
 
 User = get_user_model()
 from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
 from rest_framework import serializers
 
-# --- REGISTER ---
+from rest_framework_simplejwt.tokens import AccessToken
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
@@ -33,25 +35,38 @@ class RegisterView(APIView):
     @extend_schema(
         request=RegisterSerializer,
         responses={
-            201: OpenApiResponse(
-                description="Usuario creado",
-            ),
+            201: OpenApiResponse(description="Usuario creado correctamente"),
             400: OpenApiResponse(description="Errores de validación"),
         },
         tags=["auth"],
         summary="Registro de usuario",
     )
 
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+
         if serializer.is_valid():
             user = serializer.save()
+
             log_action(request, user, Action.AUTH_REGISTER_REQUESTED)
+
+            # send_email(pending_authorization.html) al usuario recién registrado
+
+            # send_email(admin_new_user.html) a todos los admins
+
+
             return Response(
-                {"id": user.id, "username": user.username, "email": user.email},
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "message": "Usuario registrado exitosamente",
+                },
                 status=status.HTTP_201_CREATED,
             )
+
         log_action(request, None, Action.AUTH_REGISTER_REQUESTED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoggedTokenObtainPairView(TokenObtainPairView):
@@ -92,25 +107,24 @@ class LoggedTokenRefreshView(TokenRefreshView):
         return response
 
 class LogoutView(APIView):
-    """
-    Enviar en el cuerpo: {"refresh": "<REFRESH_TOKEN>"}.
-    """
     permission_classes = [IsUser]
 
     @extend_schema(
         request=serializers.Serializer,
         responses={204: OpenApiResponse(description="Logout ok")},
         tags=["auth"],
-        summary="Logout (blacklist opcional del refresh)",
+        summary="Logout del usuario",
     )
     def post(self, request):
-        refresh = request.data.get("refresh")
-        if refresh:
-            try:
-                token = RefreshToken(refresh)
-            except Exception:
-                pass
-        log_action(request, request.user, Action.AUTH_LOGOUT)
+        token_str = request.auth
+
+        try:
+            token = AccessToken(token_str)
+            token.blacklist()
+            log_action(request, request.user, Action.AUTH_LOGOUT)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class MeView(APIView):
@@ -130,7 +144,7 @@ class MeView(APIView):
         responses=UserDetailSerializer,
         tags=["users"],
         summary="Actualizar perfil propio",
-        description="Admite cambios en email (User) y campos de profile (p. ej. name, age, state_id).",
+        description="Admite cambios en email (User) y campos de profile (p. ej. name, birth_date, state_id).",
     )
 
     def patch(self, request):
@@ -141,13 +155,43 @@ class MeView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class UserViewGetName(APIView):
+    permission_classes = [IsUser]
+
+    @extend_schema(
+        responses={
+            200: UserNameSerializer,
+            401: OpenApiResponse(description="No autenticado"),
+            403: OpenApiResponse(description="No tienes permisos"),
+            404: OpenApiResponse(description="Perfil no encontrado"),
+        },
+        summary="Obtener nombre de perfil actual",
+    )
+
+    def get(self, request):
+        try:
+            profile = request.user.profile
+        except Profile.DoesNotExist:
+            return Response(
+                {"detail": "Perfil no encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = UserNameSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+    
 @extend_schema_view(
     list=extend_schema(tags=["users"], summary="Listar usuarios (admin)"),
     retrieve=extend_schema(tags=["users"], summary="Detalle de usuario"),
     update=extend_schema(tags=["users"], summary="Actualizar usuario"),
     partial_update=extend_schema(tags=["users"], summary="Actualizar parcialmente usuario"),
 )
-
+            
 class UserViewSet(viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
