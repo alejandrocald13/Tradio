@@ -16,3 +16,72 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('id', 'name', 'description', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at')
+
+
+class AddStockRequestSerializer(serializers.Serializer):
+    symbol = serializers.CharField(help_text='Símbolo de la acción (ej: AAPL)')
+
+
+class DeleteStockSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+class DeleteStockResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
+class StockDataSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    symbol = serializers.CharField()
+    current_price = serializers.FloatField()
+    category = serializers.CharField(allow_null=True)
+
+
+class AddStockResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    stock = StockDataSerializer()
+
+
+class PriceUpdateSerializer(serializers.Serializer):
+    symbol = serializers.CharField()
+    price = serializers.FloatField(required=False)
+    status = serializers.CharField()
+
+
+class UpdatePricesResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    results = PriceUpdateSerializer(many=True)
+
+
+class HistoryDataSerializer(serializers.Serializer):
+    t = serializers.ListField(child=serializers.IntegerField(), help_text='Timestamps')
+    c = serializers.ListField(child=serializers.FloatField(), help_text='Precios de cierre')
+
+
+class HistoryResponseSerializer(serializers.Serializer):
+    stock = serializers.CharField()
+    symbol = serializers.CharField()
+    last = serializers.FloatField()
+    days = serializers.IntegerField()
+    interval = serializers.CharField()
+    data = HistoryDataSerializer()
+
+
+class StockPerformanceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    symbol = serializers.CharField()
+    open_price = serializers.FloatField()
+    current_price = serializers.FloatField()
+    change_percentage = serializers.FloatField()
+
+
+class TopGainersResponseSerializer(serializers.Serializer):
+    top_gainers = StockPerformanceSerializer(many=True)
+
+
+class TopLosersResponseSerializer(serializers.Serializer):
+    top_losers = StockPerformanceSerializer(many=True)
+
+
+class ErrorResponseSerializer(serializers.Serializer):
+    error = serializers.CharField()
