@@ -73,6 +73,15 @@
     gap: 5px;
 }
 
+.date-inputs-filter-to {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.date-inputs-filter-to p,
 .date-inputs-filter p{
     font-size: 10px;
 }

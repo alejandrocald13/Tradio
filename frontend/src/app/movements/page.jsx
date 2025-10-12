@@ -84,7 +84,7 @@ export default function movements () {
                             </div>
                         )}
                     </div>
-                    <Searcher placeholderI={'Ingresa Correo'}getValue={getDataSearcher} />
+                    <Searcher placeholderI={'Enter email'}getValue={getDataSearcher} />
                 </div>
                 <div className="table-transaction-M">
                     <TableAdmin columns={movesColumns} data={movesData} btnVerification={false}/>

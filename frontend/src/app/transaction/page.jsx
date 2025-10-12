@@ -108,17 +108,16 @@ export default function Transaction(){
                                 <div className="filter-segments">
                                     <p>Date</p>
                                     <div className="date-inputs-filter">
-                                        <p>Desde:</p>
+                                        <p>From:</p>
                                         <input 
                                             type="date" 
                                         />
                                     </div>
 
-                                    <div className="date-inputs-filter">
-                                        <p>Hasta:</p>
+                                    <div className="date-inputs-filter-to">
+                                        <p>To:</p>
                                         <input 
                                             type="date" 
-                                           
                                         />
                                     </div>
                                 </div>
@@ -128,7 +127,7 @@ export default function Transaction(){
                             </div>
                         )}
                     </div>
-                    <Searcher placeholderI={'Ingresa Correo'}getValue={getDataSearcher} />
+                    <Searcher placeholderI={'Enter email'}getValue={getDataSearcher} />
                 </div>
                 {selectedTable === 'transaction' && (<div className="table-transaction-AT">
                     <TableAdmin columns={transationColumns} data={transactionData} btnVerification={false}/>
