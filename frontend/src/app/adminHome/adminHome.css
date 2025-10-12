@@ -1,0 +1,74 @@
+.main-container-AH {
+    display: flex;
+    width: 100%;
+    background-color: #F5F5F5;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 20px;
+}
+
+.greating-admin {
+    display: flex;
+    margin: 1rem 1.5rem 0 14rem;
+}
+
+.tableContainer {
+    height: 180px;
+    overflow-y: auto;
+}
+.container-UC{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 50%;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    margin: 0 1.5rem 0 14rem;
+    box-shadow: inset;
+    border-radius: 25px;
+}
+
+.container-UC h3{
+    text-align: center;
+    color: #4E635E ;
+}
+
+
+.btnContainers {
+    display: flex;
+    height: 40px;
+    border-radius: 18px;
+    padding: 5px;
+    gap: 5px;
+    align-items: center;
+    font-size: 15;
+}
+
+
+.btnContainers button {
+    transition: all 0.3s ease; 
+}
+
+.btnContainers .h3 {
+    margin: 0 0 0 200px;
+    color: #40524e;
+}
+
+.btnContainers .selected {
+    border: none;
+    min-width: 160px;
+    color: #40524e;
+    height: 40px;
+    cursor: pointer;
+    border-bottom: 1px solid #40524e;
+    background: none;
+}
+
+.btnContainers .waiting {
+    border: none;
+    min-width: 150px;
+    background: none;
+    color: #40524e;
+    height: 40px;
+    cursor: pointer;
+}
