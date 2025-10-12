@@ -1,0 +1,293 @@
+.page-container {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 100dvh; 
+    background: #f5f5f5;
+    overflow: hidden; 
+}
+
+.div-category {
+    gap: 16px;
+    margin-left: 72px;
+    max-width: 40dvh;                 
+    height: 100dvh;
+    padding: 28px;
+    background: #fff;
+    border-top-right-radius: 28px;
+    border-bottom-right-radius: 28px;
+    box-shadow: 12px 0 24px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #d3d3d3;
+    align-items: center;
+    align-self: flex-start;
+    text-align: center;
+    position: sticky;
+    top: 0;
+}
+
+.div-category h2 {
+    width: 100%;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #4e635e;
+    padding-bottom: 12px; 
+}
+
+/* Se crea de que la barrita grisita abajo del titulo de categoria*/
+.div-category h2::after {
+    content: "";
+    display: block;
+    height: 2px;
+    width: 100%;
+    margin: 12px auto 0;
+    background: #a3a3a3;
+    border-radius: 2px;
+}
+
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;                    
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.category-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: 0;
+    padding: 0;                      
+    text-align: left;
+    cursor: pointer;
+    color: #90a19c;                   
+    outline: none;
+}
+
+.category-item:hover .category-name {
+    color: #4e635e;
+}
+
+.category-item.is-active .category-name {
+    color: #111;
+    font-weight: 600;
+}
+
+.category-name {
+    max-width: 70%;
+    overflow: hidden;
+    margin-right:10px;
+}
+
+.capsule-number {
+    min-width: 30px;
+    padding: 1.5px;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 999px;
+    background: #f1f1f1;              
+    color: #4e635e;
+}
+
+.capsule-number-active {
+    background: #a6b29e;              
+    color: #fff;
+}
+
+.div-actions {
+    width: 100%;
+}
+
+.actions-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    overflow-y: auto; 
+    width: 100%;
+    height: 85%;
+}
+
+.action-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.buttons-modal {
+    display: flex;
+    justify-content: center;
+    gap:30px;
+    margin-top: 20px;
+}
+
+.buttons-modal button {
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.buttons-modal .primary-btn {
+    background-color: #4e635e;
+    color: #fff;
+}
+
+.buttons-modal .primary-btn:hover {
+    background-color: #364743;
+}
+
+.buttons-modal .cancel-btn {
+    background-color: #e5e5e5;
+}
+
+.buttons-modal .cancel-btn:hover {
+    background-color: #c7c5c5;
+}
+
+p strong {
+    font-weight: 600;
+}
+
+.no-actions {
+    margin: 0 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    height: 90dvh;
+    text-align: center;
+    border: 2px dashed #c8c8c8;
+    border-radius: 20px;
+    color: #555555;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.no-actions:hover {
+    background: #f3f3f3;
+    color: #3a4944;
+}
+
+.no-actions-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+    animation: float 2.5s ease-in-out infinite;
+    fill: #555555;
+}
+
+.price-action-do {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    font-size: 18px;
+}
+
+.button-action-do {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    width: 100%;
+}
+
+.searcher-container {
+    /* background-color: cadetblue; */
+    width: 84%;
+    display: flex;
+    justify-content: right;
+    margin: 2rem 0 0 6rem;
+    padding: 5px;
+}
+
+.filter-btn {
+    display: flex;
+    flex-direction: row;
+    margin-left: 5rem;
+}
+
+.filter-btn-pattern {
+    display: flex;                 
+    justify-content: center;       
+    align-items: center;
+    height: 100%;
+    width: 100px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6px 12px;
+    background-color: #fff;
+    color: #4E635E;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    gap: 12px;
+    font-size: 15px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    margin-top: 45px;
+    background: white;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    z-index: 100;
+    width: 100px;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 14px;
+    color: #4e635e;
+    cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+    background: #f3f3f3;
+    color: #111;
+}
+
+
+
+/* animacion para cuando no hay acciones para la categoria, de que va de arriba hacia abajo */
+/* aca el negativo indica que va hacia arriba (solo para el inicio) */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
