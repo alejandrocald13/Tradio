@@ -73,7 +73,7 @@ export default function Portafolio (){
             <div className="main-container-portafolio">
                 <div className="horizontal-container-portafolio">
                     <div className="vertical-container-info-portafolio">
-                        <GreetingPortafolio/>
+                        <GreetingPortafolio message={'Let’s see how your portfolio is growing today.'}/>
                         
                         <div className={seeAction ? "card-info-container-portafolio2" : "card-info-container-portafolio3"}>
                             <div className="all-content">
