@@ -9,10 +9,11 @@ import "../styles/SidebarNav-Admin.css";
 export default function SidebarNavAdmin() {
     const pathname = usePathname();
     const [isUsersOpen, setIsUsersOpen] = useState(false);
+    const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
 
     const items = [
         { id: "users",          label: "Users" },
-        { id: "transaction",    label: "Transaction",   href: "/transaction" },
+        { id: "transactions",    label: "Transactions",   href: "/transaction" },
         { id: "actions",        label: "Actions",       href: "/actionsManage" },
     ];
 
@@ -26,7 +27,7 @@ export default function SidebarNavAdmin() {
         17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
         </svg>
         ),
-        transaction: (
+        transactions: (
         <svg 
         stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1em" width="1em" 
         xmlns="http://www.w3.org/2000/svg"><path d="M928 444H820V330.4c0-17.7-14.3-32-32-32H473L355.7 186.2a8.15 8.15 0 0 
@@ -65,6 +66,9 @@ export default function SidebarNavAdmin() {
     useEffect(() => {
         if (pathname.startsWith("/userClient") || pathname.startsWith("/userAdmin")) {
             setIsUsersOpen(true);
+        }
+        if (pathname.startsWith("/movements") || pathname.startsWith("/transaction")) {
+            setIsTransactionsOpen(true);
         }
     }, [pathname]);
 
@@ -107,6 +111,42 @@ export default function SidebarNavAdmin() {
                         </div>
                     );
                 }
+
+                if (it.id === "transactions") {
+                    const transactionSectionActive =
+                        pathname.startsWith("/movements") || pathname.startsWith("/transaction");
+
+                    return (
+                        <div key={it.id} className="sidebar-dropdown">
+                            <button
+                                className={`sidebar-item ${transactionSectionActive ? "is-active" : ""}`}
+                                onClick={() => setIsTransactionsOpen(!isTransactionsOpen)}
+                            >
+                                <span className="sidebar-item-leftBar" />
+                                <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
+                                <span className="sidebar-label">{it.label}</span>
+                            </button>
+
+                            {isTransactionsOpen && (
+                                <div className="sidebar-submenu">
+                                    <Link
+                                        href="/movements"
+                                        className={`sidebar-subitem ${pathname === "/movements" ? "active" : ""}`}
+                                    >
+                                        Movements
+                                    </Link>
+                                    <Link
+                                        href="/transaction"
+                                        className={`sidebar-subitem ${pathname === "/transaction" ? "active" : ""}`}
+                                    >
+                                        Transactions
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+
 
                 return (
                     <Link
