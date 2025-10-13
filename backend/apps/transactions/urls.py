@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import TransactionListView
+from rest_framework.routers import DefaultRouter
+from .views import TransactionViewSet
 
-urlpatterns = [
-    path("", TransactionListView.as_view()),
-]
+router = DefaultRouter()
+router.register(r'', TransactionViewSet, basename='transactions')
+
+urlpatterns = router.urls

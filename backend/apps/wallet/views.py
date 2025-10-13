@@ -1,105 +1,82 @@
-from rest_framework import generics, status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Wallet, Movement
-from .serializers import WalletSerializer, MovementSerializer
-from .task import publish_event
-from .market_clock import is_open
-from .services import apply_refered_code
+from .serializers import *
+from .services import WalletService
 
-class WalletBalanceView(generics.RetrieveAPIView):
-    serializer_class = WalletSerializer
+class WalletViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+    
+    @action(detail=False, methods=['get'])
+    def balance(self, request):
+        wallet, created = Wallet.objects.get_or_create(user=request.user)
+        serializer = WalletSerializer(wallet)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def topup(self, request):
+        serializer = TopUpSerializer(data=request.data)
+        if serializer.is_valid():
+            service = WalletService()
+            try:
+                movement = service.deposit(
+                    user=request.user,
+                    amount=serializer.validated_data['amount'],
+                    reference=serializer.validated_data['reference']
+                )
+                return Response({
+                    'message': 'Deposit completed successfully',
+                    'current_balance': movement.user.wallet.balance
+                }, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def withdraw(self, request):
+        serializer = WithdrawSerializer(data=request.data)
+        if serializer.is_valid():
+            service = WalletService()
+            try:
+                movement = service.withdraw(
+                    user=request.user,
+                    amount=serializer.validated_data['amount'],
+                    reference=serializer.validated_data['reference']
+                )
+                return Response({
+                    'message': 'Withdrawal completed successfully',
+                    'current_balance': movement.user.wallet.balance
+                }, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({'error': str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_object(self):
-        wallet, _ = Wallet.objects.get_or_create(user=self.request.user)
-        return wallet
-
-class WalletMovementsView(generics.ListAPIView):
+class MovementViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MovementSerializer
     permission_classes = [IsAuthenticated]
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['type', 'created_at']
+    
     def get_queryset(self):
-        return Movement.objects.filter(user=self.request.user).order_by("-created_at")
-
-
-class WalletTopupView(generics.CreateAPIView):
-    serializer_class = MovementSerializer
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request, *args, **kwargs):
-        if not is_open():
-            return Response(
-                {"detail": "Market is closed, transactions only allowed 09:30-16:00, Mon-Fri"},
-                status=status.HTTP_422_UNPROCESSABLE_ENTITY
-            )
-
-        monto = float(request.data.get("monto"))
-        referencia = request.data.get("referencia")
-        referal_code = request.data.get("referal_code")
-        commission = monto * 0.02
-        total = monto - commission
-
-        with transaction.atomic():
-            wallet, _ = Wallet.objects.get_or_create(user=request.user)
-            wallet.balance += total
-            wallet.save()
-
-            movement = Movement.objects.create(
-                user=request.user,
-                numero_transferencia=referencia,
-                tipo="TOPUP",
-                monto=monto,
-                comision=commission,
-                total=total,
-            )
-            if referal_code:
-                apply_refered_code(request.user, referal_code)
-
-            publish_event.delay(
-                "wallet.movement.posted",
-                {"user": request.user.id, "movement": movement.id}
-            )
-
-        return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
-
-class WalletWithdrawView(generics.CreateAPIView):
-    serializer_class = MovementSerializer
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request, *args, **kwargs):
-        if not is_open():
-            return Response(
-                {"detail": "Market is closed, transactions only allowed 09:30-16:00, Mon-Fri"},
-                status=status.HTTP_422_UNPROCESSABLE_ENTITY
-            )
-
-        monto = float(request.data.get("monto"))
-        referencia = request.data.get("referencia")
-        commission = monto * 0.02
-        total = monto + commission
-
-        wallet, _ = Wallet.objects.get_or_create(user=request.user)
-        if wallet.balance < total:
-            return Response({"error": "insufficient_funds"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-        with transaction.atomic():
-            wallet.balance -= total
-            wallet.save()
-
-            movement = Movement.objects.create(
-                user=request.user,
-                numero_transferencia=referencia,
-                tipo="WITHDRAW",
-                monto=monto,
-                comision=commission,
-                total=-total,
-            )
-
-            publish_event.delay(
-                "wallet.movement.posted",
-                {"user": request.user.id, "movement": movement.id}
-            )
-
-        return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
+        return Movement.objects.filter(user=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def filter(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # Date range filter
+        date_from = request.query_params.get('date_from')
+        date_to = request.query_params.get('date_to')
+        
+        if date_from:
+            queryset = queryset.filter(created_at__date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(created_at__date__lte=date_to)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
