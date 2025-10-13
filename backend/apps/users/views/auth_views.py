@@ -20,6 +20,15 @@ from apps.users.actions import Action
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
 
+    @extend_schema(
+        responses={
+            201: OpenApiResponse(description="Inicio de sesión correcto"),
+            400: OpenApiResponse(description="Credenciales Inválidas"),
+        },
+        tags=["token"],
+        summary="Inicio de Sesión",
+    )
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
