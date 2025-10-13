@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
-from users.actions import Action
-from users.utils import log_action
+from ..users.actions import Action
+from ..users.utils import log_action
 
 from .models import Portfolio
 from .serializers import (

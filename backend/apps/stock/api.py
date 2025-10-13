@@ -9,8 +9,8 @@ import os
 import yfinance as yf
 from datetime import datetime, timedelta
 from .models import Stock, Category
-from users.actions import Action
-from users.utils import log_action
+from ..users.actions import Action
+from ..users.utils import log_action
 from .serializers import (
     StockSerializer, 
     CategorySerializer,
@@ -34,6 +34,24 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'symbol', 'category__name'] # /api/stocks/?search=<valor>
     ordering_fields = ['current_price', 'name']  # /api/stocks/?ordering=-<valor>
+
+
+    @extend_schema(
+        summary="Listar todas las acciones en BD",
+        description="Devuelve todas las acciones registradas con filtros opcionales de búsqueda y ordenamiento."
+    )
+    def list(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.STOCK_VIEWED)
+        return super().list(request, *args, **kwargs)
+
+
+    @extend_schema(
+        summary="Obtener acción por ID",
+        description="Devuelve el detalle de una acción específica."
+    )
+    def retrieve(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.STOCK_VIEWED)
+        return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
         summary="Desactivar una acción (soft delete)",
