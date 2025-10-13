@@ -9,6 +9,8 @@ import os
 import yfinance as yf
 from datetime import datetime, timedelta
 from .models import Stock, Category
+from users.actions import Action
+from users.utils import log_action
 from .serializers import (
     StockSerializer, 
     CategorySerializer,
@@ -49,6 +51,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     def disable(self, request, pk=None):
         stock = self.get_object()
         stock.soft_delete()
+        log_action(request, user, Action.ADMIN_STOCK_UPDATED)
         return Response(
             {"message": "La acción fue desactivada con éxito"},
             status=status.HTTP_200_OK
@@ -70,6 +73,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     def enable(self, request, pk=None):
         stock = self.get_object()
         stock.enable()
+        log_action(request, user, Action.ADMIN_STOCK_UPDATED)
         return Response(
             {"message": "La acción fue activada con éxito"},
             status=status.HTTP_200_OK
@@ -146,7 +150,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 current_price=current_price,
                 is_active=True
             )
-            
+            log_action(request, request.user, Action.ADMIN_STOCK_CREATED)
             return Response(
                 {
                     "message": "Stock added successfully",
@@ -205,6 +209,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                     "status": f"error: {e}"
                 })
 
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
         return Response({
             "message": "Update completed",
             "results": resultados
@@ -292,6 +297,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 "t": timestamps,
                 "c": close_prices 
             }
+            log_action(request, request.user, Action.STOCK_VIEWED)
             
             return Response(
                 {
@@ -353,6 +359,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 continue
         
         top_3_gainers = sorted(gainers, key=lambda x: x['change_percentage'], reverse=True)[:3]
+        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_gainers": top_3_gainers
@@ -400,6 +407,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 continue
         
         top_3_losers = sorted(losers, key=lambda x: x['change_percentage'])[:3]
+        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_losers": top_3_losers

@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
+from users.actions import Action
+from users.utils import log_action
 
 from .models import Portfolio
 from .serializers import (
@@ -36,6 +38,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     def total(self, request):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True)
         total = sum(portfolio.total_cost for portfolio in portfolios)
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
         return Response({"total": total}, status=status.HTTP_200_OK)
     
 
@@ -48,6 +51,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     def current_total(self, request):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True).select_related('stock')
         total = sum(portfolio.quantity * float(portfolio.stock.current_price) for portfolio in portfolios)
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
         return Response({"total": round(total, 2)}, status=status.HTTP_200_OK)
 
 
@@ -75,7 +79,8 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         current_price = float(max_portfolio.stock.current_price)
         performance = ((current_price - avg_price) / avg_price * 100) if avg_price > 0 else 0
         weight_percentage = (max_portfolio.quantity / total_quantity * 100) if total_quantity > 0 else 0
-        
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
+
         return Response({
             "name": max_portfolio.stock.name,
             "symbol": max_portfolio.stock.symbol,
@@ -117,7 +122,8 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         portfolio = worst['portfolio']
         
         weight_percentage = (portfolio.quantity / total_quantity * 100) if total_quantity > 0 else 0
-        
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
+
         return Response({
             "name": portfolio.stock.name,
             "symbol": portfolio.stock.symbol,
@@ -161,7 +167,8 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         portfolio = best['portfolio']
         
         weight_percentage = (portfolio.quantity / total_quantity * 100) if total_quantity > 0 else 0
-        
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
+
         return Response({
             "name": portfolio.stock.name,
             "symbol": portfolio.stock.symbol,
