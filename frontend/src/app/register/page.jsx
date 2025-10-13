@@ -46,9 +46,54 @@ export default function RegisterPage() {
     return age;
   };
 
+  // Validar DPI (solo números, máximo 13 dígitos)
+  const validateDPI = (dpi) => {
+    const dpiRegex = /^\d{1,13}$/;
+    return dpiRegex.test(dpi);
+  };
+
+  // Validar teléfono (permite código de área y formato internacional)
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[\+]?[(]?[\d\s\-\(\)]{8,}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // Formatear teléfono mientras se escribe
+  const formatPhone = (value) => {
+    // Eliminar todo excepto números y el signo +
+    const numbers = value.replace(/[^\d+]/g, '');
+    
+    // Si empieza con +, permitir formato internacional
+    if (numbers.startsWith('+')) {
+      return numbers;
+    }
+    
+    // Formato local: (+502) 1234-5678 o similar
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 6) {
+      return `(${numbers.slice(0,3)}) ${numbers.slice(3)}`;
+    } else {
+      return `(${numbers.slice(0,3)}) ${numbers.slice(3,7)}-${numbers.slice(7,11)}`;
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    let formattedValue = value;
+
+    // Aplicar formato al teléfono
+    if (name === "cellphone") {
+      formattedValue = formatPhone(value);
+    }
+
+    // Validar DPI (solo números)
+    if (name === "dpi") {
+      // Permitir solo números y limitar a 13 caracteres
+      formattedValue = value.replace(/\D/g, '').slice(0, 13);
+    }
+
+    setFormData({ ...formData, [name]: formattedValue });
     
     // Limpiar error cuando el usuario empiece a escribir
     if (errors[name]) {
@@ -66,6 +111,29 @@ export default function RegisterPage() {
         setErrors(newErrors);
       }
     }
+
+    // Validación en tiempo real para DPI
+    if (name === "dpi" && value) {
+      if (!validateDPI(value)) {
+        setErrors({ ...errors, dpi: "El DPI debe contener solo números (máximo 13 dígitos)" });
+      } else {
+        const newErrors = { ...errors };
+        delete newErrors.dpi;
+        setErrors(newErrors);
+      }
+    }
+
+    // Validación en tiempo real para teléfono
+    if (name === "cellphone" && value) {
+      const cleanPhone = value.replace(/[^\d+]/g, '');
+      if (!validatePhone(cleanPhone)) {
+        setErrors({ ...errors, cellphone: "Ingresa un número de teléfono válido" });
+      } else {
+        const newErrors = { ...errors };
+        delete newErrors.cellphone;
+        setErrors(newErrors);
+      }
+    }
   };
 
   const handleNext = (e) => {
@@ -76,7 +144,7 @@ export default function RegisterPage() {
     if (!email) {
       newErrors.email = "El email es requerido";
     } else if (!validateEmail(email)) {
-      newErrors.email = "Ingresa un email válido (debe contener @ y dominio)";
+      newErrors.email = "Ingresa un email válido";
     }
 
     if (!password) {
@@ -117,12 +185,25 @@ export default function RegisterPage() {
     } else {
       const age = validateAge(birthdate);
       if (age < 18) {
-        newErrors.birthdate = "Debes ser mayor de edad (18+ años) para registrarte";
+        newErrors.birthdate = "Debes ser mayor de edad (18+ años)";
       }
     }
 
-    if (!cellphone) newErrors.cellphone = "El teléfono es requerido";
-    if (!dpi) newErrors.dpi = "El DPI es requerido";
+    if (!cellphone) {
+      newErrors.cellphone = "El teléfono es requerido";
+    } else {
+      const cleanPhone = cellphone.replace(/[^\d+]/g, '');
+      if (!validatePhone(cleanPhone)) {
+        newErrors.cellphone = "Ingresa un número de teléfono válido";
+      }
+    }
+
+    if (!dpi) {
+      newErrors.dpi = "El DPI es requerido";
+    } else if (!validateDPI(dpi)) {
+      newErrors.dpi = "El DPI debe contener solo números (máximo 13 dígitos)";
+    }
+
     if (!address) newErrors.address = "La dirección es requerida";
 
     if (Object.keys(newErrors).length > 0) {
@@ -170,8 +251,8 @@ export default function RegisterPage() {
               ></div>
             </div>
             <div className="progressSteps">
-              <span className={step === 1 ? "activeStep" : ""}>Step 1</span>
-              <span className={step === 2 ? "activeStep" : ""}>Step 2</span>
+              <span className={step === 1 ? "activeStep" : ""}>Account Info</span>
+              <span className={step === 2 ? "activeStep" : ""}>Personal Info</span>
             </div>
           </div>
 
@@ -190,7 +271,6 @@ export default function RegisterPage() {
                     value={formData.email}
                     onChange={handleChange}
                     className={errors.email ? "error" : ""}
-                    required
                   />
                 </div>
                 {errors.email && <span className="error-message">{errors.email}</span>}
@@ -204,7 +284,6 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={handleChange}
                     className={errors.password ? "error" : ""}
-                    required
                   />
                   <span
                     className="toggleIcon"
@@ -224,7 +303,6 @@ export default function RegisterPage() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className={errors.confirmPassword ? "error" : ""}
-                    required
                   />
                   <span
                     className="toggleIcon"
@@ -257,7 +335,6 @@ export default function RegisterPage() {
                     value={formData.fullName}
                     onChange={handleChange}
                     className={errors.fullName ? "error" : ""}
-                    required
                   />
                 </div>
                 {errors.fullName && <span className="error-message">{errors.fullName}</span>}
@@ -272,7 +349,6 @@ export default function RegisterPage() {
                     className={errors.birthdate ? "error" : ""}
                     min={getMinBirthdate()}
                     max={getMaxBirthdate()}
-                    required
                   />
                   <span className="age-info">
                     {formData.birthdate && `Edad: ${validateAge(formData.birthdate)} años`}
@@ -285,11 +361,10 @@ export default function RegisterPage() {
                   <input
                     type="tel"
                     name="cellphone"
-                    placeholder="Cellphone"
+                    placeholder="Ej: (502) 1234-5678 o +1 (555) 123-4567"
                     value={formData.cellphone}
                     onChange={handleChange}
                     className={errors.cellphone ? "error" : ""}
-                    required
                   />
                 </div>
                 {errors.cellphone && <span className="error-message">{errors.cellphone}</span>}
@@ -299,11 +374,11 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     name="dpi"
-                    placeholder="DPI"
+                    placeholder="DPI (solo números, máximo 13 dígitos)"
                     value={formData.dpi}
                     onChange={handleChange}
                     className={errors.dpi ? "error" : ""}
-                    required
+                    maxLength={13}
                   />
                 </div>
                 {errors.dpi && <span className="error-message">{errors.dpi}</span>}
@@ -317,7 +392,6 @@ export default function RegisterPage() {
                     value={formData.address}
                     onChange={handleChange}
                     className={errors.address ? "error" : ""}
-                    required
                   />
                 </div>
                 {errors.address && <span className="error-message">{errors.address}</span>}
