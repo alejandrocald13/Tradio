@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from apps.users.serializers import EmailTokenObtainPairSerializer
 
 # swagger
-from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 # no-repudio
 from apps.users.utils import log_action
@@ -33,9 +33,9 @@ class EmailTokenObtainPairView(TokenObtainPairView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,    # ⚠️ Cambia a True en producción (HTTPS)
-            samesite="Lax",  # o "None" si frontend y backend están en dominios distintos
-            max_age=3600,    # 1 hora (3600 segundos)
+            secure=False,      # True on production
+            samesite="None",  # 
+            max_age=3600,
         )
 
         return response
@@ -91,7 +91,7 @@ class LogoutView(APIView):
         try:
             token = AccessToken(token_str)
             token.blacklist()
-            
+
             log_action(request, request.user, Action.AUTH_LOGOUT)
 
             response = Response(status=status.HTTP_204_NO_CONTENT)
