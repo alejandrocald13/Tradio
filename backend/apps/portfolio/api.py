@@ -17,7 +17,7 @@ from apps.stock.models import Stock
 
 
 @extend_schema(tags=['portfolio'])
-class PortfolioViewSet(viewsets.ModelViewSet):
+class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PortfolioSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
@@ -27,6 +27,24 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return Portfolio.objects.none()
         return Portfolio.objects.filter(user=self.request.user, is_active=True).select_related('stock')
+
+
+    @extend_schema(
+        summary="Listar todos los portfolios del usuario",
+        description="Devuelve todos los portfolios que posee el usuario."
+    )
+    def list(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
+        return super().list(request, *args, **kwargs)
+
+
+    @extend_schema(
+        summary="Obtener un portfolio por ID",
+        description="Devuelve el detalle de un portfolio específico"
+    )
+    def retrieve(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.PORTFOLIO_VIEWED)
+        return super().retrieve(request, *args, **kwargs)
 
 
     @extend_schema(
