@@ -433,7 +433,17 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @extend_schema(tags=['categories'])
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
+
+
+    @extend_schema(
+    summary="Listar todas las categorías en BD",
+    description="Devuelve todas las categorías existentes en BD"
+)
+    def list(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.SEARCH_BY_CATEGORY)
+        return super().list(request, *args, **kwargs)
+    
