@@ -21,7 +21,7 @@ export default function CardInfoPortafolio(){
         <>
             <div className="card-info-container-portafolio">
                     <div className="graph">
-                        *<CircularGraph 
+                        <CircularGraph 
                             graphData={graphData}
                         />
                     </div>

@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "apexcharts": "^5.3.5",
+    "axios": "^1.12.2",
     "chart.js": "^4.5.0",
+    "lucide-react": "^0.544.0",
     "next": "15.5.2",
     "react": "19.1.0",
     "react-apexcharts": "^1.7.0",

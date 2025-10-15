@@ -1,9 +1,13 @@
-from django.urls import path
-from .views import WalletBalanceView, WalletMovementsView, WalletTopupView, WalletWithdrawView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import WalletViewSet, MovementViewSet
+
+router = DefaultRouter()
+router.register(r'movements', MovementViewSet, basename='movements')
 
 urlpatterns = [
-    path("balance/", WalletBalanceView.as_view(), name="wallet-balance"),
-    path("movements/", WalletMovementsView.as_view(), name="wallet-movements"),
-    path("topup/", WalletTopupView.as_view(), name="wallet-topup"),
-    path("withdraw/", WalletWithdrawView.as_view(), name="wallet-withdraw"),
+    path('', include(router.urls)),
+    path('balance/', WalletViewSet.as_view({'get': 'balance'}), name='wallet-balance'),
+    path('topup/', WalletViewSet.as_view({'post': 'topup'}), name='wallet-topup'),
+    path('withdraw/', WalletViewSet.as_view({'post': 'withdraw'}), name='wallet-withdraw'),
 ]

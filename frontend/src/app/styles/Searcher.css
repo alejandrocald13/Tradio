@@ -1,5 +1,7 @@
 .container-searcher{
-    width: 20%;
+    min-width: 200px;
+    max-height: 40px;
+    min-height: 40px;
     border-radius: 13px;
     position: relative;
     color: #f5f6f4;
@@ -11,23 +13,27 @@
     border: none;
     outline: none;
     border-radius: 13px;
-    height: 30px;
+    height: 40px;
     padding: 0 60px 0 20px;
 }
 
 .container-searcher .btn-searcher {
     position: absolute;
     cursor: pointer;
-    top: 6px;
-    right: 10px;
+    top: 8px;
+    right: 14px;
     border: none;
     background-color: none;
     background: none;
 }
 
 .container-searcher .btn-searcher svg {
-    width: 18px;
-    height: 18px;
+    width: 23px;
+    height: 23px;
+    color: #4E635E;
+}
+
+.container-searcher input::placeholder{
     color: #4E635E;
 }
 

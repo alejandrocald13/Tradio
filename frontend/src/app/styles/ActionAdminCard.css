@@ -1,0 +1,23 @@
+.action-card-admin {
+    display: flex;
+    flex-direction: column;  
+    background-color: #fff;
+    margin: 0px 15px 20px 15px;
+    height: 12rem;
+    width: 16rem;
+    border-radius: 20px;
+    padding: 30px 20px 7px 20px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.title-action-card-admin {
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+
+.children-action-card-admin {
+    height: 100%;
+    font-size: 18px;
+}

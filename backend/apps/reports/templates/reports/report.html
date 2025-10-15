@@ -3,33 +3,117 @@
 <head>
     <meta charset="utf-8">
     <style>
-    body {
-    font-family: Arial, sans-serif;
-    margin: 40px;
-    }
-    h1 { color: #111827; }
-    p { color: #374151; }
-    .box {
-    border: 1px solid #E5E7EB;
-    border-radius: 8px;
-    padding: 16px;
-    margin-top: 20px;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #111827;
+        }
+        h1, h2 {
+            color: #111827;
+        }
+        p {
+            color: #374151;
+            font-size: 14px;
+        }
+        .box {
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #E5E7EB;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #6B7280;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>Reporte financiero</h1>
-    <p>Usuario: {{ user.email }}</p>
-    <p>Rango: {{ from_date }} — {{ to_date }}</p>
+    <h1>Reporte Financiero</h1>
+    <p><strong>Usuario:</strong> {{ user.email }}</p>
+    <p><strong>Rango de fechas:</strong> {{ from_date }} — {{ to_date }}</p>
 
     <div class="box">
-        <p><strong>Total compras:</strong> {{ compras }}</p>
-        <p><strong>Total ventas:</strong> {{ ventas }}</p>
-        <p><strong>Saldo final:</strong> {{ saldo }}</p>
+        <p><strong>Total compras:</strong> ${{ compras_total|floatformat:2 }}</p>
+        <p><strong>Total ventas:</strong> ${{ ventas_total|floatformat:2 }}</p>
+        <p><strong>Saldo final:</strong> ${{ saldo|floatformat:2 }}</p>
     </div>
 
-    <p style="margin-top:40px; font-size:12px; color:#6B7280;">
-        Generado automáticamente por Tradio.
-    </p>
+    <h2>Detalle de Compras</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Acción / Stock</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.fecha }}</td>
+                <td>{{ compra.name_stock }}</td>
+                <td>{{ compra.cantidad_comprada }}</td>
+                <td>${{ compra.precio_comprado|floatformat:2 }}</td>
+                <td>${{ compra.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; color:#6B7280;">No hay compras registradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 style="margin-top:40px;">Detalle de Ventas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Acción / Stock</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.fecha }}</td>
+                <td>{{ venta.name_stock }}</td>
+                <td>{{ venta.cantidad_vendida }}</td>
+                <td>${{ venta.precio_vendido|floatformat:2 }}</td>
+                <td>${{ venta.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; color:#6B7280;">No hay ventas registradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Generado automáticamente por <strong>Tradio</strong>.</p>
+    </div>
 </body>
 </html>

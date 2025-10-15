@@ -1,18 +1,19 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import "../styles/SidebarNav-Admin.css";
 
 
-
-
 export default function SidebarNavAdmin() {
     const pathname = usePathname();
+    const [isUsersOpen, setIsUsersOpen] = useState(false);
+    const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
 
     const items = [
-        { id: "users",          label: "Users",         href: "/users" },
-        { id: "transaction",    label: "Transaction",   href: "/transaction" },
+        { id: "users",          label: "Users" },
+        { id: "transactions",    label: "Transactions",   href: "/transaction" },
         { id: "actions",        label: "Actions",       href: "/actionsManage" },
     ];
 
@@ -26,7 +27,7 @@ export default function SidebarNavAdmin() {
         17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
         </svg>
         ),
-        transaction: (
+        transactions: (
         <svg 
         stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1em" width="1em" 
         xmlns="http://www.w3.org/2000/svg"><path d="M928 444H820V330.4c0-17.7-14.3-32-32-32H473L355.7 186.2a8.15 8.15 0 0 
@@ -59,36 +60,119 @@ export default function SidebarNavAdmin() {
 
     const isCollapsed = (pathname === "/actionsManage");
 
+    // Hace que se quede activa la pesataña en lugar de guardarse (o sea el boton ese que se depliega)
+    // queda abajo mostrando que se selecciono 
+    // si no se a seleciionado algun tipo de user se guarda el desplegable
+    useEffect(() => {
+        if (pathname.startsWith("/userClient") || pathname.startsWith("/userAdmin")) {
+            setIsUsersOpen(true);
+        }
+        if (pathname.startsWith("/movements") || pathname.startsWith("/transaction")) {
+            setIsTransactionsOpen(true);
+        }
+    }, [pathname]);
+
     return (
         <div className={`sidebar ${isCollapsed ? "is-collapsed" : ""}`}>
-        <div className="sidebar-panel">
-            {items.map((it) => {
-            const isActive = isSectionActive(it.href, pathname);
-            return (
-                <Link
-                    key={it.id}
-                    href={it.href}
-                    className={`sidebar-item ${isActive ? "is-active" : ""}`}
-                    title={it.label} aria-label={it.label}
-                >
-                    <span className="sidebar-item-leftBar" />
-                    <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
-                    <span className="sidebar-label">{it.label}</span>
-                </Link>
-            );
-            })}
-        </div>
+            <div className="sidebar-panel">
+                {items.map((it) => {
+                const isActive = isSectionActive(it.href, pathname);
 
-        <div className="sidebar-logout">
-            <Link
-            href={logoutItem.href}
-            className="sidebar-item logout-item"
-            title={logoutItem.label} aria-label={logoutItem.label}
-            >
-            <span className="sidebar-icon">{DefaultIcons[logoutItem.id]}</span>
-            <span className="sidebar-label">{logoutItem.label}</span>
-            </Link>
-        </div>
+                if (it.id === "users") {
+                    const userSectionActive =
+                        pathname.startsWith("/userClient") || pathname.startsWith("/userAdmin");
+
+                    return (
+                        <div key={it.id} className="sidebar-dropdown">
+                            <button className={`sidebar-item ${ userSectionActive ? "is-active" : "" }`}
+                                onClick={() => setIsUsersOpen(!isUsersOpen)}
+                            >
+                                <span className="sidebar-item-leftBar" />
+                                <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
+                                <span className="sidebar-label">{it.label}</span>
+                            </button>
+
+                            {isUsersOpen && (
+                                <div className="sidebar-submenu">
+                                    <Link href="/userClient" className={`sidebar-subitem ${
+                                            pathname === "/userClient" ? "active" : ""
+                                        }`}
+                                    >
+                                        Clients
+                                    </Link>
+                                    <Link href="/userAdmin" className={`sidebar-subitem ${
+                                            pathname === "/userAdmin" ? "active" : ""
+                                        }`}
+                                    >
+                                        Admins
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+
+                if (it.id === "transactions") {
+                    const transactionSectionActive =
+                        pathname.startsWith("/movements") || pathname.startsWith("/transaction");
+
+                    return (
+                        <div key={it.id} className="sidebar-dropdown">
+                            <button
+                                className={`sidebar-item ${transactionSectionActive ? "is-active" : ""}`}
+                                onClick={() => setIsTransactionsOpen(!isTransactionsOpen)}
+                            >
+                                <span className="sidebar-item-leftBar" />
+                                <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
+                                <span className="sidebar-label">{it.label}</span>
+                            </button>
+
+                            {isTransactionsOpen && (
+                                <div className="sidebar-submenu">
+                                    <Link
+                                        href="/movements"
+                                        className={`sidebar-subitem ${pathname === "/movements" ? "active" : ""}`}
+                                    >
+                                        Movements
+                                    </Link>
+                                    <Link
+                                        href="/transaction"
+                                        className={`sidebar-subitem ${pathname === "/transaction" ? "active" : ""}`}
+                                    >
+                                        Transactions
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+
+
+                return (
+                    <Link
+                        key={it.id}
+                        href={it.href}
+                        className={`sidebar-item ${isActive ? "is-active" : ""}`}
+                        title={it.label} aria-label={it.label}
+                    >
+                        <span className="sidebar-item-leftBar" />
+                        <span className="sidebar-icon">{DefaultIcons[it.id]}</span>
+                        <span className="sidebar-label">{it.label}</span>
+                    </Link>
+                );
+                })}
+            </div>
+
+            <div className="sidebar-logout">
+                <Link
+                href={logoutItem.href}
+                className="sidebar-item logout-item"
+                title={logoutItem.label} aria-label={logoutItem.label}
+                >
+                <span className="sidebar-icon">{DefaultIcons[logoutItem.id]}</span>
+                <span className="sidebar-label">{logoutItem.label}</span>
+                </Link>
+            </div>
         </div>
     );
 }

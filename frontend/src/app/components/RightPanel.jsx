@@ -1,10 +1,12 @@
 "use client";
 
 import styles from "../purchases-sales/purchases-sales.module.css";
+import DoughnutGraph from "./DoughnutGraph"; 
 
-export default function RightPanel({ metrics }) {
+export default function RightPanel({ metrics, graphData }) {
   return (
     <aside className={styles.rightPanel}>
+      {/* Métricas arriba */}
       <div className={styles.metrics}>
         {Object.entries(metrics).map(([label, value]) => (
           <div className={styles.metricRow} key={label}>
@@ -13,12 +15,13 @@ export default function RightPanel({ metrics }) {
           </div>
         ))}
       </div>
-
-      <div className={styles.circleChart}>
-        <span>0.0</span>
+      
+       <div className={styles.graphContainer}>
+        <DoughnutGraph graphData={graphData} className={styles.graph} />
+        
+        {/* Etiqueta abajo */}
+        <div className={styles.balanceLabel}>Balance General</div>
       </div>
-      <div className={styles.balanceLabel}>Balance General</div>
     </aside>
   );
 }
-
