@@ -1,8 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from apps.users.views import (
-    RegisterView, LogoutView, LoggedTokenObtainPairView, LoggedTokenRefreshView,
-    MeView, UserViewSet, UserViewGetName
+    RegisterView, LogoutView, MeView, UserViewSet, UserViewGetName
 )
 
 router = DefaultRouter()
