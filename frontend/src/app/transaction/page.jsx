@@ -73,7 +73,7 @@ export default function Transaction(){
         }
     ]
 
-    const actions = ['Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple']
+    const actions = ['Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple','Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple','Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple']
 
     return (
         <>
