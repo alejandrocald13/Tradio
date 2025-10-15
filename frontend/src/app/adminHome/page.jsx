@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import Greeting from "../components/GreetingPortfolio"
 import TableAdmin from "../components/TableAdmin"
+import SidebarNavAdmin from "../components/SidebarNav-Admin"
+import ActionAdminCard from "../components/ActionAdminCard"
+import Link from "next/link" 
 import './adminHome.css'
 
 export default function AdminHome () {
@@ -139,24 +141,65 @@ export default function AdminHome () {
             date: '10-09-2025',
         }        
     ]
+    
+    const actions = [
+        { id: 1, name: "Apple Inc.", price: 185.32, category: "tech", active: true },
+        { id: 2, name: "Microsoft Corp.", price: 328.50, category: "tech", active: true },
+        { id: 3, name: "Pfizer Inc.", price: 35.20, category: "healthcare", active: true },
+        { id: 4, name: "NVIDIA Corp.", price: 459.20, category: "tech", active: true },
+        { id: 5, name: "Coca-Cola", price: 58.44, category: "consumer", active: true },
+        { id: 6, name: "Bank of America", price: 30.22, category: "financials", active: true  },
+        { id: 7, name: "Coca-Cola", price: 58.44, category: "consumer", active: true  },
+        { id: 8, name: "Procter & Gamble", price: 142.65, category: "consumer", active: true  },
+        { id: 9, name: "ExxonMobil", price: 110.12, category: "energy", active: true  },
+    ]
+
+    const activeActions = actions.filter(a => a.active).slice(0, 4)
+
     return (
         <>
+            <SidebarNavAdmin/>
             <div className="main-container-AH">
                 <div className="greating-admin">
-                    <Greeting message={'Welcome to the control panel. Authorize users, activate market actions, and review financial activity in real time.'}/>
-                </div>
-                <div className="container-UC">
-                    <h3>Daily Movements</h3>
-                    <div className="tableContainer">
-                        <TableAdmin  columns={movesColumns} data={movesData} btnVerification={false}/>
+                    <div className="greeting-text">
+                        <h1>Hello, Admin</h1>
                     </div>
                 </div>
-                <div className="container-UC">
-                    <h3>Daily Transactions</h3>
-                    
-            
-                    <div className="tableContainer">
-                        <TableAdmin  columns={dayTransactionColumns} data={dayUsers} btnVerification={false}/>
+                <div className="sections-configurate">
+                    <div className="section-tables">
+                        <div className="container-UC">
+                            <h3>Daily Movements</h3>
+                            <div className="tableContainer">
+                                <TableAdmin  columns={movesColumns} data={movesData} btnVerification={false}/>
+                            </div>
+                        </div>
+
+                        <div className="container-UC">
+                            <h3>Daily Transactions</h3>
+                            <div className="tableContainer">
+                                <TableAdmin  columns={dayTransactionColumns} data={dayUsers} btnVerification={false}/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="section-actions">
+                        <div className="actions-summary-container">
+                            <div className="summary-header">
+                                <h3>Latest Active Actions</h3>
+                            </div>
+
+                            <div className="summary-actions-list">
+                                {activeActions.map((action) => (
+                                    <ActionAdminCard key={action.id} title={action.name}>
+                                        <div className="action-card-content-admin">
+                                            <p className="price-action-do-admin">Price: ${action.price.toFixed(2)}</p>
+                                            <p className="category-action-do">Category: {action.category}</p>
+                                            <p className="status-action-do">Status: <strong>Active</strong></p>
+                                        </div>
+                                    </ActionAdminCard>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
