@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from apps.users.views import (
-    RegisterView, LogoutView, MeView, UserViewSet, UserViewGetName, DeleteSuperUser, SuperUserView, SearchSuperUserView
+    RegisterView, LogoutView, MeView, UserViewSet, UserViewGetName, DeleteSuperUser, SuperUserView, SearchSuperUserView, SearchUserView
 )
 
 router = DefaultRouter()
@@ -15,13 +15,15 @@ urlpatterns = [
 
     path("auth/me",       MeView.as_view(),       name="auth-me"),
     path("users/getname", UserViewGetName.as_view(), name="get-user-name"),
+    path("users/search", SearchUserView.as_view(), name="search-user-name"),
+
 
     # superusers endpoints
     path("superusers/", SuperUserView.as_view(), name="get-super-users"),
 
     path("superusers/<int:id>/delete", DeleteSuperUser.as_view(), name="disable-super-users"),
 
-    path("superusers/search", SearchSuperUserView.as_view(), name="search-super-users")
+    path("superusers/search", SearchSuperUserView.as_view(), name="search-super-users-name")
 
 ]
 urlpatterns += router.urls
