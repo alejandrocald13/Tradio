@@ -69,7 +69,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     def disable(self, request, pk=None):
         stock = self.get_object()
         stock.soft_delete()
-        log_action(request, user, Action.ADMIN_STOCK_UPDATED)
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
         return Response(
             {"message": "La acción fue desactivada con éxito"},
             status=status.HTTP_200_OK
@@ -91,7 +91,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     def enable(self, request, pk=None):
         stock = self.get_object()
         stock.enable()
-        log_action(request, user, Action.ADMIN_STOCK_UPDATED)
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
         return Response(
             {"message": "La acción fue activada con éxito"},
             status=status.HTTP_200_OK
