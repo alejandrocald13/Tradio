@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import serializers, status
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.response import Response
-
+from django.utils import timezone
 
 # serializers
 from apps.users.serializers import EmailTokenObtainPairSerializer
@@ -35,17 +35,25 @@ class EmailTokenObtainPairView(TokenObtainPairView):
         data = response.data
         access_token = data.get("access")
 
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        
         response = Response({"message": "Inicio de sesión correcto"}, status=status.HTTP_200_OK)
+
+        user.last_login = timezone.now()
+        user.save(update_fields=["last_login"])
 
         # Save token en cookie HTTPOnly
         response.set_cookie(
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,      # True on production
+            secure=True,      # True on production
             samesite="None",  # 
             max_age=3600,
         )
+
 
         return response
 
