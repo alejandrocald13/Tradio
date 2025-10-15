@@ -23,6 +23,7 @@ class Portfolio(models.Model):
         self.save()
 
     def sell(self, amount):
+        self.total_cost -= amount * self.get_average_price()
         self.quantity -= amount
         if self.quantity <= 0:
             self.quantity = 0

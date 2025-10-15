@@ -1,19 +1,33 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
+from drf_spectacular.types import OpenApiTypes
 import requests
 import os
 import yfinance as yf
 from datetime import datetime, timedelta
 from .models import Stock, Category
-from .serializers import StockSerializer, CategorySerializer
+from ..users.actions import Action
+from ..users.utils import log_action
+from .serializers import (
+    StockSerializer, 
+    CategorySerializer,
+    AddStockRequestSerializer,
+    AddStockResponseSerializer,
+    UpdatePricesResponseSerializer,
+    HistoryResponseSerializer,
+    TopGainersResponseSerializer,
+    TopLosersResponseSerializer,
+    ErrorResponseSerializer
+)
 from .permissions import IsAdminOrReadOnly
 
 API_KEY = os.getenv("FINNHUB_API_KEY")
 
-class StockViewSet(viewsets.ModelViewSet):
-    queryset = Stock.objects.all() # para devolver únicamente stocks activos
+class StockViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Stock.objects.all()
     permission_classes = [IsAdminOrReadOnly] 
     serializer_class = StockSerializer
 
@@ -21,12 +35,82 @@ class StockViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'symbol', 'category__name'] # /api/stocks/?search=<valor>
     ordering_fields = ['current_price', 'name']  # /api/stocks/?ordering=-<valor>
 
-    def perform_destroy(self, instance):
-        instance.soft_delete()
 
+    @extend_schema(
+        summary="Listar todas las acciones en BD",
+        description="Devuelve todas las acciones registradas con filtros opcionales de búsqueda y ordenamiento."
+    )
+    def list(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.STOCK_VIEWED)
+        return super().list(request, *args, **kwargs)
+
+
+    @extend_schema(
+        summary="Obtener acción por ID",
+        description="Devuelve el detalle de una acción específica."
+    )
+    def retrieve(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.STOCK_VIEWED)
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Desactivar una acción (soft delete)",
+        description="Desactiva una acción específica por su ID",
+        responses={
+            200: inline_serializer(
+                name='DisableStockResponse',
+                fields={'message': serializers.CharField()}
+            ),
+            404: ErrorResponseSerializer
+        },
+        tags=['stocks']
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
+    def disable(self, request, pk=None):
+        stock = self.get_object()
+        stock.soft_delete()
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
+        return Response(
+            {"message": "La acción fue desactivada con éxito"},
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        summary="Activar una acción",
+        description="Activa una acción específica por su ID",
+        responses={
+            200: inline_serializer(
+                name='EnableStockResponse',
+                fields={'message': serializers.CharField()}
+            ),
+            404: ErrorResponseSerializer
+        },
+        tags=['stocks']
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
+    def enable(self, request, pk=None):
+        stock = self.get_object()
+        stock.enable()
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
+        return Response(
+            {"message": "La acción fue activada con éxito"},
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        summary="Agregar acción por símbolo",
+        description="Busca y agrega una acción desde Finnhub si no existe en BD",
+        request=AddStockRequestSerializer,
+        responses={
+            200: AddStockResponseSerializer,
+            201: AddStockResponseSerializer,
+            400: ErrorResponseSerializer,
+            404: ErrorResponseSerializer,
+        },
+        tags=['stocks']
+    )
     @action(detail=False, methods=['post'])
     def add_stock(self, request):
-        # Agregar una acción por símbolo. Si no existe en BD, la busca en Finnhub
         symbol = request.data.get("symbol", "").upper().strip()
         
         if not symbol:
@@ -35,7 +119,6 @@ class StockViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verificar si ya existe en la BD
         try:
             stock = Stock.objects.get(symbol=symbol)
             return Response(
@@ -54,14 +137,11 @@ class StockViewSet(viewsets.ModelViewSet):
         except Stock.DoesNotExist:
             pass
         
-        # Buscar en Finnhub
         try:
-            # Obtener información del perfil de la empresa
             profile_url = f"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={API_KEY}"
             profile_response = requests.get(profile_url)
             profile_data = profile_response.json()
             
-            # Obtener el precio actual
             quote_url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={API_KEY}"
             quote_response = requests.get(quote_url)
             quote_data = quote_response.json()
@@ -76,13 +156,11 @@ class StockViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Obtener o crear categoría basada en la industria de Finnhub
             category, _ = Category.objects.get_or_create(
                 name=industry,
                 defaults={"description": f"Industry: {industry}"}
             )
             
-            # Crear el stock en la BD
             stock = Stock.objects.create(
                 name=company_name,
                 symbol=symbol,
@@ -90,7 +168,7 @@ class StockViewSet(viewsets.ModelViewSet):
                 current_price=current_price,
                 is_active=True
             )
-            
+            log_action(request, request.user, Action.ADMIN_STOCK_CREATED)
             return Response(
                 {
                     "message": "Stock added successfully",
@@ -111,7 +189,11 @@ class StockViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
+    @extend_schema(
+        summary="Actualizar precios de todas las acciones (admin)",
+        responses={200: UpdatePricesResponseSerializer},
+        tags=['stocks']
+    )
     @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
     def update_prices(self, request):
         activos = Stock.objects.filter(is_active=True)
@@ -123,7 +205,7 @@ class StockViewSet(viewsets.ModelViewSet):
             try:
                 response = requests.get(url)
                 data = response.json()
-                new_price = data.get('c')  # current price
+                new_price = data.get('c')
 
                 if new_price:
                     stock.current_price = new_price
@@ -145,26 +227,38 @@ class StockViewSet(viewsets.ModelViewSet):
                     "status": f"error: {e}"
                 })
 
+        log_action(request, request.user, Action.ADMIN_STOCK_UPDATED)
         return Response({
             "message": "Update completed",
             "results": resultados
         }, status=status.HTTP_200_OK)
     
-
+    @extend_schema(
+        summary="Obtener historial de precios",
+        parameters=[
+            OpenApiParameter('symbol', OpenApiTypes.STR, required=True, description='Símbolo de la acción'),
+            OpenApiParameter('days', OpenApiTypes.INT, description='Días de historial (default: 7)'),
+            OpenApiParameter('interval', OpenApiTypes.STR, description='Intervalo: 1m, 5m, 1h, 1d, etc. (default: 1d)'),
+        ],
+        responses={
+            200: HistoryResponseSerializer,
+            400: ErrorResponseSerializer,
+            404: ErrorResponseSerializer
+        },
+        tags=['stocks']
+    )
     @action(detail=False, methods=['get'])
     def history(self, request):
         symbol = request.query_params.get('symbol', None)
         days = int(request.query_params.get('days', 7))
         interval = request.query_params.get('interval', '1d') 
         
-        # Validar parámetros
         if not symbol:
             return Response(
                 {"error": "El parámetro 'symbol' es obligatorio."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Intervalos válidos en yfinance
         valid_intervals = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', 
                         '1h', '1d', '5d', '1wk', '1mo', '3mo']
         
@@ -177,7 +271,6 @@ class StockViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Restricciones de yfinance para datos intradiarios
         if interval in ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h']:
             if days > 60:
                 return Response(
@@ -189,7 +282,6 @@ class StockViewSet(viewsets.ModelViewSet):
                 )
         
         try:
-            # Obtener el stock de la base de datos
             try:
                 stock_db = Stock.objects.get(symbol=symbol.upper(), is_active=True)
                 current_price_db = float(stock_db.current_price)
@@ -204,7 +296,6 @@ class StockViewSet(viewsets.ModelViewSet):
             end_date = datetime.now()
             start_date = end_date - timedelta(days=days)
             
-            # Obtener datos históricos con el intervalo especificado
             hist = stock.history(start=start_date, end=end_date, interval=interval)
             
             if hist.empty:
@@ -213,11 +304,9 @@ class StockViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Preparar timestamps y precios de cierre
             timestamps = [int(date.timestamp()) for date in hist.index]
             close_prices = hist['Close'].tolist()
             
-            # Agregar timestamp actual y precio de la base de datos
             current_timestamp = int(datetime.now().timestamp())
             timestamps.append(current_timestamp)
             close_prices.append(current_price_db)
@@ -226,6 +315,7 @@ class StockViewSet(viewsets.ModelViewSet):
                 "t": timestamps,
                 "c": close_prices 
             }
+            log_action(request, request.user, Action.STOCK_VIEWED)
             
             return Response(
                 {
@@ -245,9 +335,13 @@ class StockViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+    @extend_schema(
+        summary="Top 3 acciones ganadoras del día",
+        responses={200: TopGainersResponseSerializer},
+        tags=['stocks']
+    )
     @action(detail=False, methods=['get'])
     def top_gainers(self, request):
-        # Devuelve las 3 acciones que más han crecido del día
         stocks = Stock.objects.filter(is_active=True)
         
         if not stocks.exists():
@@ -261,12 +355,11 @@ class StockViewSet(viewsets.ModelViewSet):
         for stock in stocks:
             try:
                 ticker = yf.Ticker(stock.symbol)
-                # Obtener datos del día actual
                 hist = ticker.history(period='1d', interval='1d')
                 
                 if not hist.empty:
                     open_price = hist['Open'].iloc[0]
-                    current_price = float(stock.current_price)  # se usa el precio de bd para mantener consistencia
+                    current_price = float(stock.current_price)
                     
                     if open_price > 0:
                         change_percentage = ((current_price - open_price) / open_price) * 100
@@ -283,17 +376,20 @@ class StockViewSet(viewsets.ModelViewSet):
             except Exception:
                 continue
         
-        # Ordenar por cambio porcentual descendente y tomar los 3 primeros
         top_3_gainers = sorted(gainers, key=lambda x: x['change_percentage'], reverse=True)[:3]
+        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_gainers": top_3_gainers
         }, status=status.HTTP_200_OK)
     
-
+    @extend_schema(
+        summary="Top 3 acciones perdedoras del día",
+        responses={200: TopLosersResponseSerializer},
+        tags=['stocks']
+    )
     @action(detail=False, methods=['get'])
     def top_losers(self, request):
-        # Devuelve las 3 acciones que más han bajado del día
         stocks = Stock.objects.filter(is_active=True)
         
         if not stocks.exists():
@@ -307,12 +403,11 @@ class StockViewSet(viewsets.ModelViewSet):
         for stock in stocks:
             try:
                 ticker = yf.Ticker(stock.symbol)
-                # Obtener datos del día actual
                 hist = ticker.history(period='1d', interval='1d')
                 
                 if not hist.empty:
                     open_price = hist['Open'].iloc[0]
-                    current_price = float(stock.current_price)  # se usa el precio de bd para mantener consistencia
+                    current_price = float(stock.current_price)
                     
                     if open_price > 0:
                         change_percentage = ((current_price - open_price) / open_price) * 100
@@ -329,15 +424,26 @@ class StockViewSet(viewsets.ModelViewSet):
             except Exception:
                 continue
         
-        # Ordenar por cambio porcentual ascendente y tomar los 3 primeros
         top_3_losers = sorted(losers, key=lambda x: x['change_percentage'])[:3]
+        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_losers": top_3_losers
         }, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+@extend_schema(tags=['categories'])
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
+
+
+    @extend_schema(
+    summary="Listar todas las categorías en BD",
+    description="Devuelve todas las categorías existentes en BD"
+)
+    def list(self, request, *args, **kwargs):
+        log_action(request, request.user, Action.SEARCH_BY_CATEGORY)
+        return super().list(request, *args, **kwargs)
+    
