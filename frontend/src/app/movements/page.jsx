@@ -70,13 +70,25 @@ export default function movements () {
                                     <p>Type</p>
                                     <select name="algo" id="1" value={selected} onChange={(e) => setSelected(e.target.value)}>
                                         <option value="" disabled>Select Type</option>
-                                        <option value="2">Sale</option>
-                                        <option value="3">Purchases</option>
+                                        <option value="2">Debit</option>
+                                        <option value="3">Credit</option>
                                     </select>
                                 </div>
                                 <div className="filter-segments">
                                     <p>Date</p>
-                                    <input type="date" value="j" />
+                                    <div className="date-inputs-filter">
+                                        <p>From:</p>
+                                        <input 
+                                            type="date" 
+                                        />
+                                    </div>
+
+                                    <div className="date-inputs-filter-to">
+                                        <p>To:</p>
+                                        <input 
+                                            type="date" 
+                                        />
+                                    </div>
                                 </div>
                                 <button className="apply-filter-btn" onClick={changeShowFiler}>
                                     Apply Filter

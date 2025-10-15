@@ -16,7 +16,6 @@ export default function users() {
         {
             id: 1,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -25,7 +24,6 @@ export default function users() {
         {
             id: 2,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -34,7 +32,6 @@ export default function users() {
         {
             id: 3,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -43,7 +40,6 @@ export default function users() {
         {
             id: 4,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -54,7 +50,6 @@ export default function users() {
         {
             id: 5,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -63,7 +58,6 @@ export default function users() {
         {
             id: 6,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -72,7 +66,6 @@ export default function users() {
         {
             id: 7,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -81,7 +74,6 @@ export default function users() {
         {
             id: 8,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -90,7 +82,6 @@ export default function users() {
         {
             id: 9,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -99,7 +90,6 @@ export default function users() {
         {
             id: 10,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -108,7 +98,6 @@ export default function users() {
         {
             id:11,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -117,7 +106,6 @@ export default function users() {
         {
             id: 12,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -126,7 +114,6 @@ export default function users() {
         {
             id: 13,
             name: 'Daniela Matul',
-            userName: 'Danim',
             email: 'dani@gmail.com',
             age: 19,
             date: '10-09-2025',
@@ -155,7 +142,7 @@ export default function users() {
     const getValueInputSearcher = (value) => {
         console.log("Hola desde getValueInput ", value)
     }
-    const columns = ['Name', 'UserName', 'Email', 'Age', 'Date', 'Enable']
+    const columns = ['Name', 'Email', 'Age', 'Date', 'Enable']
     
     return(
         <>
