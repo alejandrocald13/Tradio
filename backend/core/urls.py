@@ -39,5 +39,4 @@ urlpatterns = [
     path('api/', include('apps.reports.urls')),
 
     path('api/token/',  EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
-  
 ]

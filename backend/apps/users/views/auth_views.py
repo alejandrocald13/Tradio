@@ -5,6 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import serializers, status
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.response import Response
+from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
 
 
 # serializers
@@ -35,17 +37,25 @@ class EmailTokenObtainPairView(TokenObtainPairView):
         data = response.data
         access_token = data.get("access")
 
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        
         response = Response({"message": "Inicio de sesión correcto"}, status=status.HTTP_200_OK)
+
+        user.last_login = timezone.now()
+        user.save(update_fields=["last_login"])
 
         # Save token en cookie HTTPOnly
         response.set_cookie(
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,      # True on production
+            secure=True,      # True on production
             samesite="None",  # 
             max_age=3600,
         )
+
 
         return response
 
@@ -86,7 +96,7 @@ class LoggedTokenRefreshView(TokenRefreshView):
         return response
 
 class LogoutView(APIView):
-    permission_classes = [IsUser]
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         request=serializers.Serializer,
@@ -95,19 +105,18 @@ class LogoutView(APIView):
         summary="Logout del usuario",
     )
     def post(self, request):
-        token_str = request.auth
-
         try:
-            token = AccessToken(token_str)
-            token.blacklist()
+            token_str = request.COOKIES.get("access_token")
+
+            if not token_str:
+                return Response({"detail": "No se encontró el token en la cookie."}, status=status.HTTP_400_BAD_REQUEST)
 
             log_action(request, request.user, Action.AUTH_LOGOUT)
 
-            response = Response(status=status.HTTP_204_NO_CONTENT)
+            response = Response({"detail": "Sesión cerrada correctamente."}, status=status.HTTP_200_OK)
+            response.delete_cookie("access_token")
 
-            response.delete_cookie("access_token") # delete cookie HTTPS
+            return response
 
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({"detail": f"Error al cerrar sesión: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
