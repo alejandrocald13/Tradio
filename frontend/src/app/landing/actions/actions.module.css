@@ -120,7 +120,7 @@
 .marketSection {
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 10px;
 }
 
 
@@ -286,7 +286,7 @@
   grid-template-columns: repeat(3, 1fr); 
   gap: 1px; 
   justify-items: center; 
-  transform: translateX(-35px);
+  transform: translateX(50px);
   
 
 }

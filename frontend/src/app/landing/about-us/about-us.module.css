@@ -171,7 +171,7 @@
 .flipCard {
   background: transparent;
   width: 480px;
-  height: 420px;
+  height: 500px;
   perspective: 1000px; /* profundidad del efecto 3D */
 }
 
