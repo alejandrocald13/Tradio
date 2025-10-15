@@ -1,0 +1,33 @@
+.slide-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.slide-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.slide-panel {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    height: 100dvh;
+    box-shadow: -5px 0 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.4s ease;
+}
+
+.slide-panel.right {
+    transform: translateX(100%);
+}
+
+.slide-panel.right.open {
+    transform: translateX(0);
+}

@@ -33,7 +33,7 @@ export default function Actions() {
                                 key={sym}
                                 symbol={sym}
                                 actionName={data.name}
-                                price={`$${data.last.toLocaleString()}`}
+                                price={data.last.toLocaleString()}
                                 changeText={`${amountText} ${pctText}`}   
                                 variantClass={trendClass[trend]}           
                                 graphic={<MiniChart data={data.intraday} />}
