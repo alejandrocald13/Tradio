@@ -47,6 +47,17 @@ class UserViewSet(viewsets.GenericViewSet,
 
     def get_serializer_class(self):
         return UserListSerializer if self.action == "list" else UserDetailSerializer
+    
+    def get_queryset(self):
+        """
+        Override the default queryset:
+        - For list: return only normal users (non-staff and non-superuser)
+        - For other actions: return all users
+        """
+        qs = super().get_queryset()
+        if self.action == "list":
+            qs = qs.filter(is_staff=False, is_superuser=False)
+        return qs
 
     def list(self, request, *args, **kwargs):
         log_action(request, request.user if request.user.is_authenticated else None, Action.SEARCH_BY_FILTER)
