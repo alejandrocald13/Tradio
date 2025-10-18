@@ -10,3 +10,6 @@ media/
 
 # General
 .DS_Store
+
+# SQLITE3
+db.sqlite3
