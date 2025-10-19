@@ -20,7 +20,8 @@ from .serializers import (
     HistoryResponseSerializer,
     TopGainersResponseSerializer,
     TopLosersResponseSerializer,
-    ErrorResponseSerializer
+    ErrorResponseSerializer,
+    AllStocksHistoryResponseSerializer
 )
 from .permissions import IsAdminOrReadOnly
 
@@ -109,7 +110,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
         },
         tags=['stocks']
     )
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
     def add_stock(self, request):
         symbol = request.data.get("symbol", "").upper().strip()
         
@@ -129,7 +130,9 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                         "name": stock.name,
                         "symbol": stock.symbol,
                         "current_price": float(stock.current_price),
-                        "category": stock.category.name if stock.category else None
+                        "category": stock.category.name if stock.category else None,
+                        "exchange": stock.exchange 
+
                     }
                 },
                 status=status.HTTP_200_OK
@@ -149,6 +152,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
             current_price = quote_data.get('c')
             company_name = profile_data.get('name')
             industry = profile_data.get('finnhubIndustry', 'General')
+            exchange = profile_data.get('exchange')
             
             if not current_price or not company_name:
                 return Response(
@@ -166,6 +170,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 symbol=symbol,
                 category=category,
                 current_price=current_price,
+                exchange = exchange,
                 is_active=True
             )
             log_action(request, request.user, Action.ADMIN_STOCK_CREATED)
@@ -177,7 +182,8 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                         "name": stock.name,
                         "symbol": stock.symbol,
                         "current_price": float(stock.current_price),
-                        "category": stock.category.name
+                        "category": stock.category.name,
+                        "exchange": stock.exchange 
                     }
                 },
                 status=status.HTTP_201_CREATED
@@ -194,7 +200,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
         responses={200: UpdatePricesResponseSerializer},
         tags=['stocks']
     )
-    @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=['post'])
     def update_prices(self, request):
         activos = Stock.objects.filter(is_active=True)
         resultados = []
@@ -315,7 +321,7 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 "t": timestamps,
                 "c": close_prices 
             }
-            log_action(request, request.user, Action.STOCK_VIEWED)
+            # log_action(request, request.user, Action.STOCK_VIEWED)
             
             return Response(
                 {
@@ -334,7 +340,62 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                 {"error": f"Error fetching data: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    @action(detail=False, methods=['get'])
+    def all_history(self, request):
+        stocks = Stock.objects.filter(is_active=True)
         
+        if not stocks.exists():
+            return Response(
+                {"error": "No active stocks found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        results = []
+        
+        for stock_db in stocks:
+            try:
+                ticker = yf.Ticker(stock_db.symbol)
+                # 
+                hist = ticker.history(period='5d', interval='1d')
+                
+                if not hist.empty:
+                    # Tomar los últimos 7 días
+                    hist = hist.tail(7)
+                    
+                    timestamps = [int(date.timestamp()) for date in hist.index]
+                    close_prices = hist['Close'].tolist()
+                    
+                    current_timestamp = int(datetime.now().timestamp())
+                    current_price_db = float(stock_db.current_price)
+                    
+                    timestamps.append(current_timestamp)
+                    close_prices.append(current_price_db)
+                    
+                    results.append({
+                        "id": stock_db.id,
+                        "name": stock_db.name,
+                        "symbol": stock_db.symbol,
+                        "current_price": current_price_db,
+                        "category": stock_db.category.name if stock_db.category else None,
+                        "data": {
+                            "t": timestamps,
+                            "c": close_prices
+                        }
+                    })
+            except Exception as e:
+                print(f"Error processing {stock_db.symbol}: {str(e)}")
+                continue
+        
+        # log_action(request, request.user, Action.STOCK_VIEWED)
+        
+        return Response({
+            "message": "Historical data retrieved successfully",
+            "total_stocks": len(results),
+            "stocks": results
+        }, status=status.HTTP_200_OK)
+
+
     @extend_schema(
         summary="Top 3 acciones ganadoras del día",
         responses={200: TopGainersResponseSerializer},
