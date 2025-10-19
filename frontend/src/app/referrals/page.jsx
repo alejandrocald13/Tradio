@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./referrals.module.css";
-import Sidebar from "../components/Sidebar";
+import SidebarNav from "../components/SidebarNav-Auth";
 
 export default function ReferralsPage() {
   const [generatedCode, setGeneratedCode] = useState("");
@@ -26,7 +26,7 @@ export default function ReferralsPage() {
   return (
     <div className={styles.pageWrapper}>
       
-      <Sidebar activeTab={tab} setTab={setTab} />
+      <SidebarNav activeTab={tab} setTab={setTab} />
 
       {/* MAIN */}
       <main className={styles.main}>
