@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 class Wallet(models.Model):
     user = models.OneToOneField(
@@ -25,7 +26,7 @@ class Movement(models.Model):
         on_delete=models.PROTECT,
         related_name="movements"
     )
-    transfer_number = models.CharField(max_length=100, unique=True)
+    transfer_number = models.CharField(max_length=100, unique=True, blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     commission = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -37,6 +38,5 @@ class Movement(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.transfer_number:
-            import uuid
             self.transfer_number = f"TRF-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)

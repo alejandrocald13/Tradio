@@ -12,7 +12,7 @@ class WalletViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['get'])
     def balance(self, request):
-        wallet, created = Wallet.objects.get_or_create(user=request.user)
+        wallet, _ = Wallet.objects.get_or_create(user=request.user)
         serializer = WalletSerializer(wallet)
         return Response(serializer.data)
     
@@ -21,18 +21,15 @@ class WalletViewSet(viewsets.ViewSet):
         serializer = TopUpSerializer(data=request.data)
         if serializer.is_valid():
             service = WalletService()
-            try:
-                movement = service.deposit(
-                    user=request.user,
-                    amount=serializer.validated_data['amount'],
-                    reference=serializer.validated_data['reference']
-                )
-                return Response({
-                    'message': 'Deposit completed successfully',
-                    'current_balance': movement.user.wallet.balance
-                }, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            movement = service.deposit(
+                user=request.user,
+                amount=serializer.validated_data['amount'],
+                reference=serializer.validated_data['reference']
+            )
+            return Response({
+                'message': 'Deposit completed successfully',
+                'current_balance': movement.user.wallet.balance
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['post'])
@@ -52,8 +49,22 @@ class WalletViewSet(viewsets.ViewSet):
                 }, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({'error': str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def referral(self, request):
+        serializer = ReferralCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            service = WalletService()
+            movement = service.add_referral(
+                user=request.user,
+                code=serializer.validated_data['code'],
+                amount=serializer.validated_data['amount']
+            )
+            return Response({
+                'message': 'Referral added successfully',
+                'current_balance': movement.user.wallet.balance
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MovementViewSet(viewsets.ReadOnlyModelViewSet):
@@ -68,15 +79,11 @@ class MovementViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def filter(self, request):
         queryset = self.filter_queryset(self.get_queryset())
-        
-        # Date range filter
         date_from = request.query_params.get('date_from')
         date_to = request.query_params.get('date_to')
-        
         if date_from:
             queryset = queryset.filter(created_at__date__gte=date_from)
         if date_to:
             queryset = queryset.filter(created_at__date__lte=date_to)
-        
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

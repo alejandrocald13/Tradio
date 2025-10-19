@@ -19,3 +19,7 @@ class TopUpSerializer(serializers.Serializer):
 class WithdrawSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=0.01)
     reference = serializers.CharField(max_length=100)
+
+class ReferralCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=50)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=0.01)

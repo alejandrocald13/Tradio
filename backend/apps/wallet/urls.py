@@ -10,4 +10,5 @@ urlpatterns = [
     path('balance/', WalletViewSet.as_view({'get': 'balance'}), name='wallet-balance'),
     path('topup/', WalletViewSet.as_view({'post': 'topup'}), name='wallet-topup'),
     path('withdraw/', WalletViewSet.as_view({'post': 'withdraw'}), name='wallet-withdraw'),
+    path('referral/', WalletViewSet.as_view({'post': 'referral'}), name='wallet-referral'),
 ]

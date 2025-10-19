@@ -1,10 +1,15 @@
 from decimal import Decimal
 from .models import Wallet, Movement
 from apps.users.models import SecurityLog, UserAction
+from django.dispatch import Signal
+
+
+wallet_movement_posted = Signal()
+
 
 class WalletService:
-    DEPOSIT_COMMISSION = Decimal('0.02')  # 2%
-    WITHDRAWAL_COMMISSION = Decimal('0.03')  # 3%
+    DEPOSIT_COMMISSION = Decimal('0.02')  
+    WITHDRAWAL_COMMISSION = Decimal('0.03')  
     
     def _log_security(self, user, action, success=True):
         try:
@@ -19,11 +24,10 @@ class WalletService:
                 user_agent='Wallet Service'
             )
         except Exception:
-            pass  # Don't break flow for log errors
+            pass  
     
     def deposit(self, user, amount, reference):
-        wallet, created = Wallet.objects.get_or_create(user=user)
-        
+        wallet, _ = Wallet.objects.get_or_create(user=user)
         commission = amount * self.DEPOSIT_COMMISSION
         total_credited = amount - commission
         
@@ -40,11 +44,11 @@ class WalletService:
         wallet.save()
         
         self._log_security(user, 'DEPOSIT_SUCCESS', True)
+        wallet_movement_posted.send(sender=self.__class__, movement=movement)
         return movement
     
     def withdraw(self, user, amount, reference):
-        wallet, created = Wallet.objects.get_or_create(user=user)
-        
+        wallet, _ = Wallet.objects.get_or_create(user=user)
         commission = amount * self.WITHDRAWAL_COMMISSION
         total_debited = amount + commission
         
@@ -65,4 +69,22 @@ class WalletService:
         wallet.save()
         
         self._log_security(user, 'WITHDRAWAL_SUCCESS', True)
+        wallet_movement_posted.send(sender=self.__class__, movement=movement)
+        return movement
+    
+    def add_referral(self, user, code, amount):
+        wallet, _ = Wallet.objects.get_or_create(user=user)
+        movement = Movement.objects.create(
+            user=user,
+            transfer_number=f"REF-{code}",
+            type='REFERRAL_CODE',
+            amount=amount,
+            commission=0,
+            total=amount
+        )
+        wallet.balance += amount
+        wallet.save()
+        
+        self._log_security(user, 'REFERRAL_SUCCESS', True)
+        wallet_movement_posted.send(sender=self.__class__, movement=movement)
         return movement
