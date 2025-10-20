@@ -4,9 +4,10 @@ import './portfolio.css'
 import GreetingPortafolio from '../components/GreetingPortfolio'
 import CardInfoPortafolio from '../components/GeneralBalancePortfolio'
 import ActionPortfolio from '../components/ActionPortfolio'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SidebarNav from '../components/SidebarNav-Auth';
 import CardActionsPortfolio from '../components/CardActionsPortfolio';
+import { api } from '../lib/axios';
 
 
 export default function Portafolio (){
@@ -17,6 +18,23 @@ export default function Portafolio (){
     const [date1, setdate1] = useState("");
     const [date2, setdate2] = useState("");
     const [seeAction, setSeeAction] = useState(false)
+
+    useEffect(()=>{
+        // const login = async () => {
+        //     try{
+        //         const response = await api.post('/token/', {
+        //             email: 'robertoalejandrocalderon@gmail.com',
+        //             password: 'Tradio1309.'
+        //         })
+
+        //         console.log('Login correcto', response.data)
+        //     }catch(error){
+        //         console.log("No se logró confirmar las credenciales", error)
+        //         setErrorMessage(error.response?.data?.detail || "Error al iniciar sesión");
+        //     }
+        // }
+        // login()
+    })
     
     const hoy = new Date().toISOString().split("T")[0];
     const handleChangeD1 = (e) => {
@@ -31,17 +49,17 @@ export default function Portafolio (){
         {
         name: 'Tesla',
         description: 'Más Rentable',
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clip-rule="evenodd"></path><path fillRule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
+        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
         percentage: 16,
         rendimiento: +12
         }, {
         name: 'Oracle',
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 9.041l-4.349-5.436L7 6.646 3.354 3l-.708.707L7 8.061l2.959-2.959 3.65 4.564.781-.625z" clip-rule="evenodd"></path><path fillRule="evenodd" d="M10 9.854a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v3.5h-3.5a.5.5 0 00-.5.5z" clipRule="evenodd"></path></svg>,
+        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 9.041l-4.349-5.436L7 6.646 3.354 3l-.708.707L7 8.061l2.959-2.959 3.65 4.564.781-.625z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 9.854a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v3.5h-3.5a.5.5 0 00-.5.5z" clipRule="evenodd"></path></svg>,
         description: 'Menos Rentable',
         percentage: 20,
         rendimiento: -1.8
         },{
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
+        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
         name: 'Amazon',
         description: 'Mayor Porcentaje',
         percentage: 25,
@@ -50,10 +68,18 @@ export default function Portafolio (){
     ]
     
     const clickInforme = () => {
-        setGetInforme(getInforme ? false : true)
-        if (getInforme){
-            // Aqui mandamos a llamar para enviar gmail
-        }
+        console.log("Hola")
+        // const algo2 = async () => {
+        //     try{
+        //         const response = await api.get('/portfolios/')
+
+        //         console.log('Portafolio :)', response.data)
+        //     }catch(error){
+        //         console.log("Portafolio no se obtuvieron", error)
+        //     }
+        // }
+
+        // algo2()
         clickGetDate()
     }
     const clickGetDate = () => {
