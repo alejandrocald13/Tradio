@@ -56,7 +56,8 @@ class ReportesEstadoView(APIView):
 
         pdf_data = get_financial_report_data(user, from_date, to_date)
 
-        response = generate_report_pdf(user, from_date, to_date, pdf_data)
+        response = generate_report_pdf(user, from_date, to_date, pdf_data, request=request)
+
 
         log_action(request, user, Action.REPORTS_REQUESTED)
 
