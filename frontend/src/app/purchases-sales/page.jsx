@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./purchases-sales.module.css";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Importar los componentes
 
@@ -59,6 +60,7 @@ export default function ComprasVentasPage() {
 
 
 
+  const router = useRouter();
   const openModal = () => setModalOpen(true);
   const closeModal = () => {
     setModalOpen(false);
@@ -80,9 +82,9 @@ export default function ComprasVentasPage() {
         {/* MAIN */}
         <main className={styles.main}>
           <div className={styles.headerRow}>
-            <Link href="/portfolio" className={styles.backArrow}>
-              <ArrowLeft size={28} />
-            </Link>
+            <button onClick={() => router.back()} className={styles.backArrow}>
+                <ArrowLeft size={28} />
+            </button>
             <h1 className={styles.title}>{tab === "compras" ? "Compras" : "Ventas"}</h1>
             <div style={{ width: 28 }} /> {/* espacio para centrar el título */}
           </div>
