@@ -129,7 +129,8 @@ export default function ActionsPage() {
   </div>
 </div>
 
-      <h2 className={styles.actionsTitle}>Available Actions</h2>
+      <div className={styles.actionsContainer}>
+        <h2 className={styles.actionsTitle}>Available Actions</h2>
         <div className={styles.actionCardsGrid}>
           {symbols.map((sym) => {
             const data = MOCK[sym];
@@ -146,14 +147,15 @@ export default function ActionsPage() {
                   symbol={sym}
                   actionName={data.name}
                   price={`$${data.last.toLocaleString()}`}
-                  changeText={`${amountText} ${pctText}`}   
-                  variantClass={trendClass[trend]}           
+                  changeText={`${amountText} ${pctText}`}
+                  variantClass={trendClass[trend]}
                   graphic={<MiniChart data={data.intraday} />}
                 />
               </div>
             );
           })}
         </div>
+      </div>
 
       </section>
     </div>
