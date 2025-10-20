@@ -1,5 +1,5 @@
 # users/models.py
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -30,6 +30,7 @@ class Profile(models.Model):
     address = models.CharField(max_length=100, default='', blank=False)
     cellphone = models.CharField(max_length=20, default='', blank=False)
     dpi = models.CharField(max_length=20, default='', blank=False, unique=True)
+    auth0_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
 
     state = models.ForeignKey(
         ProfileState,
