@@ -1,0 +1,133 @@
+.container {
+  min-height: 100vh;
+  padding: 20px 40px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Colores solo para esta página */
+:local(.container) {
+  --main-color: #3f5e56;
+  --card-bg: #ffffff;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: var(--main-color);
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 40px;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--foreground);
+  font-size: 14px;   /* más pequeño */
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.link:hover {
+  color: var(--main-color);
+}
+
+.active {
+  position: relative;
+  color: var(--main-color);
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* grosor de la línea */
+  background-color: var(--main-color);
+}
+
+.authButtons {
+  display: flex;
+  gap: 15px;
+}
+
+.authButtons button {
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.login,
+.register {
+  background: var(--main-color); /* fondo verde */
+  color: #fff;
+}
+
+/* HERO */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e6ebe9;
+  padding: 70px;         /* más grande */
+  border-radius: 20px;
+  margin-bottom: 50px;
+}
+
+.heroText h1 {
+  font-size: 64px;      /* más grande */
+  margin-bottom: 15px;
+}
+
+.heroText p {
+  font-size: 50px;
+}
+
+.heroImage img {
+  border-radius: 10px;
+}
+
+/* FEATURES */
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.featureCard {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 40px;          
+  width: 770px;           
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  font-size: 22px;        
+}
+
+.icon {
+  font-size: 36px;
+  width: 48px;  
+  height: 48px; 
+  color: var(--main-color);
+  flex-shrink: 0;
+}

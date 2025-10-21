@@ -1,0 +1,373 @@
+/* app/landing/actions/actions.module.css */
+.container {
+  min-height: 100vh;
+  padding: 20px 40px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Colores */
+:local(.container) {
+  --main-color: #3f5e56;
+  --card-bg: #ffffff;
+  --positive-color: #22c55e;
+  --negative-color: #ef4444;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: var(--main-color);
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 40px;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.link:hover {
+  color: var(--main-color);
+}
+
+.active {
+  position: relative;
+  color: var(--main-color);
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* grosor de la línea */
+  background-color: var(--main-color);
+}
+
+.authButtons {
+  display: flex;
+  gap: 15px;
+}
+
+.authButtons button {
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+  background: var(--main-color);
+  color: #fff;
+}
+
+/* SEARCH SECTION */
+.searchSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border-radius: 25px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.searchIcon {
+  font-weight: bold;
+  margin-right: 10px;
+  color: var(--main-color);
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 16px;
+  color: var(--foreground);
+}
+
+.searchInput::placeholder {
+  color: #666;
+}
+
+/* MARKET SECTION */
+.marketSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.marketColumns {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.marketBlock {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+}
+
+.marketCard {
+  background: var(--card-bg);
+  border-radius: 15px;
+  padding: 25px;
+
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  color: rgb(83, 83, 83);
+}
+
+.stockName {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--main-color);
+  flex: 1;
+}
+
+.stockValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: right;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stockExchange {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.stockChange {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.positive {
+  color: var(--positive-color);
+}
+
+.negative {
+  color: var(--negative-color);
+}
+
+/* CHARTS SECTION CON ACTION CARDS - 2 POR FILA */
+.chartsSection {
+  background: transparent;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: none;
+  margin-top: 40px;
+}
+
+.chartsTitle {
+  color: var(--main-color);
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.actionCardRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+.actionCardContainer {
+  padding: 10px; 
+}
+
+
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 15px;
+  background: #f5f5f5; 
+  
+}
+.cardPrice {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: var(--main-color);
+}
+
+.actionCardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px; 
+  justify-content: center; 
+}
+
+
+
+.chartContainer {
+  width: 100%;
+  height: 220px;
+  margin-top: 15px;
+}
+
+.chartDescription {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: var(--main-color);
+}
+
+
+.actionCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 1px; 
+  justify-items: center; 
+  transform: translateX(50px);
+  
+
+}
+
+
+.actionCardWrapper {
+  width: 100%; 
+  max-width: 500px; 
+  
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .marketColumns {
+    flex-direction: column;
+  }
+  
+  .actionCardRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .chartContainer {
+    height: 180px;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .chartsSection {
+    padding: 20px;
+    margin-top: 30px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.blockTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--main-color);
+  margin: 20px 0 24px 0;
+  animation: fadeInUp 0.6s ease-in-out;
+}
+
+.actionsTitle {
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  margin: 40px 0 24px 0;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.actionsTitle::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green-deep), #a2d6cf);
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+.actionsContainer {
+  background: var(--card-bg); 
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05); 
+  margin-top: 40px; 
+}
