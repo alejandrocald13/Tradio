@@ -6,7 +6,7 @@
     padding: 14px 16px;
     background-color: #fff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    width: 350px;
+    width: 430px;
     height: 165px;
     margin: 10px;
 }
@@ -24,7 +24,7 @@
 }
 
 .ac-title span {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: #333;
 }
@@ -49,12 +49,12 @@
 
 .ac-variant.td-up .ac-amount { 
     color: #22c55e; 
-    margin-left: 50px;
+    /* margin-left: 50px; */
 }
 
 .ac-variant.td-down .ac-amount { 
     color: #ef4444; 
-    margin-left: 50px;
+    /* margin-left: 50px; */
 }
 
 .ac-variant.td-neutral .ac-amount { 
@@ -83,5 +83,5 @@
     align-items: center;
     justify-content: center;
     width: 230px;
-    margin-left: 50px;
+    /* margin-left: 50px; */
 }

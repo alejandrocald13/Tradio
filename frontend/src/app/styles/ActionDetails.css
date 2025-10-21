@@ -1,5 +1,5 @@
 .td-card {
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   /* border: 1px solid #e5e7eb; */
   padding: 16px 16px 16px 16px;
 }
@@ -112,4 +112,26 @@
 
 .td-chartBox {
   margin-top: 2rem;
+}
+
+.td-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.td-disabled:hover::after {
+  content: "Sign up to buy or sell";
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
 }
