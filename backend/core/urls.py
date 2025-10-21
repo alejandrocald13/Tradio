@@ -34,7 +34,7 @@ urlpatterns = [
     
     path("api/wallet/", include("apps.wallet.urls")),
     
-    path("api/transacciones/", include("apps.transactions.urls")),
+    path("api/transactions/", include("apps.transactions_all.urls")),
     
     path('api/', include('apps.reports.urls')),
 
