@@ -12,7 +12,8 @@ export default function ActionDetails({
   change = "—",
   changeTone = "neutral",
   tabs = ["1D","5D","1M","6M","1Y","5Y"],
-  dataByTab = {}
+  dataByTab = {},
+  isPublic = false,
 }) {
   const [isBuyOpen, setIsBuyOpen] = useState(false);
   const [isSellOpen, setIsSellOpen] = useState(false);
@@ -38,15 +39,20 @@ export default function ActionDetails({
           <h2 className="td-title">{title}</h2>
         </div>
         <div className="td-transactions">
-          <button 
-            className="td-button-bs td-button-bs-primary"
-            onClick={() => setIsBuyOpen(true)}
+          <button
+            onClick={() => !isPublic && setIsBuyOpen(true)}
+            className={`td-button-bs td-button-bs-primary ${isPublic ? "td-disabled" : ""}`}
+            disabled={isPublic}
+            title={isPublic ? "Sign up to buy" : ""}
           >
             Buy
           </button>
-          <button 
-            className="td-button-bs"
-            onClick={() => setIsSellOpen(true)}
+
+          <button
+            onClick={() => !isPublic && setIsSellOpen(true)}
+            className={`td-button-bs ${isPublic ? "td-disabled" : ""}`}
+            disabled={isPublic}
+            title={isPublic ? "Sign up to sell" : ""}
           >
             Sell
           </button>
