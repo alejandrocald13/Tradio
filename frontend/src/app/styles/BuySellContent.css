@@ -1,0 +1,161 @@
+.slide-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #fff;
+}
+
+.slide-header {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-bottom: 2px solid #eee;
+    margin-top: 1rem;
+}
+
+.slide-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1f1f1f;
+    margin-bottom: 0.5rem;
+}
+
+.slide-subtitle {
+    color: #777;
+    font-size: 14px;
+}
+
+.slide-content-prices {
+    flex: 1;
+    padding: 1.8rem 2rem;
+    border-bottom: 2px solid #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.action-title {
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #1f1f1f;
+    margin: 0.8rem 0 1.2rem 0;
+}
+
+.slide-info {
+    width: 100%;
+}
+
+.slide-info p {
+    margin: 2rem 0;
+    font-size: 1.1rem;
+}
+
+.slide-input {
+    width: 100%;
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.slide-input label {
+    font-weight: 600;
+    display: block;
+    font-size: 1.1rem;
+    color: #1f1f1f;
+    margin: 0.6rem 0 0.3rem 0;
+}
+
+.slide-input input {
+    width: 70%;
+    padding: 0.4rem 0.3rem;
+    border: none;
+    color: #1f1f1f;
+    border-bottom: 1px solid #1f1f1f;
+    outline: none;
+    font-size: 1rem;
+}
+
+.slide-content-total-btns {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 1.5rem;
+}
+
+.slide-total {
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+
+.slide-warning {
+    border-radius: 6px;
+    font-size: 0.90rem;
+    color: #a33;
+    margin-bottom: 0.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.slide-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-primary {
+    min-width: 120px; 
+    max-width: 160px;
+    border: none;
+    color: #fff;
+    padding: 0.7rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-right: 1rem;
+}
+
+.btn-primary.disabled {
+    background-color: #e0dfdf !important;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    min-width: 120px; 
+    max-width: 160px;
+    background: #f1f1f1;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.btn-cancel:hover {
+    background: #e3e3e3;
+}
+
+.buy-mode .btn-primary {
+    background-color: #4e635e;
+}
+
+.buy-mode .btn-primary:hover {
+    background-color: #3c4b47;
+}
+
+.sell-mode .btn-primary {
+    background-color: #4e635e;
+}
+
+.sell-mode .btn-primary:hover {
+    background-color: #3c4b47;
+}

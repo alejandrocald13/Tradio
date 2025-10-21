@@ -38,7 +38,7 @@ export default async function ActionDetailPage({ params }) {
           <ActionDetails
             subtitle="Nasdaq GIDS · Delayed Quote"
             title={`${name_action}`}
-            price={`$${data_details.last.toFixed(2)}`}
+            price={data_details.last.toFixed(2)}
             change={`${changeAbsolute >= 0 ? "+" : ""}${changeAbsolute.toFixed(2)} (${changePct.toFixed(2)}%)`}
             changeTone={changePrice}
             tabs={tabs}
