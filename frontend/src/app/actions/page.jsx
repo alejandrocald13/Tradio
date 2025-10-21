@@ -1,24 +1,40 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import ActionCard from "../components/ActionCard";
-import "./actions.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import MiniChart from "../components/MiniChart";
+import Searcher from "../components/Searcher";
 import { MOCK } from "../data/mockQuotes";
-
-
-
+import "./actions.css";
 
 export default function Actions() {
+    const router = useRouter();
     const symbols = Object.keys(MOCK); // ["TSLA","NVDA",...]
     const trendClass = { up: "td-up", down: "td-down", neutral: "td-neutral" };
+
+    const getValue = (value) => {
+        if (!value) return;
+            const searchTerm = value.trim().toUpperCase();
+            const foundSymbol = symbols.find((sym) => sym.toUpperCase() === searchTerm);
+        if (foundSymbol) {
+            router.push(`/actions/${foundSymbol}`);
+        } else {
+            alert("No stock with that symbol was found");
+        }
+    };
 
     return (
         <>
             <SidebarNav />
             <div className="page-container">
                 <div className="action-container">
-                    {symbols.map((sym) => {
-                        // Calculos para la diferencia de precios y el pocentaje
+                    <div className="search-divspace">
+                        <Searcher placeholderI="Search by symbol" getValue={getValue} />
+                    </div>
+
+                    <div className="cards-divspace">
+                        {symbols.map((sym) => {
                         const data = MOCK[sym];
                         const changeAbs = data.last - data.prevClose;
                         const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
@@ -30,16 +46,17 @@ export default function Actions() {
 
                         return (
                             <ActionCard
-                                key={sym}
-                                symbol={sym}
-                                actionName={data.name}
-                                price={data.last.toLocaleString()}
-                                changeText={`${amountText} ${pctText}`}   
-                                variantClass={trendClass[trend]}           
-                                graphic={<MiniChart data={data.intraday} />}
+                            key={sym}
+                            symbol={sym}
+                            actionName={data.name}
+                            price={`$${data.last.toLocaleString()}`}
+                            changeText={`${amountText} ${pctText}`}
+                            variantClass={trendClass[trend]}
+                            graphic={<MiniChart data={data.intraday} />}
                             />
                         );
-                    })}
+                        })}
+                    </div>
                 </div>
             </div>
         </>

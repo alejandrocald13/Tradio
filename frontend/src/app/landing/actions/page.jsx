@@ -150,6 +150,7 @@ export default function ActionsPage() {
                   changeText={`${amountText} ${pctText}`}
                   variantClass={trendClass[trend]}
                   graphic={<MiniChart data={data.intraday} />}
+                  basePath="/landing/actions"
                 />
               </div>
             );
