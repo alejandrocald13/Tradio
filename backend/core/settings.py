@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "apps.reports",
     "apps.portfolio",
     "apps.wallet",
-    "apps.transactions"
+    "apps.transactions_all"
 ]
 
 MIDDLEWARE = [
