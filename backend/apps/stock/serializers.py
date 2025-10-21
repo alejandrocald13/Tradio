@@ -7,7 +7,7 @@ class StockSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stock
-        fields = ('id', 'name', 'symbol', 'category', 'category_name', 'current_price', 'is_active', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'symbol', 'category', 'category_name', 'current_price', 'exchange', 'is_active', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at')
 
 
@@ -42,6 +42,8 @@ class StockDataSerializer(serializers.Serializer):
     symbol = serializers.CharField()
     current_price = serializers.FloatField()
     category = serializers.CharField(allow_null=True)
+    exchange = serializers.CharField(allow_null=True)
+
 
 
 class AddStockResponseSerializer(serializers.Serializer):
@@ -90,6 +92,20 @@ class TopGainersResponseSerializer(serializers.Serializer):
 class TopLosersResponseSerializer(serializers.Serializer):
     top_losers = StockPerformanceSerializer(many=True)
 
+
+class StockHistoryDataSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    symbol = serializers.CharField()
+    current_price = serializers.FloatField()
+    category = serializers.CharField(allow_null=True)
+    data = HistoryDataSerializer()
+
+
+class AllStocksHistoryResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    total_stocks = serializers.IntegerField()
+    stocks = StockHistoryDataSerializer(many=True)
 
 class ErrorResponseSerializer(serializers.Serializer):
     error = serializers.CharField()
