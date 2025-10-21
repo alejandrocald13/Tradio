@@ -1,0 +1,553 @@
+/* === MAIN LAYOUT === */
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: #f9fafb;
+  overflow: hidden; /* 🚫 Evita scroll general */
+  font-family: "Inter", sans-serif;
+}
+
+/* Fixed Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 100vh;
+  background: #fff;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  margin-left: 200px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow: hidden; /* 🚫 No scroll vertical dentro del main */
+  transition: margin-left 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Sidebar collapsed */
+.sidebar.is-collapsed ~ .main {
+  margin-left: 72px;
+}
+
+/* === SECTIONS === */
+.section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* === BALANCE CARD === */
+.balanceCard {
+  background: #e1eae3;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* 🔧 Alinea ambos elementos al inicio vertical */
+  flex-shrink: 0;
+}
+
+.balanceLabel {
+  font-size: 1.2rem;
+  color: #2d483a;
+}
+
+.balanceAmount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #28352a;
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.3rem; /* 🔧 Baja un poco el grupo para nivelar */
+  justify-content: flex-start; /* 🔧 Evita que se empuje hacia la derecha */
+}
+
+
+.btn {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.8rem 1.8rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-transform: capitalize;
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Deposit button */
+.btn.deposit {
+  background: #516d5f;
+  color: white;
+  border-color: #516d5f;
+}
+
+.btn.deposit:hover {
+  background: #3d5547;
+}
+
+/* Withdrawal button */
+.btn.withdrawal {
+  background: #fff;
+  color: #516d5f;
+  border-color: #516d5f;
+  display: flex; /* ✅ asegura centrado real */
+  align-items: center;
+  justify-content: center; /* ✅ centra horizontalmente el texto */
+  text-align: center;
+}
+
+.btn.withdrawal:hover {
+  background: #f2f9f5;
+  color: #516d5f;
+  
+}
+
+/* === TABLE STYLES === */
+.tableContainer {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  flex: 1;
+}
+
+.tableScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 280px; /* 📏 Ajustado para que no genere scroll general */
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tableScroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.tableScroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  min-width: 600px;
+}
+
+.tableScroll thead {
+  background-color: #f8fafc;
+  position: sticky;
+  top: 0;
+}
+
+.tableScroll th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.tableScroll td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f3f5;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.tableScroll tr:hover {
+  background-color: #f9fafb;
+}
+
+.positive {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.negative {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* === SIDE PANEL === */
+.sidePanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 1100;
+  overflow-y: auto;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panelHeader h3 {
+  font-size: 1.5rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+.closeBtn {
+  font-size: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #4b5563;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === PANEL FORM === */
+.panelForm {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panelForm label {
+  font-size: 1rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.panelForm input {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid #d1d5db;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #f9fafb;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.panelForm input:focus {
+  outline: none;
+  border-color: #516d5f;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(81, 109, 95, 0.1);
+}
+
+.sendBtn {
+  margin-top: 1rem;
+  background-color: #516d5f;
+  color: #fff;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  width: 100%;
+}
+
+.sendBtn:hover {
+  background-color: #3d5547;
+}
+
+/* === CONFIRMATION MODAL === */
+.confirmationOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.confirmationModal {
+  background: white;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.confirmationHeader h2 {
+  color: #9fba9c;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.confirmationHeader h3 {
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.userInfo {
+  margin: 1rem 0 2rem;
+}
+
+.userName {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.bankName {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.transactionDetails {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f3f5;
+  padding-bottom: 0.5rem;
+}
+
+.detailLabel {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.detailValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.confirmationButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.confirmBtn,
+.cancelBtn {
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.confirmBtn {
+  background: #516d5f;
+  color: white;
+}
+
+.confirmBtn:hover {
+  background: #3d5547;
+  transform: translateY(-1px);
+}
+
+.cancelBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.cancelBtn:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .balanceCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .sidePanel {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .confirmationModal {
+    max-width: 320px;
+  }
+}
+/* === NUEVO MODAL (estilo verde) === */
+.confirmationBox {
+  background: white;
+  border-radius: 16px;
+  width: 420px;
+  max-width: 90%;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  position: relative;
+}
+
+.confirmationHeader {
+  background: #3f5a4f; /* fondo verde oscuro se mantiene */
+  color: #a9c8b4; /* 🌿 texto verde más claro */
+  font-weight: 700;
+  font-size: 1.4rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 0.8rem;
+  margin: -2rem -1.5rem 1rem -1.5rem;
+  text-align: left; /* título alineado a la izquierda */
+}
+
+
+
+.confirmationQuestion {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.confirmationUser .userName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #515d55;
+  margin-bottom: 0.25rem;
+}
+
+.confirmationUser .bankName {
+  font-size: 0.95rem;
+  color: #3a4538;
+  margin-bottom: 1.5rem;
+}
+
+.confirmationDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+}
+
+.confirmationDetails div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #2c3931;
+}
+
+.confirmationDetails span {
+  font-weight: 600;
+  color: #2c3931;
+}
+
+.confirmationButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirmarBtn,
+.cancelarBtn {
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 45%;
+  transition: all 0.3s ease;
+}
+
+.confirmarBtn {
+  background: #3f5a4f;
+  color: white;
+}
+
+.confirmarBtn:hover {
+  background: #2f463d;
+}
+
+.cancelarBtn {
+  background: #3f5a4f;
+  color: white;
+  opacity: 0.8;
+}
+
+.cancelarBtn:hover {
+  opacity: 1;
+  background: #2f463d;
+}
+
