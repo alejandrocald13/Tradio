@@ -3,38 +3,27 @@ import { useState } from "react";
 import "./wallet.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import DataTable from "../components/DataTable";
+import Modal from "../components/Modal"; // ✅ import del modal reutilizable
 
 export default function WalletPage() {
-  const [transactions, setTransactions] = useState([
-    { id: "455565655", date: "27 Sep 2025", amount: -100.0, type: "Withdrawal" },
-    { id: "455565656", date: "27 Sep 2025", amount: 100.0, type: "Deposit" },
-    { id: "455565657", date: "27 Sep 2025", amount: -50.0, type: "Withdrawal" },
-    { id: "455565658", date: "27 Sep 2025", amount: 200.0, type: "Deposit" },
-    { id: "455565659", date: "27 Sep 2025", amount: -75.0, type: "Withdrawal" },
-    { id: "455565660", date: "27 Sep 2025", amount: 300.0, type: "Deposit" },
-  ]);
-
+  const [transactions, setTransactions] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [actionType, setActionType] = useState("");
   const [formData, setFormData] = useState({ bank: "", amount: "", code: "" });
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  // Logged-in user data (replace with actual)
-  const loggedInUser = {
-    name: "John Doe",
-  };
-
+  const loggedInUser = { name: "John Doe" };
   const balance = transactions.reduce((acc, t) => acc + t.amount, 0);
 
   const handleOpenPanel = (type) => {
     setActionType(type);
-    setFormData({ bank: loggedInUser.bank || "", amount: "", code: "" });
+    setFormData({ bank: "", amount: "", code: "" });
     setShowPanel(true);
   };
 
   const handleClosePanel = () => {
     setShowPanel(false);
-    setShowConfirmation(false);
+    setShowModal(false);
   };
 
   const handleChange = (e) => {
@@ -45,8 +34,9 @@ export default function WalletPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const amountValue = parseFloat(formData.amount);
-    if (isNaN(amountValue) || amountValue <= 0) return alert("Please enter a valid amount.");
-    setShowConfirmation(true);
+    if (isNaN(amountValue) || amountValue <= 0)
+      return alert("Please enter a valid amount.");
+    setShowModal(true);
   };
 
   const confirmTransaction = () => {
@@ -64,13 +54,11 @@ export default function WalletPage() {
 
     setTransactions([newTransaction, ...transactions]);
     setShowPanel(false);
-    setShowConfirmation(false);
-    alert(`Transaction ${actionType === "Deposit" ? "deposited" : "withdrawn"} successfully!`);
+    setShowModal(false);
+    alert(`Transaction ${actionType} successful!`);
   };
 
-  const cancelTransaction = () => setShowConfirmation(false);
-
-  const panelTitle = actionType === "Deposit" ? "Send Money to App" : "Send Money to Bank";
+  const cancelTransaction = () => setShowModal(false);
 
   const transactionsColored = transactions.map((t) => ({
     ...t,
@@ -93,7 +81,6 @@ export default function WalletPage() {
       <SidebarNav />
 
       <main className="main">
-        {/* Balance */}
         <div className="balanceCard">
           <div>
             <p className="balanceLabel">Your Balance:</p>
@@ -105,26 +92,22 @@ export default function WalletPage() {
               Deposit
             </button>
             <button className="btn withdrawal" onClick={() => handleOpenPanel("Withdrawal")}>
-            Withdrawal
+              Withdrawal
             </button>
           </div>
         </div>
 
-        {/* Transactions Table */}
         <div className="section">
           <h2 className="sectionTitle">Transaction History</h2>
           <DataTable mode="transactions" data={transactionsColored} columns={columns} />
         </div>
       </main>
 
-      {/* Side Panel */}
       {showPanel && (
         <div className="sidePanel">
           <div className="panelHeader">
-            <h3>{panelTitle}</h3>
-            <button className="closeBtn" onClick={handleClosePanel}>
-              ×
-            </button>
+            <h3>{actionType === "Deposit" ? "Send Money to App" : "Send Money to Bank"}</h3>
+            <button className="closeBtn" onClick={handleClosePanel}>×</button>
           </div>
 
           <form className="panelForm" onSubmit={handleSubmit}>
@@ -169,49 +152,58 @@ export default function WalletPage() {
             </button>
           </form>
 
-          {/* Confirmation Modal */}
-          {showConfirmation && (
-            <div className="confirmationOverlay">
-              <div className="confirmationBox">
-                <div className="confirmationHeader">
-                  <h2>Confirmation</h2>
-                </div>
+          {/* ✅ Usamos el Modal Component */}
+          <Modal
+            isOpen={showModal}
+            title="Confirmation"
+            onClose={cancelTransaction}
+          >
+            <p>
+              Are you sure you want to{" "}
+              {actionType === "Deposit" ? "deposit" : "withdraw"}?
+            </p>
 
-                <h3 className="confirmationQuestion">
-                  Are you sure you want to {actionType === "Deposit" ? "deposit" : "withdraw"}?
-                </h3>
+            <p style={{ marginTop: "8px", fontWeight: 600 }}>
+              {loggedInUser.name}
+            </p>
+            <p>{formData.bank || "Mandiri Bank"}</p>
 
-                <div className="confirmationUser">
-                  <h4 className="userName">{loggedInUser.name}</h4>
-                  <p className="bankName">{formData.bank || "Mandiri Bank"}</p>
-                </div>
-
-                <div className="confirmationDetails">
-                  <div>
-                    <p>You Send</p>
-                    <span>USD {formData.amount}</span>
-                  </div>
-                  <div>
-                    <p>They Receive</p>
-                    <span>ID 718,612</span>
-                  </div>
-                  <div>
-                    <p>Will Arrive On</p>
-                    <span>6 Sep 2025</span>
-                  </div>
-                </div>
-
-                <div className="confirmationButtons">
-                  <button className="confirmarBtn" onClick={confirmTransaction}>
-                    Confirm
-                  </button>
-                  <button className="cancelarBtn" onClick={cancelTransaction}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
+            <div style={{ marginTop: "10px", fontSize: "14px" }}>
+              <p>You Send: USD {formData.amount}</p>
+              <p>They Receive: ID 718,612</p>
+              <p>Will Arrive On: 6 Sep 2025</p>
             </div>
-          )}
+
+            <div style={{ marginTop: "18px", display: "flex", justifyContent: "center", gap: "12px" }}>
+              <button
+                onClick={confirmTransaction}
+                style={{
+                  background: "#4e635e",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 18px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Confirm
+              </button>
+
+              <button
+                onClick={cancelTransaction}
+                style={{
+                  background: "#b5b5b5",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 18px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </Modal>
         </div>
       )}
     </div>
