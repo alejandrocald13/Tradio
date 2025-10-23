@@ -31,6 +31,7 @@ class Profile(models.Model):
     cellphone = models.CharField(max_length=20, default='', blank=False)
     dpi = models.CharField(max_length=20, default='', blank=False, unique=True)
     auth0_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    profile_completed = models.BooleanField(default=False, blank=False)
 
     state = models.ForeignKey(
         ProfileState,
