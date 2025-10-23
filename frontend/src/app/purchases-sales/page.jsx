@@ -55,7 +55,7 @@ export default function ComprasVentasPage() {
   dataL: [100, 110],
   widthSend: 200,
   heightSend: 200,
-  backgroundColor: ["#729c8775", "#729c87ff"]
+  num: 2
 };
 
 
