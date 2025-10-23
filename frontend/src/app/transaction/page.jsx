@@ -1,22 +1,73 @@
 'use client'
 
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import './transaction.css'
 import TableAdmin from "../components/TableAdmin"
 import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
 import Searcher from "../components/Searcher"
+import { responseCookiesToRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
+import { api } from "../lib/axios"
 
 export default function Transaction(){
-    const [selectedTable, setSelectedTable] = useState('transaction')
     const [showFilter, setShowFilter] = useState(false)
-    const [selected, setSelected] = useState("")
-    const [selectedAction, setSelectedAction] = useState("")
-    const [selectedDate, setSelectedDate] = useState("")
+    const [typeSelected, setTypeSelected] = useState("") // Filtro de tipo
+    const [selectedAction, setSelectedAction] = useState("") // Filtro de Accion 
+    const [date1, setdate1] = useState(""); // Filtro de fecha 1
+    const [date2, setdate2] = useState(""); // FIltro fecha 2
+    const [email, setEmail] = useState(""); // Email
+    const hoy = new Date().toISOString().split("T")[0];
+    const [usersData, setUsersData] = useState([]) // En esta variable va la info que obtenemos de usersData (Enviarla en componente tabla )
+    const [actions, setActions] = useState([])
 
-    // Vamos a necesitar dos endpoints 
-    // 1. Obtenemos datos de transacciones
-    // 2. Obtenemos datos de movimiento
+
+    useEffect(()=>{
+        // Aqui va endpoint para obtener usuarios y utilizar filtros
+        // Si el usuario no ha elegido un filtro estos estan ""
+        const login = async () => {
+             try{
+                 const response = await api.post('/token/', {
+                     email: 'robertoalejandrocalderon@gmail.com',
+                     password: 'Tradio1309.'
+                 })
+
+                 console.log('Login correcto', response.data)
+             }catch(error){
+                 console.log("No se logró confirmar las credenciales", error)
+                 setErrorMessage(error.response?.data?.detail || "Error al iniciar sesión");
+             }
+         }
+         login()
+        console.log("Tipo", typeSelected)
+        console.log("aCCION", selectedAction)
+        console.log("d1", date1)
+        console.log("d2", date2)
+
+    }, [showFilter, email])
+
+    useEffect(()=> {
+        const getActions = async () =>{
+            try{
+                const response = await api.get('/stocks/')
+                const data = response.data
+                
+                const formattedData = data.map(dat => ({
+                    name: dat.name,
+                    symbol: dat.symbol,
+                    id: dat.id
+                }));
+
+                setActions(formattedData);
+                console.log(formattedData);
+
+                
+            }catch(error){
+                console.log("Error al obtener acciones disponibles en bd", error)
+            }
+        }
+        getActions()
+        
+    }, [])
 
     const changeShowFiler = () => {
         if(showFilter){
@@ -27,8 +78,9 @@ export default function Transaction(){
     }
 
     const getDataSearcher = (data) => {
-        console.log(data)
+        setEmail(data)
     }
+
     const transationColumns = ['Type', 'User Email', 'Action', 'Quantity', 'Total', 'Date']
     const transactionData = [
         {
@@ -72,9 +124,7 @@ export default function Transaction(){
             'Date': '12/04/2025'
         }
     ]
-
-    const actions = ['Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple','Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple','Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple', 'Oracle', 'Tesla', 'Spotify', 'Amazon', 'Apple']
-
+    
     return (
         <>
             <SidebarNavAdmin/>
@@ -90,18 +140,18 @@ export default function Transaction(){
                             <div className="filter">
                                 <div className="filter-segments">
                                     <p>Type</p>
-                                    <select name="algo" id="1" value={selected} onChange={(e) => setSelected(e.target.value)}>
+                                    <select name="algo" id="1" value={typeSelected} onChange={(e) => setTypeSelected(e.target.value)}>
                                         <option value="" disabled>Select Type</option>
-                                        <option value="2">Sale</option>
-                                        <option value="3">Purchases</option>
+                                        <option value="Sale">Sale</option>
+                                        <option value="Purchases">Purchases</option>
                                     </select>
                                 </div>
                                 <div className="filter-segments">
                                     <p>Action</p>
                                     <select name="algo" id="1" value={selectedAction} onChange={(e) => setSelectedAction(e.target.value)}>
                                         <option value="" disabled>Select Type</option>
-                                        {actions.map((action, index) => (
-                                                <option value={index}>{action}</option>
+                                        {actions.map((action) => (
+                                                <option value={action.symbol}>{action.name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -111,6 +161,9 @@ export default function Transaction(){
                                         <p>From:</p>
                                         <input 
                                             type="date" 
+                                            value={date1} 
+                                            onChange={(e)=> setdate1(e.target.value)} 
+                                            max={hoy} 
                                         />
                                     </div>
 
@@ -118,6 +171,9 @@ export default function Transaction(){
                                         <p>To:</p>
                                         <input 
                                             type="date" 
+                                            value={date2} 
+                                            onChange={(e)=> setdate2(e.target.value)} 
+                                            max={hoy} 
                                         />
                                     </div>
                                 </div>
@@ -129,12 +185,9 @@ export default function Transaction(){
                     </div>
                     <Searcher placeholderI={'Enter email'}getValue={getDataSearcher} />
                 </div>
-                {selectedTable === 'transaction' && (<div className="table-transaction-AT">
+                <div className="table-transaction-AT">
                     <TableAdmin columns={transationColumns} data={transactionData} btnVerification={false}/>
-                </div>)}
-                {selectedTable === 'moves' &&(<div className="table-transaction-AT">
-                    <TableAdmin columns={movesColumns} data={movesData} btnVerification={false}/>
-                </div>)}
+                </div>
             </div>
         </>
     )
