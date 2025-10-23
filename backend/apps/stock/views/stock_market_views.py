@@ -10,8 +10,6 @@ from ..serializers import (
     ErrorResponseSerializer
 )
 from ..permissions import IsAdminOrReadOnly
-from ...users.actions import Action
-from ...users.utils import log_action
 
 
 @extend_schema(tags=['stocks-market'])
@@ -62,7 +60,6 @@ class StockMarketViewSet(viewsets.GenericViewSet):
                 continue
         
         top_3_gainers = sorted(gainers, key=lambda x: x['change_percentage'], reverse=True)[:3]
-        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_gainers": top_3_gainers
@@ -108,7 +105,6 @@ class StockMarketViewSet(viewsets.GenericViewSet):
                 continue
         
         top_3_losers = sorted(losers, key=lambda x: x['change_percentage'])[:3]
-        log_action(request, request.user, Action.STOCK_VIEWED)
         
         return Response({
             "top_losers": top_3_losers

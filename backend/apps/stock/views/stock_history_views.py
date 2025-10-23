@@ -12,8 +12,6 @@ from ..serializers import (
     ErrorResponseSerializer
 )
 from ..permissions import IsAdminOrReadOnly
-from ...users.actions import Action
-from ...users.utils import log_action
 
 
 @extend_schema(tags=['stocks-history'])
