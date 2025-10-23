@@ -53,6 +53,7 @@ class StockMarketViewSet(viewsets.GenericViewSet):
                             "id": stock.id,
                             "name": stock.name,
                             "symbol": stock.symbol,
+                            "exchange": stock.exchange,
                             "open_price": round(open_price, 2),
                             "current_price": round(current_price, 2),
                             "change_percentage": round(change_percentage, 2)
@@ -98,6 +99,7 @@ class StockMarketViewSet(viewsets.GenericViewSet):
                             "id": stock.id,
                             "name": stock.name,
                             "symbol": stock.symbol,
+                            "exchange": stock.exchange,
                             "open_price": round(open_price, 2),
                             "current_price": round(current_price, 2),
                             "change_percentage": round(change_percentage, 2)
