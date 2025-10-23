@@ -17,13 +17,26 @@ ChartJS.register(ArcElement, Tooltip, Legend);
     }
 */
 export default function DoughnutGraph({graphData}) {
+    function generateShades(baseColor, n) {
+  // baseColor = "#729c87"
+  const r = parseInt(baseColor.slice(1, 3), 16);
+  const g = parseInt(baseColor.slice(3, 5), 16);
+  const b = parseInt(baseColor.slice(5, 7), 16);
+
+  const colors = [];
+  for (let i = 0; i < n; i++) {
+    const alpha = (0.4 + (0.6 * i) / (n - 1)).toFixed(2);
+    colors.push(`rgba(${r}, ${g}, ${b}, ${alpha})`);
+  }
+  return colors;
+}
     const data = {
         labels: graphData.clasificacion,
         datasets: [
             {
                 label: graphData.name,
                 data: graphData.dataL,
-                backgroundColor: graphData.backgroundColor,
+                backgroundColor: generateShades("#729c87ff", graphData.num),
             },
         ]
     }
