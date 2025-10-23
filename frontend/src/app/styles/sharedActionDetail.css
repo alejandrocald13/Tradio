@@ -1,0 +1,51 @@
+.no-actions-found {
+    margin: 0 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    text-align: center;
+    border: 2px dashed #c8c8c8;
+    border-radius: 20px;
+    color: #555555;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.no-actions-found :hover {
+    background: #f3f3f3;
+    color: #3a4944;
+}
+
+.no-actions-icon-found  {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+    animation: float 2.5s ease-in-out infinite;
+    fill: #555555;
+}
+
+/* animacion para cuando no hay acciones para la categoria, de que va de arriba hacia abajo */
+/* aca el negativo indica que va hacia arriba (solo para el inicio) */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.no-actions-found.with-sidebar {
+    min-height: calc(100vh - 120px);
+    margin-left: 6rem;
+    width: calc(98% - 6rem);
+}
+
+.no-actions-found.no-sidebar {
+    margin-left: 0;
+    width: 100%;
+    min-height: 70vh;
+}

@@ -101,6 +101,7 @@ export default function BigChart({
     const options = {
       chart: {
         type: "area",
+        background: "#ffffff",
         toolbar: { show: false },
         zoom: { enabled: false },
         animations: {
@@ -166,6 +167,7 @@ export default function BigChart({
   const options = {
     chart: {
       type: "area",
+      background: "#ffffff",
       toolbar: { show: false },
       zoom: { enabled: false },
       animations: {
