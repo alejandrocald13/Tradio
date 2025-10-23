@@ -48,12 +48,7 @@ class Auth0LoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        payload = {
-            "user_id": user.id,
-            "email": user.email,
-            "exp": datetime.utcnow() + timedelta(hours=1),
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+        auth0_token = serializer.validated_data.get("auth0_token")
 
         response = Response(
             {
@@ -65,10 +60,10 @@ class Auth0LoginView(APIView):
 
         response.set_cookie(
             key="access_token",
-            value=token,
+            value=auth0_token,
             httponly=True,
             samesite="None",
-            secure=False,
+            secure=True,
             max_age=3600,
         )
 
