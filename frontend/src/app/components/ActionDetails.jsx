@@ -39,23 +39,23 @@ export default function ActionDetails({
           <h2 className="td-title">{title}</h2>
         </div>
         <div className="td-transactions">
-          <button
-            onClick={() => !isPublic && setIsBuyOpen(true)}
-            className={`td-button-bs td-button-bs-primary ${isPublic ? "td-disabled" : ""}`}
-            disabled={isPublic}
-            title={isPublic ? "Sign up to buy" : ""}
-          >
-            Buy
-          </button>
+          {!isPublic && (
+            <>
+              <button
+                onClick={() => setIsBuyOpen(true)}
+                className="td-button-bs td-button-bs-primary"
+              >
+                Buy
+              </button>
 
-          <button
-            onClick={() => !isPublic && setIsSellOpen(true)}
-            className={`td-button-bs ${isPublic ? "td-disabled" : ""}`}
-            disabled={isPublic}
-            title={isPublic ? "Sign up to sell" : ""}
-          >
-            Sell
-          </button>
+              <button
+                onClick={() => setIsSellOpen(true)}
+                className="td-button-bs"
+              >
+                Sell
+              </button>
+            </>
+          )}
         </div>
       </div>
 

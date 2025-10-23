@@ -6,7 +6,7 @@
 
 .action-container {
     background-color: #ffffff;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
     border-radius: 30px;
     margin: 20px 2rem 20px 14rem;
     padding: 32px 24px;
