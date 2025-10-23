@@ -103,12 +103,12 @@ export default function SidebarNavAdmin() {
                                     >
                                         Clients
                                     </Link>
-                                    <Link href="/userAdmin" className={`sidebar-subitem ${
+                                    {/* <Link href="/userAdmin" className={`sidebar-subitem ${
                                             pathname === "/userAdmin" ? "active" : ""
                                         }`}
                                     >
                                         Admins
-                                    </Link>
+                                    </Link> */}
                                 </div>
                             )}
                         </div>
