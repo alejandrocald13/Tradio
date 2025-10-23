@@ -162,3 +162,5 @@ MARKET_END = '16:00'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')

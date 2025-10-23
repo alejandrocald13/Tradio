@@ -1,9 +1,14 @@
+import jwt
+from jwt.algorithms import RSAAlgorithm
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.utils.text import slugify
 from apps.users.models import Profile, ProfileState
 import requests
 from django.conf import settings
+
+from apps.users.utils import assign_unique_referral_code
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,23 +44,44 @@ class Auth0UserLoginSerializer(serializers.Serializer):
     def validate(self, attrs):
         token = attrs.get("auth0_token")
 
-        resp = requests.get(
-            f"https://{settings.AUTH0_DOMAIN}/userinfo",
-            headers={"Authorization": f"Bearer {token}"}
-        )
+        try:
+            jwks_url = f"https://{settings.AUTH0_DOMAIN}/.well-known/jwks.json"
+            jwks = requests.get(jwks_url, timeout=5).json()
 
-        if resp.status_code != 200:
-            raise serializers.ValidationError("Token de Auth0 inválido o expirado.")
+            unverified_header = jwt.get_unverified_header(token)
+            rsa_key = next(
+                (
+                    RSAAlgorithm.from_jwk(key)
+                    for key in jwks["keys"]
+                    if key["kid"] == unverified_header["kid"]
+                ),
+                None,
+            )
 
-        user_info = resp.json()
-        attrs["auth0_id"] = user_info.get("sub")
-        attrs["email"] = user_info.get("email")
-        attrs["name"] = user_info.get("name") or user_info.get("nickname", "Usuario")
+            if rsa_key is None:
+                raise serializers.ValidationError("No se encontró la clave pública de Auth0.")
 
-        if not attrs["auth0_id"] or not attrs["email"]:
-            raise serializers.ValidationError("Datos incompletos desde Auth0.")
+            payload = jwt.decode(
+                token,
+                key=rsa_key,
+                algorithms=["RS256"],
+                issuer=f"https://{settings.AUTH0_DOMAIN}/",
+                options={"verify_aud": False},
+            )
 
-        return attrs
+            attrs["auth0_id"] = payload.get("sub")
+            attrs["email"] = payload.get("email")
+            attrs["name"] = payload.get("name") or "Usuario"
+
+            if not attrs["auth0_id"]:
+                raise serializers.ValidationError("El token no contiene un ID de usuario válido.")
+
+            return attrs
+
+        except jwt.ExpiredSignatureError:
+            raise serializers.ValidationError("El token ha expirado.")
+        except jwt.InvalidTokenError as e:
+            raise serializers.ValidationError(f"Token inválido: {str(e)}")
 
     def create(self, validated_data):
         auth0_id = validated_data["auth0_id"]
@@ -65,7 +91,7 @@ class Auth0UserLoginSerializer(serializers.Serializer):
         profile = Profile.objects.filter(auth0_id=auth0_id).first()
         if profile:
             return profile.user
-
+                
         base_username = slugify(name.replace(" ", "")) or "user"
         username = base_username
         counter = 1
@@ -92,5 +118,8 @@ class Auth0UserLoginSerializer(serializers.Serializer):
             birth_date=None,
             state=pendiente_state,
         )
+
+        assign_unique_referral_code(profile, length=6)
+
 
         return user

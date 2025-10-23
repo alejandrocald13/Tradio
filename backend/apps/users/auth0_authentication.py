@@ -40,8 +40,8 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
                 token,
                 key=jwt.algorithms.RSAAlgorithm.from_jwk(rsa_key),
                 algorithms=["RS256"],
-                audience=settings.AUTH0_API_AUDIENCE,
                 issuer=f"https://{settings.AUTH0_DOMAIN}/",
+                options={"verify_aud": False},
             )
 
             auth0_id = payload.get("sub")
