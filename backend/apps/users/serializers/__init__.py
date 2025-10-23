@@ -1,5 +1,5 @@
 from .register_serializers import RegisterSerializer
-from .auth_serializers import EmailTokenObtainPairSerializer
 from .profile_serializers import ProfileSerializer, ProfileStateSerializer, UserNameSerializer
 from .user_serializers import UserListSerializer, UserDetailSerializer
 from .admin_serializers import CreateSuperUserSerializer, SuperUserListSerializer
+from .auth0_serializers import Auth0UserLoginSerializer, UserSerializer
