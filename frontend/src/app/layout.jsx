@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
         authorizationParams={{
           redirect_uri:
             typeof window !== "undefined"
-              ? `${window.location.origin}/auth0-login`
+              ? `${window.location.origin}/landing`
               : "",
         }}
       >
