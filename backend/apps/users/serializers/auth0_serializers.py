@@ -108,7 +108,7 @@ class Auth0UserLoginSerializer(serializers.Serializer):
 
         pendiente_state = ProfileState.objects.get(name="pendiente")
 
-        Profile.objects.create(
+        profile = Profile.objects.create(
             user=user,
             auth0_id=auth0_id,
             name=name,
