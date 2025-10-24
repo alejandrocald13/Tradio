@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.users.serializers import Auth0UserLoginSerializer, UserSerializer
 
+# no-repudio
+from apps.users.utils import log_action
+from apps.users.actions import Action
+
 class Auth0LoginView(APIView):
     """
     Valida el token de Auth0.
@@ -87,6 +91,8 @@ class Auth0LoginView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+        log_action(request, user, Action.AUTH_LOGIN)
 
         response.set_cookie(
             key="access_token",

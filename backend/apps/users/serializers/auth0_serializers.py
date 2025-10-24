@@ -10,6 +10,10 @@ from django.conf import settings
 
 from apps.users.utils import assign_unique_referral_code
 
+# no-repudio
+from apps.users.utils import log_action
+from apps.users.actions import Action
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -84,6 +88,8 @@ class Auth0UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Token inválido: {str(e)}")
 
     def create(self, validated_data):
+        request = self.context.get("request")
+
         auth0_id = validated_data["auth0_id"]
         email = validated_data["email"]
         name = validated_data["name"]
@@ -120,6 +126,9 @@ class Auth0UserLoginSerializer(serializers.Serializer):
         )
 
         assign_unique_referral_code(profile, length=6)
+
+        if request:
+            log_action(request, user, Action.AUTH_REGISTER_REQUESTED)
 
 
         return user
