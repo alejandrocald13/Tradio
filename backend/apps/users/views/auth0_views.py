@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.users.serializers import Auth0UserLoginSerializer, UserSerializer
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 # no-repudio
 from apps.users.utils import log_action
 from apps.users.actions import Action
@@ -32,6 +33,29 @@ class Auth0LoginView(APIView):
                     print("Error al revocar token de Auth0:", resp.text)
             except Exception as e:
                 print("No se pudo revocar token de Auth0:", e)
+    
+    @extend_schema(
+    tags=["auth"],
+    summary="Autenticación con Auth0",
+    description="Valida el token de Auth0, crea o actualiza al usuario y guarda el JWT en cookie HttpOnly.",
+    request=Auth0UserLoginSerializer,
+    responses={
+        200: OpenApiResponse(
+            response=UserSerializer,
+            description="Inicio de sesión exitoso."
+        ),
+        201: OpenApiResponse(
+            response=UserSerializer,
+            description="Usuario creado pero pendiente de habilitación."
+        ),
+        403: OpenApiResponse(
+            description="Perfil no autorizado o acceso restringido."
+        ),
+        400: OpenApiResponse(
+            description="Token inválido o datos incompletos."
+        ),
+    },
+    )
 
     def post(self, request):
         
