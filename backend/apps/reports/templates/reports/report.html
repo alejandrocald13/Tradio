@@ -2,48 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            color: #111827;
-        }
-        h1, h2 {
-            color: #111827;
-        }
-        p {
-            color: #374151;
-            font-size: 14px;
-        }
-        .box {
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        th, td {
-            border: 1px solid #E5E7EB;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #F3F4F6;
-            color: #111827;
-        }
-
-        .footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #6B7280;
-            text-align: center;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'reports/report.css' %}">
+    <title>Reporte Financiero</title>
 </head>
 <body>
     <h1>Reporte Financiero</h1>

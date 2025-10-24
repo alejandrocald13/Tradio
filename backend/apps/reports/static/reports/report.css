@@ -1,0 +1,121 @@
+@page {
+  margin: 20mm 25mm;
+}
+
+:root {
+  --text-primary: #212529;
+  --bg: #f5f5f5;
+  --text-muted: #6c757d;
+  --green-dark: #1e392a;
+  --border-color: #dee2e6;
+  --radius: 8px;
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-stack);
+  font-size: 13px;
+  background: #ffffff;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 22px;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 4mm;
+}
+
+h2 {
+  font-size: 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 2mm;
+  margin-top: 10mm;
+  margin-bottom: 3mm;
+}
+
+p {
+  color: var(--text-muted);
+  margin: 2mm 0;
+}
+body > p {
+  font-size: 15px;          
+  color: var(--text-primary); 
+  font-weight: 600;         
+}
+
+.box {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 5mm 6mm;
+  margin-top: 5mm;
+  background: #f8f9fa;
+}
+
+.box p {
+  margin: 1mm 0;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.box strong {
+  color: var(--green-dark);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4mm;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+}
+
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 8px 6px;
+  text-align: left;
+}
+
+th {
+  background: #f8f9fa;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+td {
+  color: #343a40;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #fcfdfe;
+}
+
+td[colspan="5"] {
+    color: var(--text-muted);
+    background-color: transparent !important;
+}
+
+.footer {
+  margin-top: 12mm;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 4mm;
+}
+
+.footer strong {
+    color: var(--green-dark);
+}
+
+table, tr, td, th {
+  page-break-inside: avoid;
+}
+
+h2, .box, .footer {
+  page-break-before: avoid;
+  page-break-after: avoid;
+}
