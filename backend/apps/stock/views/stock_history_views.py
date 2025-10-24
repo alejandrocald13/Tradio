@@ -156,12 +156,18 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
                     
                     timestamps.append(current_timestamp)
                     close_prices.append(current_price_db)
-                    
+
+                    open_price = float(close_prices[0])
+                
+                    change_percentage = round(((current_price_db - open_price) / open_price) * 100, 2)           
+
                     results.append({
                         "id": stock_db.id,
                         "name": stock_db.name,
                         "symbol": stock_db.symbol,
                         "current_price": current_price_db,
+                        "open_price": open_price,
+                        "change_percentage": change_percentage,
                         "category": stock_db.category.name if stock_db.category else None,
                         "data": {
                             "t": timestamps,
