@@ -1,3 +1,5 @@
+import requests
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,6 +12,22 @@ class Auth0LoginView(APIView):
     - Si existe pero el perfil no está habilitado -> no genera JWT.
     - Si el perfil está habilitado -> genera cookie JWT (1h).
     """
+    def revoke_auth0_token(self, token):
+            """Revoca el token de Auth0 para impedir futuros accesos."""
+            try:
+                resp = requests.post(
+                    f"https://{settings.AUTH0_DOMAIN}/oauth/revoke",
+                    data={
+                        "client_id": settings.AUTH0_CLIENT_ID,
+                        "client_secret": settings.AUTH0_CLIENT_SECRET,
+                        "token": token,
+                    },
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+                if resp.status_code not in (200, 204):
+                    print("Error al revocar token de Auth0:", resp.text)
+            except Exception as e:
+                print("No se pudo revocar token de Auth0:", e)
 
     def post(self, request):
         
@@ -22,6 +40,8 @@ class Auth0LoginView(APIView):
 
         profile = getattr(user, "profile", None)
 
+        auth0_token = request.data.get("auth0_token")
+
         if not profile:
             return Response(
                 {"detail": "El usuario no tiene perfil asociado."},
@@ -29,6 +49,7 @@ class Auth0LoginView(APIView):
             )
 
         if profile.state.name.lower() == "pendiente":
+            self.revoke_auth0_token(auth0_token)
             return Response(
                 {
                     "message": "Usuario creado correctamente, pero pendiente de habilitación.",
@@ -38,9 +59,20 @@ class Auth0LoginView(APIView):
             )
 
         if profile.state.name.lower() != "habilitado":
+            self.revoke_auth0_token(auth0_token)
             return Response(
                 {
                     "message": f"El perfil está '{profile.state.name}'. Acceso restringido.",
+                    "user": UserSerializer(user).data,
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        
+        if profile.profile_completed == False:
+            self.revoke_auth0_token(auth0_token)
+            return Response(
+                {
+                    "message": f"El perfil está incompleto'. Acceso restringido.",
                     "user": UserSerializer(user).data,
                 },
                 status=status.HTTP_403_FORBIDDEN,
