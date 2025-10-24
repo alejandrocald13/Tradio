@@ -17,8 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import (TokenRefreshView)
-from apps.users.views import EmailTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,5 +36,5 @@ urlpatterns = [
     
     path('api/', include('apps.reports.urls')),
 
-    path('api/token/',  EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/token/',  EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]
