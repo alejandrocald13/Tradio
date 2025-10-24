@@ -1,48 +1,47 @@
-from datetime import datetime
-# from apps.transactions.models import Transaction
+from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
 
 def get_financial_report_data(user, from_date, to_date):
-    # compras_qs = Transaction.objects.filter(
-    #     user=user,
-    #     created_at__range=(from_date, to_date),
-    #     type="BUY"
-    # )
+    compras_qs = PurchaseTransaction.objects.filter(
+        user=user,
+        date__range=(from_date, to_date)
+    )
 
-    # ventas_qs = Transaction.objects.filter(
-    #     user=user,
-    #     created_at__range=(from_date, to_date),
-    #     type="SELL"
-    # )
+    ventas_qs = SaleTransaction.objects.filter(
+        user=user,
+        date__range=(from_date, to_date)
+    )
 
-    # compras = [
-    #     {
-    #         "fecha": t.created_at.strftime("%Y-%m-%d"),
-    #         "name_stock": t.stock,
-    #         "cantidad_comprada": t.quantity,
-    #         "precio_comprado": float(t.price),
-    #         "subtotal": float(t.total),
-    #     }
-    #     for t in compras_qs
-    # ]
+    compras = [
+        {
+            "fecha": c.date.strftime("%Y-%m-%d"),
+            "name_stock": c.stock.name,
+            "cantidad_comprada": float(c.quantity),
+            "precio_comprado": float(c.unit_price),
+            "subtotal": float(c.quantity * c.unit_price),
+        }
+        for c in compras_qs
+    ]
 
-    # ventas = [
-    #     {
-    #         "fecha": t.created_at.strftime("%Y-%m-%d"),
-    #         "name_stock": t.stock,
-    #         "cantidad_vendida": t.quantity,
-    #         "precio_vendido": float(t.price),
-    #         "subtotal": float(t.total),
-    #     }
-    #     for t in ventas_qs
-    # ]
+    ventas = [
+        {
+            "fecha": v.date.strftime("%Y-%m-%d"),
+            "name_stock": v.stock.name,
+            "cantidad_vendida": float(v.quantity),
+            "precio_vendido": float(v.unit_price),
+            "subtotal": float(v.quantity * v.unit_price),
+        }
+        for v in ventas_qs
+    ]
 
-    # total_compras = sum(c["subtotal"] for c in compras)
-    # total_ventas = sum(v["subtotal"] for v in ventas)
-    # saldo = total_ventas - total_compras
-    
+    total_compras = sum(item["subtotal"] for item in compras)
+    total_ventas = sum(item["subtotal"] for item in ventas)
+
+    saldo = total_ventas - total_compras
+
     return {
-        "compras": 1500,
-        "compras_total": 1500,
-        "ventas_total": 45,
-        "saldo": 10,
+        "compras": compras,
+        "ventas": ventas,
+        "compras_total": total_compras,
+        "ventas_total": total_ventas,
+        "saldo": saldo,
     }

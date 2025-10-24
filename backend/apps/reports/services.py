@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 import uuid
-from django.conf import settings
 
 
 def generate_report_pdf(user, from_date, to_date, data, request=None):
