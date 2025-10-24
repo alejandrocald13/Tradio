@@ -29,7 +29,7 @@ class Profile(models.Model):
     birth_date = models.DateField(blank=False, default=None, null=True)
     address = models.CharField(max_length=100, default='', blank=False)
     cellphone = models.CharField(max_length=20, default='', blank=False)
-    dpi = models.CharField(max_length=20, default='', blank=False, unique=True)
+    dpi = models.CharField(max_length=20, default='', blank=False)
     auth0_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
     profile_completed = models.BooleanField(default=False, blank=False)
 
