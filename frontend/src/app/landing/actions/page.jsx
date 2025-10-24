@@ -1,53 +1,84 @@
-// app/landing/actions/page.jsx
 "use client";
 import { useState, useEffect } from "react";
 import styles from "./actions.module.css";
 
+import { api } from "../../lib/axios"; 
 
 import ActionCard from "@/app/components/ActionCard";
 import MiniChart from "@/app/components/MiniChart";
-import { MOCK } from "@/app/data/mockQuotes";
 
 export default function ActionsPage() {
-  const [marketData, setMarketData] = useState([]);
+  const [topGainers, setTopGainers] = useState([]);
+  const [topLosers, setTopLosers] = useState([]);
+  const [availableActions, setAvailableActions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const symbols = Object.keys(MOCK); 
   const trendClass = { up: styles.positive, down: styles.negative, neutral: styles.neutral };
 
   useEffect(() => {
     const fetchMarketData = async () => {
+      console.log("Iniciando carga de datos del mercado...");
       try {
+        const [gainersRes, losersRes, historyRes] = await Promise.all([
+          api.get("/stocks-market/top_gainers/"),
+          api.get("/stocks-market/top_losers/"),
+          api.get("/stocks-history/all_history/") 
+        ]);
+
+        console.log("Datos recibidos:", { gainersRes, losersRes, historyRes });
+
+        const gainersData = gainersRes.data; 
+        const losersData = losersRes.data;   
+        const historyData = historyRes.data; 
+
+        setTopGainers(gainersData.top_gainers);
+        setTopLosers(losersData.top_losers);
+
         
-        const formatted = symbols.map((sym) => {
-          const data = MOCK[sym];
-          const changeAbs = data.last - data.prevClose;
-          const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
+        const formattedActions = historyData.stocks.map(stock => {
+          
+          const last = stock.current_price;
+          const intradayData = stock.data.c || []; 
+          let basePrice = null;
+          if (intradayData.length > 0) {
+            basePrice = intradayData[0];
+          } 
+          if (basePrice === null) {
+            basePrice = last; 
+          }
+          
+          
+          const changeAbs = last - basePrice;
+          const changePct = (basePrice !== 0) ? (changeAbs / basePrice) * 100 : 0; // Evitar división por cero
+          
           const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
+          const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
 
           return {
-            name: data.name,
-            symbol: sym,
-            value: `$${data.last.toLocaleString()}`,
-            exchange: "NASDAQ - Mock Data",
+            name: stock.name, 
+            symbol: stock.symbol,
+            value: `$${last.toLocaleString()}`,
+            exchange: stock.exchange || "NASDAQ - API Data",
             change: `${sign}${Math.abs(changeAbs).toFixed(2)}`,
             changePercent: `${sign}${Math.abs(changePct).toFixed(2)}%`,
-            trend: changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral",
-            intraday: data.intraday,
-            tabs: data.tabs
+            trend: trend,
+            intraday: intradayData, 
+            tabs: stock.tabs || {} 
           };
         });
 
-        setMarketData(formatted);
+        setAvailableActions(formattedActions);
         setLoading(false);
+        console.log("Datos cargados y formateados.");
+
       } catch (error) {
-        console.error("Error fetching market data:", error);
+        console.error("Error al cargar los datos del mercado:", error);
         setLoading(false);
       }
     };
 
     fetchMarketData();
-  }, []);
+  }, []); 
 
   if (loading) {
     return <div className={styles.loading}>Loading market data...</div>;
@@ -55,7 +86,6 @@ export default function ActionsPage() {
 
   return (
     <div className={styles.container}>
-      {/* NAVBAR */}
       <header className={styles.navbar}>
         <div className={styles.logo}></div>
         <nav>
@@ -71,7 +101,6 @@ export default function ActionsPage() {
         </div>
       </header>
 
-      {/* SEARCH BAR */}
       <div className={styles.searchSection}>
         <div className={styles.searchContainer}>
           <span className={styles.searchIcon}>Q</span>
@@ -83,80 +112,79 @@ export default function ActionsPage() {
         </div>
       </div>
 
-      {/* MARKET DATA - LAYOUT VERTICAL IZQUIERDA Y DERECHA */}
       <section className={styles.marketSection}>
         <div className={styles.marketColumns}>
-  {/* Bloque Izquierdo */}
-  <div className={styles.marketBlock}>
-    <h2 className={`${styles.blockTitle} ${styles.gains}`}>Top Gainers</h2>
-    {marketData.slice(0, 3).map((item, index) => (
-      <div key={index} className={styles.marketCard}>
-        <div className={styles.cardHeader}>
-          <div className={styles.stockName}>{item.name}</div>
-          <div className={styles.stockValue}>{item.value}</div>
-        </div>
-        <div className={styles.cardFooter}>
-          <div className={styles.stockExchange}>{item.exchange}</div>
-          <div className={styles.stockChange}>
-            <span className={item.change.includes('+') ? styles.positive : styles.negative}>
-              {item.change} ({item.changePercent})
-            </span>
+          
+          <div className={styles.marketBlock}>
+            <h2 className={`${styles.blockTitle} ${styles.gains}`}>Top Gainers</h2>
+            {topGainers.map((item, index) => {
+              const changeAbs = item.current_price - item.open_price;
+              const sign = changeAbs >= 0 ? "+" : "-";
+              
+              return (
+                <div key={index} className={styles.marketCard}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.stockName}>{item.name}</div>
+                    <div className={styles.stockValue}>${item.current_price.toLocaleString()}</div>
+                  </div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.stockExchange}>{item.exchange || "NASDAQ"}</div>
+                    <div className={styles.stockChange}>
+                      <span className={styles.positive}>
+                        {sign}${Math.abs(changeAbs).toFixed(2)} ({item.change_percentage.toFixed(2)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className={styles.marketBlock}>
+            <h2 className={`${styles.blockTitle} ${styles.losses}`}>Top Losers</h2>
+            {topLosers.map((item, index) => {
+              const changeAbs = item.current_price - item.open_price;
+              const sign = changeAbs >= 0 ? "+" : "-"; 
+              
+              return (
+                <div key={index} className={styles.marketCard}>
+                   <div className={styles.cardHeader}>
+                    <div className={styles.stockName}>{item.name}</div>
+                    <div className={styles.stockValue}>${item.current_price.toLocaleString()}</div>
+                  </div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.stockExchange}>{item.exchange || "NASDAQ"}</div>
+                    <div className={styles.stockChange}>
+                      <span className={styles.negative}>
+                         {sign}${Math.abs(changeAbs).toFixed(2)} ({item.change_percentage.toFixed(2)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
-    ))}
-  </div>
 
-  {/* Bloque Derecho */}
-  <div className={styles.marketBlock}>
-    <h2 className={`${styles.blockTitle} ${styles.losses}`}>Top Losers</h2>
-    {marketData.slice(3, 6).map((item, index) => (
-      <div key={index} className={styles.marketCard}>
-        <div className={styles.cardHeader}>
-          <div className={styles.stockName}>{item.name}</div>
-          <div className={styles.stockValue}>{item.value}</div>
-        </div>
-        <div className={styles.cardFooter}>
-          <div className={styles.stockExchange}>{item.exchange}</div>
-          <div className={styles.stockChange}>
-            <span className={item.change.includes('+') ? styles.positive : styles.negative}>
-              {item.change} ({item.changePercent})
-            </span>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-      <div className={styles.actionsContainer}>
-        <h2 className={styles.actionsTitle}>Available Actions</h2>
-        <div className={styles.actionCardsGrid}>
-          {symbols.map((sym) => {
-            const data = MOCK[sym];
-            const changeAbs = data.last - data.prevClose;
-            const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
-            const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
-            const amountText = `${sign}${Math.abs(changeAbs).toFixed(2)}`;
-            const pctText = `(${sign}${Math.abs(changePct).toFixed(2)}%)`;
-            const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
-
-            return (
-              <div key={sym} className={styles.actionCardWrapper}>
+        <div className={styles.actionsContainer}>
+          <h2 className={styles.actionsTitle}>Available Actions</h2>
+          <div className={styles.actionCardsGrid}>
+            
+            {availableActions.map((item) => (
+              <div key={item.symbol} className={styles.actionCardWrapper}>
                 <ActionCard
-                  symbol={sym}
-                  actionName={data.name}
-                  price={`$${data.last.toLocaleString()}`}
-                  changeText={`${amountText} ${pctText}`}
-                  variantClass={trendClass[trend]}
-                  graphic={<MiniChart data={data.intraday} />}
-                  basePath="/landing/actions"
+                  symbol={item.symbol}
+                  actionName={item.name}
+                  price={item.value}
+                  changeText={`${item.change} ${item.changePercent}`}
+                  variantClass={trendClass[item.trend]}
+                  graphic={<MiniChart data={item.intraday} />}
                 />
               </div>
-            );
-          })}
+            ))}
+
+          </div>
         </div>
-      </div>
 
       </section>
     </div>
