@@ -19,22 +19,16 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = [
             "id",
-            "auth0_id",
             "name",
-            "referral_code",
             "birth_date",
-            "address",
             "cellphone",
             "dpi",
-            "state",
         ]
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
-
     class Meta:
         model = User
-        fields = ["id", "username", "email", "profile"]
+        fields = ["id", "is_superuser"]
 
 class Auth0UserLoginSerializer(serializers.Serializer):
     """
