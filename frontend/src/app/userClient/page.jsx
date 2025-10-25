@@ -6,141 +6,63 @@ import Modal from '../components/Modal'
 import Searcher from "../components/Searcher";
 import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
 import "./users.css"
+import { api } from "../lib/axios";
 
 export default function users() {
     const [users, setUsers] = useState([]);
-    const [statusValue, setStatusValue] = useState(false)
+    const [statusValue, setStatusValue] = useState({value: true, id:0})
     const [isOpen, setIsOpen] = useState(false)
-    const [confirmation, setConfirmaton] = useState(false)
-    const usersR = [
-        {
-            id: 1,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        }, 
-        {
-            id: 2,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: true
-        },
-        {
-            id: 3,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: true
-        },
-        {
-            id: 4,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        }  
-        
-        ,
-        {
-            id: 5,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 6,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 7,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 8,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 9,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 10,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id:11,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 12,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        },
-        {
-            id: 13,
-            name: 'Daniela Matul',
-            email: 'dani@gmail.com',
-            age: 19,
-            date: '10-09-2025',
-            enable: false
-        }          
-    ]
+    const [confirmation, setConfirmation] = useState(false)
 
+
+    const getUsers = async () => {
+        try{
+            const response = await api.get('/users/')
+            setUsers(response.data)
+        }catch(error){
+            console.log("Error obteniendo usuarios", error)
+            alert(error)
+        }
+    }    
     useEffect(() => {
-        // Aqui obtendremos los usuarios de la Api
-
-        setUsers(usersR)
+        getUsers()
     }, [confirmation])
 
 
-    const getValueInput = (value) => {
-        console.log("Valor", value.value)
+    const getValueInputEnable = (value) => {
         setStatusValue(value)
         setIsOpen(true)
     }
 
-    const closeModal = () => {
+    const closeModal = async (value) => {
         setIsOpen(false)
-        setConfirmaton(true)
+        if(value){
+            try{
+                if(statusValue.value){
+                    const response = await api.post(`/users/${statusValue.id}/enable/`)
+                    console.log("Se ha habilitado el usuario", response.data)
+                } else{
+                    const response = await api.post(`/users/${statusValue.id}/disable/`)
+                    console.log("Se ha deshabilitado el usuario", response.data)
+                }
+                setConfirmation(!statusValue)
+            }catch(error){
+                alert(error)
+            }
+        }
     }
 
-    const getValueInputSearcher = (value) => {
-        console.log("Hola desde getValueInput ", value)
+    const getValueInputSearcher = async (value) => {
+        if (value === ''){
+            getUsers()
+            return 0
+        }
+        try{
+            const response = await api.post("/users/search", {name: value})
+            setUsers(response.data)
+        }catch(error){
+            alert(error)
+        }
     }
     const columns = ['Name', 'Email', 'Age', 'Date', 'Enable']
     
@@ -152,7 +74,7 @@ export default function users() {
                     <Searcher placeholderI={'Enter name'} getValue={getValueInputSearcher} />
                 </div>
                 <div className="table-TA-container">
-                    <TableAdmin  columns={columns} data={users} btnVerification={true} getValueInputP={getValueInput}/>
+                    <TableAdmin  columns={columns} data={users} btnVerification={true} getValueInputP={getValueInputEnable}/>
                 </div>
 
 
@@ -165,10 +87,10 @@ export default function users() {
                         </div>
 
                         <div className="btns">
-                            <button className="changeStatus-confirmation" onClick={closeModal}>
+                            <button className="changeStatus-confirmation" onClick={()=> closeModal(true)}>
                                     Confirm
                             </button>
-                            <button className="changeStatus-cancel" onClick={closeModal}>
+                            <button className="changeStatus-cancel" onClick={()=> closeModal(false)}>
                                     Cancel
                             </button>
                         </div>
