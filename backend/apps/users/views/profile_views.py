@@ -8,7 +8,7 @@ from rest_framework import status
 from apps.users.models import Profile
 
 # swagger
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 
 # serializers
 from apps.users.serializers import UserDetailSerializer
@@ -29,13 +29,28 @@ class MeView(APIView):
     def get(self, request):
         data = UserDetailSerializer(request.user).data
         return Response(data, status=status.HTTP_200_OK)
-
+    
     @extend_schema(
         request=UserDetailSerializer,
         responses=UserDetailSerializer,
         tags=["users"],
         summary="Actualizar perfil propio",
-        description="Admite cambios en email (User) y campos de profile (p. ej. name, birth_date, state_id).",
+        description="Actualiza únicamente los campos del **perfil del usuario**.",
+        examples=[
+            OpenApiExample(
+                name="Ejemplo de actualización de perfil",
+                description="Solo se actualizan los campos permitidos.",
+                value={
+                    "profile": {
+                        "name": "string",
+                        "birth_date": "2004-09-11",
+                        "address": "string",
+                        "cellphone": "string",
+                        "dpi": "string"
+                    }
+                },
+            )
+        ],
     )
 
     def patch(self, request):
