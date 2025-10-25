@@ -15,25 +15,26 @@
 
 .more-Info-portafolio {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   gap: 12px;
 }
 
 
-.data-portafolio {
-  font-size: 16px;
-  margin: 4px 0;
+.data-container-portafolio {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.data-portafolio .label {
+.data-container-portafolio .value {
   color: #888;   
   font-weight: 500;
 }
 
-.data-portafolio .value {
+.data-container-portafolio .label{
   color: #000;   
   font-weight: 600;
+  text-align: start;
 }
 
 

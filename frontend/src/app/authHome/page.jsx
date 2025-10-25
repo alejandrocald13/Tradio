@@ -114,7 +114,16 @@ export default function AuthHome() {
                             <h3>Some of your actions</h3>
                             <div className="portfolio-actions">
                                 {dataGeneral.map((dat, index) =>(
-                                    <ActionPortfolio key={index} data={dat}/>))
+                                    <ActionPortfolio key={index} data={dat}>
+                                        {/* <div className="subtitles">
+                                            <p>Portfolio Weight:</p>
+                                            <p>Performance:</p>
+                                        </div>
+                                        <div className="data">
+                                            <p>0%</p>
+                                            <p>0%</p>
+                                        </div> */}
+                                    </ActionPortfolio>))
                                 }
                             </div>
                         </div>
