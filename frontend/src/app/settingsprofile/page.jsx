@@ -115,7 +115,7 @@ export default function SettingsProfile() {
     e.preventDefault();
     
     if (!validateForm()) {
-      alert("❌ Please fix the errors in the form before saving.");
+      // alert("❌ Please fix the errors in the form before saving.");
       return;
     }
 
@@ -124,7 +124,7 @@ export default function SettingsProfile() {
 
   // Confirm and save changes
   const confirmSave = () => {
-    alert("✅ Changes saved successfully.");
+    // alert("✅ Changes saved successfully.");
     setErrors({});
     setSaveModalOpen(false);
   };
@@ -147,10 +147,10 @@ export default function SettingsProfile() {
           dpi: "",
         });
         setErrors({});
-        alert("❎ Changes cancelled.");
+        // alert("❎ Changes cancelled.");
       }
     } else {
-      alert("ℹ️ No pending changes to cancel.");
+      // alert("ℹ️ No pending changes to cancel.");
     }
   };
 
