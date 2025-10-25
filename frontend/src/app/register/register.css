@@ -158,9 +158,9 @@
 
 /* Mensajes de error - ESTILOS MEJORADOS */
 .error-message {
-  color: #ff4444;
-  font-size: clamp(12px, 2.2vw, 14px);
-  margin: 0 0 12px 18px;
+  color: #ff4444e5;
+  font-size: clamp(10px, 2.2vw, 12px);
+  margin: 0 0 8px 18px;
   display: block;
   text-align: left;
   min-height: 16px; /* Altura mínima para evitar que el layout se mueva */

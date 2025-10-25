@@ -178,33 +178,33 @@ export default function RegisterPage() {
     const { fullName, birthdate, cellphone, dpi, address } = formData;
     const newErrors = {};
 
-    if (!fullName) newErrors.fullName = "El nombre completo es requerido";
+    if (!fullName) newErrors.fullName = "Full name is required.";
     
     if (!birthdate) {
-      newErrors.birthdate = "La fecha de nacimiento es requerida";
+      newErrors.birthdate = "Date of birth is required.";
     } else {
       const age = validateAge(birthdate);
       if (age < 18) {
-        newErrors.birthdate = "Debes ser mayor de edad (18+ años)";
+        newErrors.birthdate = "You must be at least 18 years old.";
       }
     }
 
     if (!cellphone) {
-      newErrors.cellphone = "El teléfono es requerido";
+      newErrors.cellphone = "Phone number is required.";
     } else {
       const cleanPhone = cellphone.replace(/[^\d+]/g, '');
       if (!validatePhone(cleanPhone)) {
-        newErrors.cellphone = "Ingresa un número de teléfono válido";
+        newErrors.cellphone = "Enter a valid phone number.";
       }
     }
 
     if (!dpi) {
-      newErrors.dpi = "El DPI es requerido";
+      newErrors.dpi = "DPI number is required.";
     } else if (!validateDPI(dpi)) {
-      newErrors.dpi = "El DPI debe contener solo números (máximo 13 dígitos)";
+      newErrors.dpi = "The DPI number must contain only numbers (maximum 13 digits).";
     }
 
-    if (!address) newErrors.address = "La dirección es requerida";
+    if (!address) newErrors.address = "Address is required.";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -212,7 +212,7 @@ export default function RegisterPage() {
     }
 
     setErrors({});
-    alert("✅ Registro completado correctamente.");
+    alert("Personal Info saved successfully.");
   };
 
   // Calcular fecha máxima (18 años atrás desde hoy)
@@ -240,10 +240,10 @@ export default function RegisterPage() {
 
         {/* Lado Derecho */}
         <div className="right">
-          <h2 className="title">Register</h2>
+          {/* <h2 className="title">Register</h2> */}
 
           {/* Barra de progreso */}
-          <div className="progressContainer">
+          {/* <div className="progressContainer">
             <div className="progressBar">
               <div
                 className="progressFill"
@@ -254,11 +254,11 @@ export default function RegisterPage() {
               <span className={step === 1 ? "activeStep" : ""}>Account Info</span>
               <span className={step === 2 ? "activeStep" : ""}>Personal Info</span>
             </div>
-          </div>
+          </div> */}
 
           <form className="form" onSubmit={handleSubmit}>
             {/* Paso 1: Account Info */}
-            {step === 1 && (
+            {/* {step === 1 && (
               <div className="section active">
                 <h3 className="sectionTitle">Account Info</h3>
 
@@ -319,12 +319,12 @@ export default function RegisterPage() {
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Paso 2: Personal Info */}
-            {step === 2 && (
+            {step === 1 && (
               <div className="section active">
-                <h3 className="sectionTitle">Personal Info</h3>
+                <h2 className="sectionTitle">Complete Personal Info</h2>
 
                 <div className="inputGroup">
                   <FaUser className="icon" />
