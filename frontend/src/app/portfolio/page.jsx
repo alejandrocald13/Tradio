@@ -32,20 +32,6 @@ export default function Portafolio (){
     })
 
     useEffect(()=>{
-        // const login = async () => {
-        //      try{
-        //          const response = await api.post('/token/', {
-        //              email: 'robertoalejandrocalderon@gmail.com',
-        //              password: 'Tradio1309.'
-        //          })
-
-        //          console.log('Login correcto', response.data)
-        //      }catch(error){
-        //          console.log("No se logró confirmar las credenciales", error)
-        //          setErrorMessage(error.response?.data?.detail || "Error al iniciar sesión");
-        //      }
-        // }
-        // login()
         const getHighestPerformanceAction = async () => {
             try{
                 const response = await api.get('/portfolios/highest_performance/')
