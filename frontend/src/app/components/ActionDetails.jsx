@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import BigChart from "./BigChart";
 import SlideActionPanel from "./SlideActionPanel";
 import BuySellContent from "./BuySellContent";
@@ -11,17 +11,18 @@ export default function ActionDetails({
   price = 0,
   change = "—",
   changeTone = "neutral",
-  tabs = ["1D","5D","1M","6M","1Y","5Y"],
+  tabs = ["1D", "5D", "1M", "6M", "1Y", "5Y"],
   dataByTab = {},
   isPublic = false,
+  currentTab,
+  onTabChange,
 }) {
   const [isBuyOpen, setIsBuyOpen] = useState(false);
   const [isSellOpen, setIsSellOpen] = useState(false);
-  const [tab, setTab] = useState(tabs[0] ?? "1D");
 
   const { data = [], labels = [], ref } = useMemo(
-    () => dataByTab[tab] || {},
-    [tab, dataByTab]
+    () => dataByTab[currentTab] || {},
+    [currentTab, dataByTab]
   );
 
   const refLine = Number.isFinite(Number(ref)) ? Number(ref) : undefined;
@@ -69,8 +70,8 @@ export default function ActionDetails({
           <button
             key={t}
             type="button"
-            onClick={() => setTab(t)}
-            className={`td-tab ${t === tab ? "td-active" : ""}`}
+            onClick={() => onTabChange(t)}
+            className={`td-tab ${t === currentTab ? "td-active" : ""}`}
           >
             {t}
           </button>
@@ -79,7 +80,7 @@ export default function ActionDetails({
 
       <div className="td-chartBox">
         <BigChart
-          chartKey={`${title}-${tab}`}
+          chartKey={`${title}-${currentTab}`}
           data={data}
           labels={labels}
           refLine={refLine}
