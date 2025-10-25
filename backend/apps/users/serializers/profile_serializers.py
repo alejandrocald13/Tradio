@@ -6,25 +6,25 @@ class ProfileStateSerializer(serializers.ModelSerializer):
         model = ProfileState
         fields = ["name"]
 
+
 class ProfileSerializer(serializers.ModelSerializer):
-    # Lectura: estado anidado
-    state = ProfileStateSerializer(read_only=True)
-    # Escritura: permitir enviar state por id (opcional)
-    state_id = serializers.PrimaryKeyRelatedField(
-        queryset=ProfileState.objects.all(),
-        source="state",
-        write_only=True,
-        required=False,
-    )
 
     class Meta:
         model = Profile
-        fields = ["birth_date", "name", "state", "state_id"]
+        fields = ["name", "birth_date", "address", "cellphone", "dpi", "profile_completed"]
         read_only_fields = ["deleted_at"]
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.profile_completed = True
+
+        instance.save()
+        return instance
 
 
 class UserNameSerializer(serializers.ModelSerializer):
-
     """
     Para obtener el nombre del usuario.
     """
@@ -33,4 +33,3 @@ class UserNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ["name"]
-
