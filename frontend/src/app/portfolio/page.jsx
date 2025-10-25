@@ -40,6 +40,7 @@ export default function Portafolio (){
                 setHighestPerformanceAction(response.data)
             }catch(error){
                 console.log("HighestPerformanceAction ERROR", error)
+                alert(error)
             }
         }
 
@@ -51,6 +52,7 @@ export default function Portafolio (){
                 setLowestPerformanceAction(response.data)
             }catch(error){
                 console.log("LowestPerformanceAction ERROR", error)
+                alert(error)
             }
         } 
 
@@ -62,6 +64,7 @@ export default function Portafolio (){
                 setHighestWeightAction(response.data)
             }catch(error){
                 console.log("HighestWeightAction ERROR", error)
+                alert(error)
             }
         }
         getHighestPerformanceAction()
@@ -102,8 +105,23 @@ export default function Portafolio (){
         }
     ]
     
+    const validateDate = () => {
+        const fechaInicio = new Date(date1);
+        const fechaFin = new Date(date2);
+
+        const diffMs = Math.abs(fechaFin - fechaInicio);
+        const diffDias = diffMs / (1000 * 60 * 60 * 24);
+
+        if (diffDias <=90){
+            return diffDias;
+        }else{
+            throw new Error('El tiempo excede los tres meses')
+        }
+    }
     const clickInforme = async () => {
+
         try{
+            validateDate()
             const response = await api.post('/reports/',{
                 from: date1, 
                 to: date2
@@ -111,6 +129,7 @@ export default function Portafolio (){
             console.log("Se logro :) con estas fechas", response.data)
         }catch(error){
             console.log("No funciono :(", error)
+            alert(error)
         }
         clickGetDate()
     }
