@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./settingsprofile.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import Modal from "../components/Modal";
@@ -12,9 +12,10 @@ import {
   FaEnvelope,
   FaCheckCircle,
 } from "react-icons/fa";
+import { api } from "../lib/axios";
 
 export default function SettingsProfile() {
-  const [userEmail] = useState("user@example.com"); // Auth0 email (read-only)
+  const [userEmail, setUserEmail] = useState("user@example.com"); // Auth0 email (read-only)
 
   // Form fields
   const [formData, setFormData] = useState({
@@ -72,7 +73,6 @@ export default function SettingsProfile() {
     }
   };
 
-  // Validate form
   const validateForm = () => {
     const newErrors = {};
 
@@ -110,22 +110,18 @@ export default function SettingsProfile() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Open confirmation modal for save
   const handleSaveClick = (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      // alert("❌ Please fix the errors in the form before saving.");
       return;
     }
 
     setSaveModalOpen(true);
   };
 
-  // Confirm and save changes
-  const confirmSave = () => {
-    // alert("✅ Changes saved successfully.");
-    setErrors({});
+  const confirmSave = async () => {
+    await updateProfileData();
     setSaveModalOpen(false);
   };
 
@@ -147,14 +143,12 @@ export default function SettingsProfile() {
           dpi: "",
         });
         setErrors({});
-        // alert("❎ Changes cancelled.");
       }
     } else {
       // alert("ℹ️ No pending changes to cancel.");
     }
   };
 
-  // Confirmation modal content
   const renderSaveModalContent = () => {
     return (
       <div className="modal-content-success">
@@ -177,6 +171,54 @@ export default function SettingsProfile() {
       </div>
     );
   };
+
+  async function getProfileData() {
+    try {
+      const response = await api.get('/users/me')
+      
+      const data = response.data
+
+      const profile = data.profile
+
+      setFormData({
+        name: profile.name || "",
+        address: profile.address || "",
+        birthdate: profile.birth_date || "",
+        phone: profile.cellphone || "",
+        dpi: profile.dpi || "",
+      });
+
+      setUserEmail(data.email)
+
+    } catch (error) {
+      console.error("Error when getting user profile.", error)
+    }
+  }
+
+    async function updateProfileData() {
+    try {
+      const body = {
+          profile: {
+            name: formData.name,
+            birth_date: formData.birthdate,
+            address: formData.address,
+            cellphone: formData.phone,
+            dpi: formData.dpi,
+          }
+      };
+      const response = await api.patch('/users/me', body)
+      
+      await getProfileData()
+
+    } catch (error) {
+      console.error("Error when updating user profile.", error)
+    }
+  }
+
+  useEffect(() => {
+    getProfileData();
+  }, []);
+
 
   return (
     <div className="settings-layout">
