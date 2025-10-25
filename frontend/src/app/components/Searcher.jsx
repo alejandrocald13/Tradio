@@ -1,6 +1,6 @@
 'useClient'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../styles/Searcher.css'
 
 
@@ -11,6 +11,10 @@ import '../styles/Searcher.css'
 
 export default function Searcher({placeholderI, getValue}){
     const [value, setValue] = useState('')
+
+    useEffect (()=>{
+        getValue(value)
+    }, [value])
 
     return (
         <>
