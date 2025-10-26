@@ -1,14 +1,22 @@
+from decimal import Decimal
+from django.db import transaction
 from django.utils.dateparse import parse_date
+
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
+
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+)
 
 from apps.users.auth0_authentication import Auth0JWTAuthentication
-from apps.wallet.models import Movement
+from apps.wallet.models import Wallet, Movement
 
 
-# Mapeo interno para mostrar un label legible en la tabla
 TYPE_LABELS = {
     "TOPUP": "Deposit",
     "WITHDRAW": "Withdrawal",
@@ -20,14 +28,14 @@ TYPE_LABELS = {
     tags=['wallet'],
     summary="Lista los movimientos de la wallet (admin view)",
     description=(
-        "Historial de movimientos de todos los usuarios (wallet_movement).\n\n"
+        "Historial de movimientos de TODOS los usuarios.\n\n"
         "Filtros opcionales:\n"
-        "- email=<user email, substring>\n"
+        "- email=<user email substring>\n"
         "- type=TOPUP|WITHDRAW|REFERRAL_CODE\n"
         "- date_from=YYYY-MM-DD\n"
         "- date_to=YYYY-MM-DD\n\n"
-        "Devuelve una lista ya formateada para la tabla del frontend con llaves:\n"
-        "Type, User Email, Amount, Date"
+        "Devuelve una lista con llaves: "
+        "Type, User Email, Amount, Date (lo que consume /movements en admin)."
     ),
     parameters=[
         OpenApiParameter(name="email", required=False, type=str),
@@ -41,6 +49,11 @@ TYPE_LABELS = {
     }
 )
 class WalletMovementListView(APIView):
+    """
+    GET /api/wallet/movements/
+    Vista ADMIN: lista movimientos de cualquier usuario,
+    con filtros, para la página /movements del admin.
+    """
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -78,4 +91,233 @@ class WalletMovementListView(APIView):
                 "Date": mv.created_at.date().isoformat(),
             })
 
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class WalletMeView(APIView):
+    """
+    GET /api/wallet/me/
+    Devuelve balance actual del usuario autenticado
+    + SU historial personal (no de todos).
+    """
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["wallet"],
+        summary="Estado de la wallet del usuario autenticado",
+        description=(
+            "Devuelve el balance actual de la wallet y el historial de movimientos "
+            "del usuario autenticado."
+        ),
+        responses={
+            200: OpenApiResponse(description="OK"),
+            401: OpenApiResponse(description="Unauthorized"),
+        },
+    )
+    def get(self, request):
+        user = request.user
+
+        wallet_obj, _ = Wallet.objects.get_or_create(
+            user=user,
+            defaults={"balance": Decimal("0.00")}
+        )
+
+        moves_qs = Movement.objects.filter(user=user).order_by("-created_at")
+
+        movements = []
+        for mv in moves_qs:
+            human_type = TYPE_LABELS.get(mv.type, mv.type)
+            movements.append({
+                "id": mv.id,
+                "date": mv.created_at.date().isoformat(),
+                "amount": float(mv.total or mv.amount or 0),
+                "type": human_type,
+            })
+
+        data = {
+            "balance": float(wallet_obj.balance),
+            "transactions": movements,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class WalletDepositView(APIView):
+    """
+    POST /api/wallet/deposit/
+    Body:
+    {
+      "amount": 100.50,
+      "bank": "Banco Industrial",
+      "code": "ABC123"
+    }
+
+    Lógica:
+    - suma al balance
+    - registra Movement con type='TOPUP'
+    """
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["wallet"],
+        summary="Depositar dinero en la wallet del usuario",
+        description="Aumenta el balance del usuario y registra un movimiento TOPUP.",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "amount": {"type": "number"},
+                    "bank": {"type": "string"},
+                    "code": {"type": "string"},
+                },
+                "required": ["amount"],
+            }
+        },
+        responses={
+            200: OpenApiResponse(description="OK"),
+            400: OpenApiResponse(description="Bad Request"),
+        },
+    )
+    def post(self, request):
+        user = request.user
+        amount = request.data.get("amount")
+        bank = request.data.get("bank")
+        code = request.data.get("code")
+
+        try:
+            amount_dec = Decimal(str(amount))
+            if amount_dec <= 0:
+                return Response(
+                    {"detail": "Amount must be > 0"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception:
+            return Response(
+                {"detail": "Invalid amount"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            wallet_obj, _ = Wallet.objects.select_for_update().get_or_create(
+                user=user,
+                defaults={"balance": Decimal("0.00")}
+            )
+
+            new_balance = wallet_obj.balance + amount_dec
+            wallet_obj.balance = new_balance
+            wallet_obj.save()
+
+            mv = Movement.objects.create(
+                user=user,
+                type="TOPUP",
+                amount=amount_dec,
+                commission=Decimal("0.00"),
+                total=amount_dec,         
+                transfer_number=code or "",
+            )
+
+        return Response({
+            "detail": "Deposit successful",
+            "new_balance": float(wallet_obj.balance),
+            "movement": {
+                "id": mv.id,
+                "date": mv.created_at.date().isoformat(),
+                "amount": float(mv.total),
+                "type": TYPE_LABELS.get(mv.type, mv.type),
+            }
+        }, status=status.HTTP_200_OK)
+
+
+class WalletWithdrawView(APIView):
+    """
+    POST /api/wallet/withdraw/
+    Body:
+    {
+      "amount": 50.00,
+      "bank": "Banco Industrial",
+      "code": "XYZ999"
+    }
+
+    Lógica:
+    - resta del balance (no deja negativo)
+    - registra Movement con type='WITHDRAW'
+    """
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["wallet"],
+        summary="Retirar dinero de la wallet del usuario",
+        description="Disminuye el balance del usuario y registra un movimiento WITHDRAW.",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "amount": {"type": "number"},
+                    "bank": {"type": "string"},
+                    "code": {"type": "string"},
+                },
+                "required": ["amount"],
+            }
+        },
+        responses={
+            200: OpenApiResponse(description="OK"),
+            400: OpenApiResponse(description="Bad Request"),
+        },
+    )
+    def post(self, request):
+        user = request.user
+        amount = request.data.get("amount")
+        bank = request.data.get("bank")
+        code = request.data.get("code")
+
+        try:
+            amount_dec = Decimal(str(amount))
+            if amount_dec <= 0:
+                return Response(
+                    {"detail": "Amount must be > 0"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception:
+            return Response(
+                {"detail": "Invalid amount"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            wallet_obj, _ = Wallet.objects.select_for_update().get_or_create(
+                user=user,
+                defaults={"balance": Decimal("0.00")}
+            )
+
+            if wallet_obj.balance < amount_dec:
+                return Response(
+                    {"detail": "Insufficient funds"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            new_balance = wallet_obj.balance - amount_dec
+            wallet_obj.balance = new_balance
+            wallet_obj.save()
+
+            mv = Movement.objects.create(
+                user=user,
+                type="WITHDRAW",
+                amount=amount_dec,
+                commission=Decimal("0.00"),
+                total=-amount_dec,         
+                transfer_number=code or "",
+            )
+
+        return Response({
+            "detail": "Withdrawal successful",
+            "new_balance": float(wallet_obj.balance),
+            "movement": {
+                "id": mv.id,
+                "date": mv.created_at.date().isoformat(),
+                "amount": float(mv.total),  # negativo
+                "type": TYPE_LABELS.get(mv.type, mv.type),
+            }
+        }, status=status.HTTP_200_OK)
