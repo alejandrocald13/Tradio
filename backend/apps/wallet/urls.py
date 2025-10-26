@@ -1,14 +1,6 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import WalletViewSet, MovementViewSet
-
-router = DefaultRouter()
-router.register(r'movements', MovementViewSet, basename='movements')
+from django.urls import path
+from .views import WalletMovementListView
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('balance/', WalletViewSet.as_view({'get': 'balance'}), name='wallet-balance'),
-    path('topup/', WalletViewSet.as_view({'post': 'topup'}), name='wallet-topup'),
-    path('withdraw/', WalletViewSet.as_view({'post': 'withdraw'}), name='wallet-withdraw'),
-    path('referral/', WalletViewSet.as_view({'post': 'referral'}), name='wallet-referral'),
+    path('movements/', WalletMovementListView.as_view(), name='wallet-movements'),
 ]

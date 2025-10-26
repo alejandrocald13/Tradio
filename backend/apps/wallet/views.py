@@ -1,124 +1,81 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
+from django.utils.dateparse import parse_date
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse, OpenApiParameter
-from .models import Wallet, Movement
-from .serializers import WalletSerializer, MovementSerializer, TopUpSerializer, WithdrawSerializer, ReferralCodeSerializer
-from .services import WalletService
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
-@extend_schema(tags=['wallet'])
-class WalletViewSet(viewsets.ViewSet):
+from apps.users.auth0_authentication import Auth0JWTAuthentication
+from apps.wallet.models import Movement
+
+
+# Mapeo interno para mostrar un label legible en la tabla
+TYPE_LABELS = {
+    "TOPUP": "Deposit",
+    "WITHDRAW": "Withdrawal",
+    "REFERRAL_CODE": "Referral Bonus",
+}
+
+
+@extend_schema(
+    tags=['wallet'],
+    summary="Lista los movimientos de la wallet (admin view)",
+    description=(
+        "Historial de movimientos de todos los usuarios (wallet_movement).\n\n"
+        "Filtros opcionales:\n"
+        "- email=<user email, substring>\n"
+        "- type=TOPUP|WITHDRAW|REFERRAL_CODE\n"
+        "- date_from=YYYY-MM-DD\n"
+        "- date_to=YYYY-MM-DD\n\n"
+        "Devuelve una lista ya formateada para la tabla del frontend con llaves:\n"
+        "Type, User Email, Amount, Date"
+    ),
+    parameters=[
+        OpenApiParameter(name="email", required=False, type=str),
+        OpenApiParameter(name="type", required=False, type=str),
+        OpenApiParameter(name="date_from", required=False, type=str),
+        OpenApiParameter(name="date_to", required=False, type=str),
+    ],
+    responses={
+        200: OpenApiResponse(description="OK"),
+        401: OpenApiResponse(description="Unauthorized"),
+    }
+)
+class WalletMovementListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @extend_schema(
-        summary="Consultar saldo de la wallet",
-        description="Devuelve el saldo actual de la wallet del usuario y la fecha de última actualización.",
-        responses={200: WalletSerializer, 401: OpenApiResponse(description="Unauthorized")}
-    )
-    @action(detail=False, methods=['get'])
-    def balance(self, request):
-        wallet, _ = Wallet.objects.get_or_create(user=request.user)
-        serializer = WalletSerializer(wallet)
-        return Response(serializer.data)
+    def get(self, request):
+        email_filter = request.query_params.get("email")
+        type_filter = request.query_params.get("type")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
 
-    @extend_schema(
-        summary="Recargar (topup) la wallet",
-        description="Aumenta el saldo de la wallet. Calcula comisión, guarda movimiento y registra auditoría.",
-        request=TopUpSerializer,
-        responses={200: OpenApiResponse(description="Depósito exitoso"), 400: OpenApiResponse(description="Datos inválidos")},
-        examples=[
-            OpenApiExample("Ejemplo de request", value={"amount": "100.00", "reference": "TOP-123"}, request_only=True),
-            OpenApiExample("Ejemplo de respuesta", value={"message": "Deposit completed successfully", "current_balance": "98.00"}, response_only=True),
-        ]
-    )
-    @action(detail=False, methods=['post'])
-    def topup(self, request):
-        serializer = TopUpSerializer(data=request.data)
-        if serializer.is_valid():
-            service = WalletService()
-            movement = service.deposit(user=request.user, amount=serializer.validated_data['amount'], reference=serializer.validated_data['reference'])
-            return Response({'message': 'Deposit completed successfully', 'current_balance': movement.user.wallet.balance}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        qs = Movement.objects.select_related("user").all().order_by("-created_at")
 
-    @extend_schema(
-        summary="Retiro (withdraw) de la wallet",
-        description="Disminuye el saldo de la wallet. Valida fondos, calcula comisión y registra auditoría.",
-        request=WithdrawSerializer,
-        responses={200: OpenApiResponse(description="Retiro exitoso"), 422: OpenApiResponse(description="Fondos insuficientes")},
-        examples=[
-            OpenApiExample("Ejemplo de request", value={"amount": "50.00", "reference": "WD-001"}, request_only=True),
-            OpenApiExample("Error por fondos insuficientes", value={"error": "Insufficient funds for withdrawal"}, response_only=True),
-        ]
-    )
-    @action(detail=False, methods=['post'])
-    def withdraw(self, request):
-        serializer = WithdrawSerializer(data=request.data)
-        if serializer.is_valid():
-            service = WalletService()
-            try:
-                movement = service.withdraw(user=request.user, amount=serializer.validated_data['amount'], reference=serializer.validated_data['reference'])
-                return Response({'message': 'Withdrawal completed successfully', 'current_balance': movement.user.wallet.balance}, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({'error': str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if email_filter:
+            qs = qs.filter(user__email__icontains=email_filter)
 
-    @extend_schema(
-        summary="Aplicar código de referido",
-        description="Agrega saldo por referido y guarda el movimiento en la wallet.",
-        request=ReferralCodeSerializer,
-        responses={200: OpenApiResponse(description="Referral aplicado"), 400: OpenApiResponse(description="Datos inválidos")},
-        examples=[OpenApiExample("Ejemplo de request", value={"code": "ABC123", "amount": "10.00"}, request_only=True)]
-    )
-    @action(detail=False, methods=['post'])
-    def referral(self, request):
-        serializer = ReferralCodeSerializer(data=request.data)
-        if serializer.is_valid():
-            service = WalletService()
-            movement = service.add_referral(user=request.user, code=serializer.validated_data['code'], amount=serializer.validated_data['amount'])
-            return Response({'message': 'Referral added successfully', 'current_balance': movement.user.wallet.balance}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if type_filter:
+            qs = qs.filter(type__iexact=type_filter)
 
-@extend_schema(tags=['wallet-movements'])
-class MovementViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = MovementSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['type', 'created_at']
-
-    @extend_schema(
-        summary="Listar movimientos",
-        description="Lista movimientos de la wallet del usuario autenticado. Permite filtrar por tipo y fecha.",
-        parameters=[
-            OpenApiParameter(name="type", description="TOPUP | WITHDRAW | REFERRAL_CODE", required=False, type=str),
-            OpenApiParameter(name="created_at", description="Fecha exacta (YYYY-MM-DD)", required=False, type=str),
-        ],
-        responses={200: MovementSerializer, 401: OpenApiResponse(description="Unauthorized")}
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return Movement.objects.filter(user=self.request.user)
-
-    @extend_schema(
-        summary="Filtrar movimientos por rango de fechas",
-        description="Filtro adicional por `date_from` y `date_to` (YYYY-MM-DD).",
-        parameters=[
-            OpenApiParameter(name="date_from", required=False, type=str),
-            OpenApiParameter(name="date_to", required=False, type=str),
-        ],
-        responses={200: MovementSerializer}
-    )
-    @action(detail=False, methods=['get'])
-    def filter(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-        date_from = request.query_params.get('date_from')
-        date_to = request.query_params.get('date_to')
         if date_from:
-            queryset = queryset.filter(created_at__date__gte=date_from)
+            df = parse_date(date_from)
+            if df:
+                qs = qs.filter(created_at__date__gte=df)
+
         if date_to:
-            queryset = queryset.filter(created_at__date__lte=date_to)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            dt = parse_date(date_to)
+            if dt:
+                qs = qs.filter(created_at__date__lte=dt)
+
+        data = []
+        for mv in qs:
+            human_type = TYPE_LABELS.get(mv.type, mv.type)
+            data.append({
+                "Type": human_type,
+                "User Email": mv.user.email,
+                "Amount": float(mv.total or mv.amount or 0),
+                "Date": mv.created_at.date().isoformat(),
+            })
+
+        return Response(data)
