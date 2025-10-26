@@ -75,6 +75,7 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
             stock_db = Stock.objects.get(symbol=symbol.upper(), is_active=True)
             current_price_db = float(stock_db.current_price)
             stock_name = str(stock_db.name)
+            exchange = str(stock_db.exchange)
         except Stock.DoesNotExist:
             return Response(
                 {"error": "Stock not found in database"},
@@ -105,6 +106,7 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
                 {
                     "stock": stock_name,
                     "symbol": symbol.upper(),
+                    "exchange": exchange,
                     "last": current_price_db,
                     "days": days,
                     "interval": interval,
