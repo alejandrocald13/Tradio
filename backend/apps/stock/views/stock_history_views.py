@@ -107,6 +107,7 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
             
             return Response(
                 {
+                    "id": stock_db.id,
                     "stock": stock_name,
                     "symbol": symbol.upper(),
                     "exchange": exchange,
