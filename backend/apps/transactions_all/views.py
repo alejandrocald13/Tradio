@@ -1,12 +1,9 @@
 from decimal import Decimal
-from django.utils.dateparse import parse_date
-
+from django.db.models import Q
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
+from rest_framework.views import APIView
 
 from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
 from apps.transactions_all.serializers import (
@@ -14,125 +11,203 @@ from apps.transactions_all.serializers import (
     SaleTransactionSerializer,
 )
 
-from apps.users.auth0_authentication import Auth0JWTAuthentication
+
+def safe_total(obj):
+    for field in ["total_amount", "total", "amount_total"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            return Decimal(getattr(obj, field))
+
+    qty = getattr(obj, "quantity", None)
+    price = getattr(obj, "unit_price", None)
+    if qty is not None and price is not None:
+        try:
+            return Decimal(qty) * Decimal(price)
+        except Exception:
+            pass
+
+    return Decimal("0")
 
 
-@extend_schema(
-    tags=['transactions'],
-    summary="Purchase Transactions",
-    description="CRUD de transacciones de compra.",
-)
+def safe_date(obj):
+    for field in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            dt = getattr(obj, field)
+            try:
+                return dt.strftime("%d/%m/%Y")
+            except Exception:
+                return str(dt)
+    return ""
+
+
 class PurchaseTransactionViewSet(viewsets.ModelViewSet):
     queryset = PurchaseTransaction.objects.all().select_related("user", "stock")
     serializer_class = PurchaseTransactionSerializer
-    authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
 
-@extend_schema(
-    tags=['transactions'],
-    summary="Sale Transactions",
-    description="CRUD de transacciones de venta.",
-)
 class SaleTransactionViewSet(viewsets.ModelViewSet):
     queryset = SaleTransaction.objects.all().select_related("user", "stock")
     serializer_class = SaleTransactionSerializer
-    authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
 
-@extend_schema(
-    tags=['transactions'],
-    summary="Listado unificado de transacciones (compras y ventas) para la tabla del admin",
-    description=(
-        "Devuelve compras y ventas combinadas en un solo array, con las llaves exactas "
-        "que consume el frontend (/transaction). Soporta filtros opcionales.\n\n"
-        "Query params soportados:\n"
-        "- type=Sale|Purchases\n"
-        "- stock=<stock symbol>\n"
-        "- email=<user email substring>\n"
-        "- date_from=YYYY-MM-DD\n"
-        "- date_to=YYYY-MM-DD\n\n"
-        "Formato de cada fila:\n"
-        "{ 'Type', 'User Email', 'Action', 'Quantity', 'Total', 'Date' }"
-    ),
-    parameters=[
-        OpenApiParameter(name="type", description="Sale | Purchases", required=False, type=str),
-        OpenApiParameter(name="stock", description="Stock symbol (e.g. AAPL)", required=False, type=str),
-        OpenApiParameter(name="email", description="User email (partial match)", required=False, type=str),
-        OpenApiParameter(name="date_from", description="YYYY-MM-DD", required=False, type=str),
-        OpenApiParameter(name="date_to", description="YYYY-MM-DD", required=False, type=str),
-    ],
-    responses={
-        200: OpenApiResponse(description="OK"),
-        401: OpenApiResponse(description="Unauthorized"),
-    }
-)
-class TransactionReportView(APIView):
-    authentication_classes = [Auth0JWTAuthentication]
+class AdminTransactionsReportView(APIView):
+    """
+    GET /api/transactions/report/?type=Purchases|Sale&stock=TSLA&email=x&date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    Respuesta lista para TableAdmin en /transaction/page.jsx
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        type_filter = request.query_params.get("type")
-        stock_symbol = request.query_params.get("stock")
-        email_filter = request.query_params.get("email")
+        tx_type = request.query_params.get("type")           
+        stock_symbol = request.query_params.get("stock")     
+        email_filter = request.query_params.get("email")   
         date_from = request.query_params.get("date_from")
         date_to = request.query_params.get("date_to")
 
-        purchases_qs = PurchaseTransaction.objects.select_related("user", "stock").all()
-        sales_qs = SaleTransaction.objects.select_related("user", "stock").all()
-
-        if email_filter:
-            purchases_qs = purchases_qs.filter(user__email__icontains=email_filter)
-            sales_qs = sales_qs.filter(user__email__icontains=email_filter)
+        purchase_qs = PurchaseTransaction.objects.all().select_related("user", "stock")
+        sale_qs = SaleTransaction.objects.all().select_related("user", "stock")
 
         if stock_symbol:
-            purchases_qs = purchases_qs.filter(stock__symbol__iexact=stock_symbol)
-            sales_qs = sales_qs.filter(stock__symbol__iexact=stock_symbol)
+            purchase_qs = purchase_qs.filter(stock__symbol=stock_symbol)
+            sale_qs = sale_qs.filter(stock__symbol=stock_symbol)
 
-        if date_from:
-            df = parse_date(date_from)
-            if df:
-                purchases_qs = purchases_qs.filter(date__date__gte=df)
-                sales_qs = sales_qs.filter(date__date__gte=df)
+        if email_filter:
+            purchase_qs = purchase_qs.filter(user__email__icontains=email_filter)
+            sale_qs = sale_qs.filter(user__email__icontains=email_filter)
 
-        if date_to:
-            dt = parse_date(date_to)
-            if dt:
-                purchases_qs = purchases_qs.filter(date__date__lte=dt)
-                sales_qs = sales_qs.filter(date__date__lte=dt)
+       
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
 
-        purchase_rows = []
-        for p in purchases_qs:
-            total = (p.quantity or Decimal("0")) * (p.unit_price or Decimal("0"))
-            purchase_rows.append({
-                "Type": "Purchases",
-                "User Email": p.user.email,
-                "Action": p.stock.name,
-                "Quantity": float(p.quantity),
-                "Total": float(total),
-                "Date": p.date.date().isoformat(),  # "YYYY-MM-DD"
+            purchase_qs = apply_date_filter(
+                purchase_qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+            sale_qs = apply_date_filter(
+                sale_qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        rows = []
+
+        if not tx_type or tx_type == "Purchases":
+            for p in purchase_qs:
+                rows.append({
+                    "Type": "Purchases",
+                    "User Email": getattr(p.user, "email", ""),
+                    "Action": getattr(p.stock, "symbol", "") if getattr(p, "stock", None) else "",
+                    "Quantity": getattr(p, "quantity", ""),
+                    "Total": f"{safe_total(p)}",
+                    "Date": safe_date(p),
+                })
+
+        if not tx_type or tx_type == "Sale":
+            for s in sale_qs:
+                rows.append({
+                    "Type": "Sale",
+                    "User Email": getattr(s.user, "email", ""),
+                    "Action": getattr(s.stock, "symbol", "") if getattr(s, "stock", None) else "",
+                    "Quantity": getattr(s, "quantity", ""),
+                    "Total": f"{safe_total(s)}",
+                    "Date": safe_date(s),
+                })
+
+        return Response(rows)
+
+
+class UserPurchasesView(APIView):
+    """
+    /api/transactions/me/purchases/?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    para la pestaña "Compras" del usuario en purchases-sales/page.jsx
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        qs = PurchaseTransaction.objects.filter(user=user).select_related("stock")
+
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
+            qs = apply_date_filter(
+                qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        data = []
+        for row in qs:
+            data.append({
+                "accion": getattr(row.stock, "name", "-") if getattr(row, "stock", None) else "-",
+                "compra": f"${getattr(row, 'unit_price', Decimal('0'))}",
+                "cantidad": str(getattr(row, "quantity", "")),
+                "fecha": safe_date(row),
             })
 
-        sale_rows = []
-        for s in sales_qs:
-            total = (s.quantity or Decimal("0")) * (s.unit_price or Decimal("0"))
-            sale_rows.append({
-                "Type": "Sale",
-                "User Email": s.user.email,
-                "Action": s.stock.name,
-                "Quantity": float(s.quantity),
-                "Total": float(total),
-                "Date": s.date.date().isoformat(),
+        return Response(data)
+
+
+class UserSalesView(APIView):
+    """
+    /api/transactions/me/sales/?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    para la pestaña "Ventas" del usuario en purchases-sales/page.jsx
+    calcula % de ganancia usando unit_price vs average_cost si existe
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        qs = SaleTransaction.objects.filter(user=user).select_related("stock")
+
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
+            qs = apply_date_filter(
+                qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        data = []
+        for row in qs:
+            sell_price = getattr(row, "unit_price", None)
+            if sell_price is None:
+                sell_price = Decimal("0")
+            else:
+                sell_price = Decimal(sell_price)
+
+            avg_cost = getattr(row, "average_cost", None)
+            if avg_cost is None:
+                avg_cost = Decimal("0")
+            else:
+                avg_cost = Decimal(avg_cost)
+
+            pct_gain = Decimal("0")
+            if avg_cost > 0:
+                pct_gain = ((sell_price - avg_cost) / avg_cost) * Decimal("100")
+
+            data.append({
+                "accion": getattr(row.stock, "name", "-") if getattr(row, "stock", None) else "-",
+                "compra": f"${avg_cost:.2f}",
+                "venta": f"${sell_price:.2f}",
+                "pct": f"{pct_gain:.2f}%",
+                "cantidad": str(getattr(row, "quantity", "")),
+                "fecha": safe_date(row),
             })
 
-        combined = purchase_rows + sale_rows
-
-        if type_filter == "Purchases":
-            combined = [row for row in combined if row["Type"] == "Purchases"]
-        elif type_filter == "Sale":
-            combined = [row for row in combined if row["Type"] == "Sale"]
-
-        combined.sort(key=lambda r: r["Date"], reverse=True)
-
-        return Response(combined)
+        return Response(data)

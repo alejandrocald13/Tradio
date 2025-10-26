@@ -4,7 +4,9 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     PurchaseTransactionViewSet,
     SaleTransactionViewSet,
-    TransactionReportView,
+    AdminTransactionsReportView,
+    UserPurchasesView,
+    UserSalesView,
 )
 
 router = DefaultRouter()
@@ -13,5 +15,7 @@ router.register(r'sales', SaleTransactionViewSet, basename='sales')
 
 urlpatterns = [
     *router.urls,
-    path('report/', TransactionReportView.as_view(), name='transactions-report'),
+    path('report/', AdminTransactionsReportView.as_view(), name='transactions-report'),
+    path('me/purchases/', UserPurchasesView.as_view(), name='user-purchases'),
+    path('me/sales/', UserSalesView.as_view(), name='user-sales'),
 ]
