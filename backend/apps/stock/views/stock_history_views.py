@@ -85,6 +85,9 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
         try:
             stock = yf.Ticker(symbol.upper())
             end_date = datetime.now()
+            if end_date.weekday() >= 5:
+                days_to_subtract = end_date.weekday() - 4
+                end_date -= timedelta(days=days_to_subtract)
             start_date = end_date - timedelta(days=days)
             
             hist = stock.history(start=start_date, end=end_date, interval=interval)
