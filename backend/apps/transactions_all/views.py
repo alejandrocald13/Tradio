@@ -14,7 +14,7 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return PurchaseTransaction.objects.filter(user=self.request.user).order_by('-created_at')
+        return PurchaseTransaction.objects.filter(user=self.request.user).order_by('-date')
 
     @extend_schema(
         summary="Ejecutar compra",
@@ -55,7 +55,7 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return SaleTransaction.objects.filter(user=self.request.user).order_by('-created_at')
+        return SaleTransaction.objects.filter(user=self.request.user).order_by('-date')
 
     @extend_schema(
         summary="Ejecutar venta",
