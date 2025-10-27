@@ -192,6 +192,11 @@
     background-color: #3c4b47;
 }
 
+.modal-btn-primary:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
 .modal-btn-cancel {
     min-width: 120px;
     max-width: 160px;
@@ -207,4 +212,9 @@
 
 .modal-btn-cancel:hover {
     background: #d6d6d6;
+}
+
+.modal-btn-cancel:disabled {
+    background: #d6d6d6;
+    cursor: not-allowed;
 }

@@ -33,6 +33,24 @@ export default function ActionDetails({
     changeTone === "down" ? "td-down" :
     "td-neutral";
 
+  const isMarketOpen = () => {
+    const now = new Date();
+
+    const day = now.getDay();
+    if (day === 0 || day === 6) return false;
+
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const currentTime = hour * 60 + minute;
+
+    const startTime = 8 * 60;
+    const endTime = 20 * 60;
+
+    return currentTime >= startTime && currentTime <= endTime;
+  };
+
+  const marketClosed = true;
+
   return (
     <div className="td-card">
       <div className="td-header">
@@ -44,15 +62,17 @@ export default function ActionDetails({
           {!isPublic && (
             <>
               <button
-                onClick={() => setIsBuyOpen(true)}
-                className="td-button-bs td-button-bs-primary"
+                onClick={() => !marketClosed && setIsBuyOpen(true)}
+                disabled={marketClosed}
+                className={`td-button-bs td-button-bs-primary ${marketClosed ? "td-disabled-market" : ""}`}
               >
                 Buy
               </button>
 
               <button
-                onClick={() => setIsSellOpen(true)}
-                className="td-button-bs"
+                onClick={() => !marketClosed && setIsSellOpen(true)}
+                disabled={marketClosed}
+                className={`td-button-bs ${marketClosed ? "td-disabled-market" : ""}`}
               >
                 Sell
               </button>

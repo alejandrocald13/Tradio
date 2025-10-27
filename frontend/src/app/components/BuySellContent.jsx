@@ -37,6 +37,8 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [errorModalOpen, setErrorModalOpen] = useState(false);
 
+    const [isProcessing, setIsProcessing] = useState(false);
+
     useEffect(() => {
         if (!isOpen) {
             setQuantity("");
@@ -78,7 +80,8 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
 
     const handleAction = async () => {
         try {
-            const quantityStr = numQuantity.toFixed(4);
+            setIsProcessing(true);
+            const quantityStr = numQuantity.toFixed(3);
             if (isBuy) {
                 await api.post("/transactions/purchases/", {
                     stock: idStock,
@@ -98,6 +101,8 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
         } catch (err) {
             setConfirmModalOpen(false);
             setErrorModalOpen(true);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -128,12 +133,17 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
 
                     <div className="slide-input">
                         <label htmlFor="quantity">Quantity:</label>
-                        <input id="quantity" type="number" min="1" value={quantity} onChange={(e) => {
-                            const value = e.target.value;   // verificamos que si sea un numero positivo (fallaba si es negativo por alguna razon)
-                            if (Number(value) < 0) return;
-                            setQuantity(value);
-                        }} 
-                            placeholder="example: 5" 
+                        <input id="quantity" type="number" min="0" value={quantity} 
+                            onChange={(e) => {
+                                let value = e.target.value;
+                                if (Number(value) < 0) return;
+                                if (value.includes(".")) {
+                                    const [whole, decimals] = value.split(".");
+                                    if (decimals && decimals.length > 3) return; 
+                                }
+                                setQuantity(value);
+                            }}
+                            placeholder="example: 5"
                         />
                     </div>
                 </div>
@@ -161,14 +171,16 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
                 </div>
             </div>
 
-            <Modal isOpen={confirmModalOpen} title="Confirm Transaction" onClose={() => setConfirmModalOpen(false)}>
+            <Modal isOpen={confirmModalOpen} title="Confirm Transaction" onClose={() => !isProcessing && setConfirmModalOpen(false)}>
                 <p className="modal-message">
                     Are you sure you want to {isBuy ? "buy" : "sell"} {numQuantity} shares of {title} for ${total.toFixed(2)}?
                 </p>
 
                 <div className="modal-actions">
-                    <button className="modal-btn-cancel" onClick={() => setConfirmModalOpen(false)}>Cancel</button>
-                    <button className="modal-btn-primary" onClick={handleAction}>Confirm</button>
+                    <button className="modal-btn-cancel" onClick={() => setConfirmModalOpen(false)} disabled={isProcessing}>Cancel</button>
+                    <button className="modal-btn-primary" onClick={handleAction} disabled={isProcessing}>
+                        {isProcessing ? "Processing..." : "Confirm"}
+                    </button>
                 </div>
             </Modal>
 
