@@ -16,6 +16,7 @@ export default function ActionDetails({
   isPublic = false,
   currentTab,
   onTabChange,
+  id = 0,
 }) {
   const [isBuyOpen, setIsBuyOpen] = useState(false);
   const [isSellOpen, setIsSellOpen] = useState(false);
@@ -91,6 +92,7 @@ export default function ActionDetails({
 
       <SlideActionPanel isOpen={isBuyOpen} onClose={() => setIsBuyOpen(false)}>
         <BuySellContent
+          id={id}
           mode="buy"
           data={{ title, subtitle, price, funds: 500 }}
           isOpen={isBuyOpen}
@@ -101,6 +103,7 @@ export default function ActionDetails({
 
       <SlideActionPanel isOpen={isSellOpen} onClose={() => setIsSellOpen(false)}>
         <BuySellContent
+          id={id}
           mode="sell"
           data={{ title, subtitle, price }}
           isOpen={isSellOpen}

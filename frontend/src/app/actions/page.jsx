@@ -53,22 +53,22 @@ export default function Actions() {
 
                     <div className="cards-divspace">
                         {stocks.map((stock) => {
-                            const todayPrices = stock.data.c;
-                            const last = stock.current_price;
-                            const prev = todayPrices[todayPrices.length - 2] ?? last;
-                            const changeAbs = last - prev;
-                            const changePct = (changeAbs / prev) * 100;
+                            const todayPrices = stock.data.c.map(Number);
+                            const last = Number(stock.current_price);
+                            const first = todayPrices[0];
+                            let changeAbs = last - first;
+                            let changePct = (changeAbs / first) * 100;
                             const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
 
                             return (
                                 <ActionCard
-                                key={stock.symbol}
-                                symbol={stock.symbol}
-                                actionName={stock.name}
-                                price={`$${last.toFixed(2)}`}
-                                changeText={`${changeAbs.toFixed(2)} (${changePct.toFixed(2)}%)`}
-                                variantClass={trendClass[trend]}
-                                graphic={<MiniChart data={todayPrices} />}
+                                    key={stock.symbol}
+                                    symbol={stock.symbol}
+                                    actionName={stock.name}
+                                    price={`$${last.toFixed(2)}`}
+                                    changeText={`${changeAbs.toFixed(2)} (${changePct.toFixed(2)}%)`}
+                                    variantClass={trendClass[trend]}
+                                    graphic={<MiniChart data={todayPrices} />}
                                 />
                             );
                         })}

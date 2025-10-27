@@ -10,12 +10,12 @@ import "../styles/sharedActionDetail.css";
 
 export default function SharedActionDetail({ symbol, showSidebar = false, SidebarComponent = null, isPublic = false }) {
     const TAB_CONFIG = {
-        "1D": { days: 1, interval: "1d" },
+        "1D": { days: 1, interval: "1h" },
         "5D": { days: 5, interval: "1d" },
-        "1M": { days: 30, interval: "1d" },
-        "6M": { days: 180, interval: "1wk" },
-        "1Y": { days: 365, interval: "1wk" },
-        "5Y": { days: 1825, interval: "1mo" },
+        "1M": { days: 30, interval: "1wk" },
+        "6M": { days: 180, interval: "1mo" },
+        "1Y": { days: 365, interval: "1mo" },
+        "5Y": { days: 1825, interval: "3mo" },
     };
 
     const router = useRouter();
@@ -56,13 +56,40 @@ export default function SharedActionDetail({ symbol, showSidebar = false, Sideba
                 }
 
                 const values = points.c;
-                const labels = points.t.map((ts) => new Date(ts * 1000).toLocaleDateString());
+                const labels = points.t.map((ts) => {
+                    const date = new Date(ts * 1000);
+                    
+                    if (tab === "1D") {
+                        return date.toLocaleTimeString("es-ES", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true
+                        });
+                    }
+                    if (tab === "5D") {
+                        const diaSemana = date.toLocaleString("es-ES", { weekday: "short" });
+                        return diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
+                    }
+                    if (tab === "1M") {
+                        const diaSemana = date.toLocaleString("es-ES", { weekday: "short" });
+                        const diaMes = date.getDate();
+                        return `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}-${diaMes}`;
+                    }
+                    if (tab === "6M" || tab === "1Y" || tab === "5Y") {
+                        const mesAbrev = date.toLocaleString("es-ES", { month: "short" });
+                        const añoCorto = date.getFullYear().toString().slice(-2);
+                        return `${mesAbrev.charAt(0).toUpperCase() + mesAbrev.slice(1)}-${añoCorto}`; // "Oct-25"
+                    }
+
+                    return date.toLocaleDateString("es-ES");
+                });
                 const first = values[0];
                 const last = values[values.length - 1];
                 const changeAbs = last - first;
                 const changePct = (changeAbs / first) * 100;
 
                 setStock({
+                    id: data.id,
                     name: data.stock,
                     price: last,
                     changeAbs,
@@ -128,7 +155,7 @@ export default function SharedActionDetail({ symbol, showSidebar = false, Sideba
 
                     {stock && (
                         <ActionDetails
-                            subtitle="Market Data"
+                            subtitle={stock.exchange}
                             title={stock.name}
                             price={stock.price.toFixed(2)}
                             change={`${stock.changeAbs >= 0 ? "+" : ""}${stock.changeAbs.toFixed(2)} (${stock.changePct.toFixed(2)}%)`}
@@ -138,6 +165,7 @@ export default function SharedActionDetail({ symbol, showSidebar = false, Sideba
                             isPublic={isPublic}
                             currentTab={tab}
                             onTabChange={setTab}
+                            id={stock.id}
                         />
                     )}
                 </div>
