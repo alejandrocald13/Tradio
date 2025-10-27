@@ -100,6 +100,8 @@ class StockHistoryDataSerializer(serializers.Serializer):
     name = serializers.CharField()
     symbol = serializers.CharField()
     current_price = serializers.FloatField()
+    open_price = serializers.FloatField()
+    change_percentage = serializers.FloatField()
     category = serializers.CharField(allow_null=True)
     data = HistoryDataSerializer()
 
