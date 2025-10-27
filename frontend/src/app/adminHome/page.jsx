@@ -8,13 +8,9 @@ import { api } from "../lib/axios"
 import './adminHome.css'
 
 export default function AdminHome () {
-    const dayUserColumns = ['Name', 'UserName', 'Email', 'Age', 'Fecha']
     const dayTransactionColumns = ['Type', 'User Email', 'Action', 'Quantity', 'Total', 'Date'];
-    const hoy = new Date().toISOString().split("T")[0];
 
     const movesColumns = ['Type', 'User Email', 'Amount', 'Date']
-
-    const [dayTransactions, setDayTransactions] = useState([]);
 
 
     const movesData = [
@@ -146,50 +142,25 @@ export default function AdminHome () {
     ]
 
     const [activeActions, setActiveActions] = useState([])
-
+    
     useEffect(() => {
-        fetchDailyMovements()
-        fetchDailyTransactions()
-        fetchActiveStocks()
-    }, [])
+        const fetchActiveStocks = async () => {
+            try {
+                const response = await api.get("/stocks-admin/");
+                const stocks = response.data;
 
-    const fetchDailyMovements = async () => {
-        try {
-            const today = new Date().toISOString().split("T")[0]
-            const response = await api.get(`/wallet/movements-admin/?date_from=${today}&date_to=${today}`)
-            setMovesData(response.data)
-        } catch (error) {
-            // console.log("Error obteniendo movimientos del día", error)
-            alert("Error to fetch daily movements")
-        }
-    }
+                const filtered = stocks
+                    .filter(stock => stock.is_active)
+                    .slice(0, 4);
 
-    const fetchDailyTransactions = async () => {
-        try {
-            const today = new Date().toISOString().split("T")[0]
-            const response = await api.get(`/transactions/report/?date_from=${today}&date_to=${today}`)
-            setDailyTransactions(response.data)
-        } catch (error) {
-            // console.log("Error obteniendo transacciones del día", error)
-            alert("Error to fetch daily transactions")
-        }
-    }
-
-    const fetchActiveStocks = async () => {
-        try {
-            const response = await api.get("/stocks-admin/")
-            const stocks = response.data
-
-            const filtered = stocks
-                .filter(stock => stock.is_active === true)
-                .slice(0, 4)
-
-            setActiveActions(filtered)
-        } catch (error) {
-            // console.log("Error obteniendo acciones activas", error)
-            alert("Error to fetch active stocks")
-        }
-    }
+                setActiveActions(filtered);
+            } catch (error) {
+                console.error("Error fetching active stocks:", error);
+                alert("Error fetching active stocks");
+            }
+    };
+        fetchActiveStocks();
+    }, []);
 
     return (
         <>
@@ -220,7 +191,7 @@ export default function AdminHome () {
                     <div className="section-actions">
                         <div className="actions-summary-container">
                             <div className="summary-header">
-                                <h3>Latest Active Actions</h3>
+                                <h3>Some active actions</h3>
                             </div>
 
                             <div className="summary-actions-list">
