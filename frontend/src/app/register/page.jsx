@@ -12,13 +12,11 @@ import {
   FaIdCard,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { api } from "../lib/axios";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
     fullName: "",
     birthdate: "",
     cellphone: "",
@@ -212,7 +210,6 @@ export default function RegisterPage() {
     }
 
     setErrors({});
-    alert("Personal Info saved successfully.");
   };
 
   // Calcular fecha máxima (18 años atrás desde hoy)
@@ -228,6 +225,26 @@ export default function RegisterPage() {
     const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
     return minDate.toISOString().split('T')[0];
   };
+
+  // Complete Info
+  const saveInfo = async () => {
+    try{
+      const response = await api.patch('/users/me',{
+        profile: {
+          name: formData.dpi,
+          birthDate: formData.birthdate,
+          address: formData.address,
+          cellphone: formData.cellphone,
+          dpi: formData.dpi
+        }
+      })
+      console.log("Se ha logrado guardar la información",  response.data)
+      alert("Personal Info saved successfully.");
+    }catch(error){
+      console.log(error)
+      alert(error)
+    }
+  }
 
   return (
     <div className="background">
@@ -397,10 +414,10 @@ export default function RegisterPage() {
                 {errors.address && <span className="error-message">{errors.address}</span>}
 
                 <div className="buttonWrapper stepsButtons">
-                  <button className="btn backBtn" onClick={handleBack}>
+                  {/* <button className="btn backBtn" onClick={handleBack}>
                     Back
-                  </button>
-                  <button type="submit" className="btn">
+                  </button> */}
+                  <button type="submit" className="btn" onClick={saveInfo}>
                     Register
                   </button>
                 </div>
