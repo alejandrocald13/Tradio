@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import "../styles/SidebarNav-Auth.css";
-import { useAuth0 } from "@auth0/auth0-react";
+//import { useAuth0 } from "@auth0/auth0-react";
 import { api } from "../lib/axios";
 
 
@@ -102,28 +102,27 @@ export default function SidebarNav() {
 
   // Acá se detecta si en las acciones hay un tushito mas (/NFLX o cualquier otro), para activar el boton
   // y para que la barra se haga mas pequeña de la normal
-  const isSectionActive = (href, path) => {
-    if (!path) return false;
-    if (href === "/") return path === "/";
-    return path === href || path.startsWith(href + "/");
-  };
+  // const isSectionActive = (href, path) => {
+  //   if (!path) return false;
+  //   if (href === "/") return path === "/";
+  //   return path === href || path.startsWith(href + "/");
+  // };
 
-  const isCollapsed  = pathname?.startsWith("/actions/");
-  
-  const {
-    logout
-  } = useAuth0();
+  // const isCollapsed  = pathname?.startsWith("/actions/");
+  //   const {
+  //   logout
+  // } = useAuth0();
 
-  async function LogOutWithAuth0(){
-    try {
-      const response = await api.post("auth/logout/")
+  // async function LogOutWithAuth0(){
+  //   try {
+  //     const response = await api.post("auth/logout/")
       
-      logout({ logoutParams: { returnTo: window.location.origin } });
+  //     logout({ logoutParams: { returnTo: window.location.origin } });
 
-    } catch (error) {
-      console.error("No se pudo terminar sesión correctamente.", error)
-    }
-  }
+  //   } catch (error) {
+  //     console.error("No se pudo terminar sesión correctamente.", error)
+  //   }
+  // }
 
   return (
     <div className={`sidebar ${isCollapsed ? "is-collapsed" : ""}`}>
