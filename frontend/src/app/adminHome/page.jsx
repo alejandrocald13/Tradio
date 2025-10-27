@@ -4,17 +4,19 @@ import { useEffect, useState } from "react"
 import TableAdmin from "../components/TableAdmin"
 import SidebarNavAdmin from "../components/SidebarNav-Admin"
 import ActionAdminCard from "../components/ActionAdminCard"
-import Link from "next/link" 
+import { api } from "../lib/axios"
 import './adminHome.css'
 
 export default function AdminHome () {
-    useEffect(() => {
-        // Aqui obtendremos los usuarios del dia
-        // Las transacciones del dia
-    })
     const dayUserColumns = ['Name', 'UserName', 'Email', 'Age', 'Fecha']
-    const dayTransactionColumns = ['Name', 'UserName', 'Email', 'Age', 'Fecha']
+    const dayTransactionColumns = ['Type', 'User Email', 'Action', 'Quantity', 'Total', 'Date'];
+    const hoy = new Date().toISOString().split("T")[0];
+
     const movesColumns = ['Type', 'User Email', 'Amount', 'Date']
+
+    const [dayTransactions, setDayTransactions] = useState([]);
+
+
     const movesData = [
         {
             'Type': 'Debit',
@@ -41,6 +43,7 @@ export default function AdminHome () {
             'Date': '20/07/2024'
         }
     ]
+
     const dayUsers = [
         {
             id: 1,
@@ -141,20 +144,52 @@ export default function AdminHome () {
             date: '10-09-2025',
         }        
     ]
-    
-    const actions = [
-        { id: 1, name: "Apple Inc.", price: 185.32, category: "tech", active: true },
-        { id: 2, name: "Microsoft Corp.", price: 328.50, category: "tech", active: true },
-        { id: 3, name: "Pfizer Inc.", price: 35.20, category: "healthcare", active: true },
-        { id: 4, name: "NVIDIA Corp.", price: 459.20, category: "tech", active: true },
-        { id: 5, name: "Coca-Cola", price: 58.44, category: "consumer", active: true },
-        { id: 6, name: "Bank of America", price: 30.22, category: "financials", active: true  },
-        { id: 7, name: "Coca-Cola", price: 58.44, category: "consumer", active: true  },
-        { id: 8, name: "Procter & Gamble", price: 142.65, category: "consumer", active: true  },
-        { id: 9, name: "ExxonMobil", price: 110.12, category: "energy", active: true  },
-    ]
 
-    const activeActions = actions.filter(a => a.active).slice(0, 4)
+    const [activeActions, setActiveActions] = useState([])
+
+    useEffect(() => {
+        fetchDailyMovements()
+        fetchDailyTransactions()
+        fetchActiveStocks()
+    }, [])
+
+    const fetchDailyMovements = async () => {
+        try {
+            const today = new Date().toISOString().split("T")[0]
+            const response = await api.get(`/wallet/movements-admin/?date_from=${today}&date_to=${today}`)
+            setMovesData(response.data)
+        } catch (error) {
+            // console.log("Error obteniendo movimientos del día", error)
+            alert("Error to fetch daily movements")
+        }
+    }
+
+    const fetchDailyTransactions = async () => {
+        try {
+            const today = new Date().toISOString().split("T")[0]
+            const response = await api.get(`/transactions/report/?date_from=${today}&date_to=${today}`)
+            setDailyTransactions(response.data)
+        } catch (error) {
+            // console.log("Error obteniendo transacciones del día", error)
+            alert("Error to fetch daily transactions")
+        }
+    }
+
+    const fetchActiveStocks = async () => {
+        try {
+            const response = await api.get("/stocks-admin/")
+            const stocks = response.data
+
+            const filtered = stocks
+                .filter(stock => stock.is_active === true)
+                .slice(0, 4)
+
+            setActiveActions(filtered)
+        } catch (error) {
+            // console.log("Error obteniendo acciones activas", error)
+            alert("Error to fetch active stocks")
+        }
+    }
 
     return (
         <>
@@ -192,8 +227,8 @@ export default function AdminHome () {
                                 {activeActions.map((action) => (
                                     <ActionAdminCard key={action.id} title={action.name}>
                                         <div className="action-card-content-admin">
-                                            <p className="price-action-do-admin">Price: ${action.price.toFixed(2)}</p>
-                                            <p className="category-action-do">Category: {action.category}</p>
+                                            <p className="price-action-do-admin">Price: ${action.current_price}</p>
+                                            <p className="category-action-do">Category: {action.category_name}</p>
                                             <p className="status-action-do">Status: <strong>Active</strong></p>
                                         </div>
                                     </ActionAdminCard>
