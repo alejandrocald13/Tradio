@@ -36,7 +36,7 @@ export default function Actions() {
             lastTyped.current = cleaned;
             return;
         }
-        if (lastTyped.current.length >= 2) {
+        if (lastTyped.current.length >= 1) {
             router.push(`/actions/${lastTyped.current}`);
         }
         lastTyped.current = "";

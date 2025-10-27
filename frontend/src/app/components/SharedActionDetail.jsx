@@ -31,8 +31,9 @@ export default function SharedActionDetail({ symbol, showSidebar = false, Sideba
             lastTyped.current = cleaned;
             return;
         }
-        if (lastTyped.current.length >= 2) {
-            router.push(`/actions/${lastTyped.current}`);
+        if (lastTyped.current.length >= 1) {
+            const basePath = isPublic ? "/landing/actions" : "/actions";
+            router.push(`${basePath}/${lastTyped.current}`);
         }
         lastTyped.current = "";
     };
