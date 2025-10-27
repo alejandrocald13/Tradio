@@ -2,7 +2,7 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Auth0Provider } from "@auth0/auth0-react";
+import { UserProvider } from "@auth0/nextjs-auth0/client"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,13 +16,21 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-      <Auth0Provider
+    <>
+    <html lang="en">
+      <UserProvider>
+        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+          {children}
+        </body>
+      </UserProvider>
+    </html>
+    {/*<Auth0Provider
         domain={process.env.NEXT_PUBLIC_DOMAIN_AUTH0}
         clientId={process.env.NEXT_PUBLIC_CLIENT_ID_AUTH0}
         authorizationParams={{
           redirect_uri:
             typeof window !== "undefined"
-              ? `${window.location.origin}/landing`
+              ? `${window.location.origin}/callback`
               : "",
         }}
       >
@@ -31,6 +39,7 @@ export default function RootLayout({ children }) {
           {children}
         </body>
       </html>
-    </Auth0Provider>
+    </Auth0Provider>*/}
+    </>
   );
 }

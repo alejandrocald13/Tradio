@@ -7,9 +7,9 @@ import Link from "next/link";
 import './authHome.css'
 
 
-
-
 export default function AuthHome() {
+    // Auth0
+
     const labels = [
         "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"
     ];

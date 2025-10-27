@@ -1,62 +1,43 @@
 "use client";
 import styles from "./landing.module.css";
 import { Rocket, Shield } from "lucide-react"; 
-import { useAuth0 } from "@auth0/auth0-react";
 import { api } from "../lib/axios";
 import { useEffect, useState } from "react";
 
+
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
+import { getAccessToken } from "@auth0/nextjs-auth0";
+
+
 export default function LandingPage() {
-  const {
-    isAuthenticated,
-    isLoading,
-    loginWithRedirect,
-    logout,
-    getIdTokenClaims
-  } = useAuth0();
 
   const [message, setMessage] = useState(null);
+  const {user, error, isLoading} = useUser();
+  const router = useRouter()
 
-  useEffect(() => {
-    const sendTokenToBackend = async () => {
-      try {
-        const claims = await getIdTokenClaims();
-        const token = claims.__raw;
+  console.log("user", user)
 
-        const response = await api.post("/auth/login/", { auth0_token: token });
-
-        if (response.status === 200) {
-          setMessage("Inicio de sesión exitoso.");
-          console.log("Cookie JWT configurada en el backend");
-        }
-
-      } catch (err) {
-        if (err.response) {
-          const { status, data } = err.response;
-
-          if (status === 403) {
-            setMessage(data.message || "Acceso restringido.");
-          } else if (status === 400) {
-            setMessage("Token inválido o sesión expirada.");
-          } else {
-            setMessage("Error inesperado al autenticar.");
-          }
-
-          logout({ logoutParams: { returnTo: window.location.origin } });
-        } else {
-          console.error("Error al enviar token al backend:", err);
-          setMessage("Error de conexión con el servidor.");
-        }
-      }
-    };
-
-    if (!isLoading && isAuthenticated) {
-      sendTokenToBackend();
+useEffect(() => {
+  if (!isLoading && user) {
+    console.log("user2", user)
+    if (user.is_superuser) {
+      router.push("/adminHome");
+    } else {
+      router.push("/authHome");
     }
-    }, [isAuthenticated, isLoading]);
+  }
+}, [user, isLoading]);
 
-    
+  if (isLoading) return <p>Cargando...</p>;
+  if (error) return <p>Error al cargar usuario</p>;
+
+
   return (
     <div className={styles.container}>
+      {user &&(
+        <p>Hola user {user.name}</p>
+      )}
       {/* NAVBAR */}
       <header className={styles.navbar}>
         <div className={styles.logo}></div>
@@ -68,8 +49,13 @@ export default function LandingPage() {
           </ul>
         </nav>
         <div className={styles.authButtons}>
-          <button className={styles.login} onClick={() => loginWithRedirect({ prompt: "login" })}>Login</button>
-          <button className={styles.register} onClick={() => loginWithRedirect({ screen_hint: "signup" })}>Register</button>
+          <a href="/api/auth/login">
+            <button className={styles.login}>Login</button>
+          </a>
+
+          <a href="/api/auth/signup">
+            <button className={styles.register}>Register</button>
+          </a>
         </div>
       </header>
 
