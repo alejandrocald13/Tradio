@@ -49,7 +49,7 @@ export default function ActionDetails({
     return currentTime >= startTime && currentTime <= endTime;
   };
 
-  const marketClosed = true;
+  const marketClosed = isMarketOpen();
 
   return (
     <div className="td-card">
