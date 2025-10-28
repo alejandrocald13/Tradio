@@ -36,11 +36,15 @@ export default function ActionDetails({
   const isMarketOpen = () => {
     const now = new Date();
 
-    const day = now.getDay();
+    const guatemalaTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'America/Guatemala' })
+    );
+
+    const day = guatemalaTime.getDay();
     if (day === 0 || day === 6) return false;
 
-    const hour = now.getHours();
-    const minute = now.getMinutes();
+    const hour = guatemalaTime.getHours();
+    const minute = guatemalaTime.getMinutes();
     const currentTime = hour * 60 + minute;
 
     const startTime = 8 * 60;
@@ -49,7 +53,7 @@ export default function ActionDetails({
     return currentTime >= startTime && currentTime <= endTime;
   };
 
-  const marketClosed = isMarketOpen();
+  const marketClosed = !isMarketOpen();
 
   return (
     <div className="td-card">

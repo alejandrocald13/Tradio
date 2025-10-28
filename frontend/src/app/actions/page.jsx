@@ -36,11 +36,15 @@ export default function Actions() {
             lastTyped.current = cleaned;
             return;
         }
-        if (lastTyped.current.length >= 1) {
-            router.push(`/actions/${lastTyped.current}`);
+        if (lastTyped.current) {
+            const exists = symbols.includes(lastTyped.current);
+            if (exists) {
+                router.push(`/actions/${lastTyped.current}`);
+            }
         }
         lastTyped.current = "";
     };
+
 
     return (
         <>
