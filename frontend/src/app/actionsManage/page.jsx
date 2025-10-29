@@ -36,6 +36,16 @@ export default function ActionsManage() {
     const [isConfirming, setIsConfirming] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
 
+    // Pa actualizar las categorias cuando las acciones cambian
+    const updateCategories = (actionsList) => {
+        const uniqueCategories = [...new Set(actionsList.map(a => a.category))];
+        const categoryObjects = [
+            { id: "all", name: "All" },
+            ...uniqueCategories.map(cat => ({ id: cat, name: cat }))
+        ];
+        setCategories(categoryObjects);
+    };
+
     useEffect(() => {
         let filteredList = actions;
 
@@ -96,30 +106,10 @@ export default function ActionsManage() {
     }, []);
 
     useEffect(() => {
-        let filtered = actions;
-
-        if (searchTerm) {
-            filtered = filtered.filter(a =>
-                a.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+        if (actions.length > 0) {
+            updateCategories(actions);
         }
-
-        if (statusFilter === "enable") filtered = filtered.filter(a => a.active);
-        if (statusFilter === "disable") filtered = filtered.filter(a => !a.active);
-
-        const counts = filtered.reduce((acc, a) => {
-            acc[a.category] = (acc[a.category] || 0) + 1;
-            return acc;
-        }, {});
-        counts["all"] = filtered.length;
-        setCategoryCounts(counts);
-
-        if (activeId !== "all") {
-            filtered = filtered.filter(a => a.category === activeId);
-        }
-
-        setFilteredActions(filtered);
-    }, [activeId, actions, searchTerm, statusFilter]);
+    }, [actions]);
 
     const handleSearch = (value) => {
         setSearchTerm(value.toLowerCase());
@@ -282,6 +272,7 @@ export default function ActionsManage() {
                                     active: a.is_active
                                 }));
                                 setActions(formatted);
+                                updateCategories(formatted);
                                 showToast("Action added successfully!");
                                 setIsAddModalOpen(false);
                                 setNewSymbol("");
