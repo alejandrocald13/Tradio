@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import "../styles/SidebarNav-Admin.css";
-import { useAuth0 } from "@auth0/auth0-react";
+//import { useAuth0 } from "@auth0/auth0-react";
 import { api } from "../lib/axios";
 
 export default function SidebarNavAdmin() {
@@ -19,7 +19,7 @@ export default function SidebarNavAdmin() {
         { id: "actions",        label: "Actions",       href: "/actionsManage" },
     ];
 
-    const logoutItem = { id: "logout", label: "Logout", href: "/" };
+    const logoutItem = { id: "logout", label: "Logout", href: "/api/auth/logout?returnTo=/landing" };
 
     const DefaultIcons = {
         homeAdmin: (
@@ -68,29 +68,29 @@ export default function SidebarNavAdmin() {
     // Hace que se quede activa la pesataña en lugar de guardarse (o sea el boton ese que se depliega)
     // queda abajo mostrando que se selecciono 
     // si no se a seleciionado algun tipo de user se guarda el desplegable
-    useEffect(() => {
-        if (pathname.startsWith("/userClient") || pathname.startsWith("/userAdmin")) {
-            setIsUsersOpen(true);
-        }
-        if (pathname.startsWith("/movements") || pathname.startsWith("/transaction")) {
-            setIsTransactionsOpen(true);
-        }
-    }, [pathname]);
+    // useEffect(() => {
+    //     if (pathname.startsWith("/userClient") || pathname.startsWith("/userAdmin")) {
+    //         setIsUsersOpen(true);
+    //     }
+    //     if (pathname.startsWith("/movements") || pathname.startsWith("/transaction")) {
+    //         setIsTransactionsOpen(true);
+    //     }
+    // }, [pathname]);
     
-    const {
-        logout
-    } = useAuth0();
+    // const {
+    //     logout
+    // } = useAuth0();
 
-    async function LogOutWithAuth0(){
-        try {
-        const response = await api.post("auth/logout/")
+    // async function LogOutWithAuth0(){
+    //     try {
+    //     const response = await api.post("auth/logout/")
         
-        logout({ logoutParams: { returnTo: window.location.origin } });
+    //     logout({ logoutParams: { returnTo: window.location.origin } });
 
-        } catch (error) {
-        console.error("No se pudo terminar sesión correctamente.", error)
-        }
-    }
+    //     } catch (error) {
+    //     console.error("No se pudo terminar sesión correctamente.", error)
+    //     }
+    // }
     return (
         <div className={`sidebar ${isCollapsed ? "is-collapsed" : ""}`}>
             <div className="sidebar-panel">
