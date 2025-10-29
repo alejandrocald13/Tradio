@@ -8,7 +8,11 @@
   </div>
 
   <h2 style="margin:0 0 8px;font-size:20px;">Tu cuenta aún no está activa</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.first_name|default:user.username }}, gracias por registrarte en Tradio.</p>
+  <p style="margin:0 0 12px;">Hola {{ user.name }}, gracias por registrarte en Tradio.</p>
+  <p style="margin:0 0 12px;">
+    Has iniciado sesión con el correo <strong>{{ user.email }}</strong> mediante 
+    <strong>{{ authentic_method }}</strong>.
+  </p>
   <p style="margin:0 0 20px;">
     Tu cuenta se encuentra en estado <strong>pendiente de autorización</strong>.  
     Un administrador revisará tu solicitud y te notificaremos por correo cuando sea aprobada.

@@ -17,7 +17,7 @@ from django.contrib.auth import get_user_model
 
 # celery
 
-from apps.common.email_service import send_admin_new_user_email
+from apps.common.email_service import send_admin_new_user_email, send_pending_authorization_email
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -106,6 +106,11 @@ class Auth0LoginView(APIView):
                         send_admin_new_user_email(admin_email, user)
                     except Exception as e:
                         logger.exception("Error al encolar email de nuevo usuario para %s: %s", admin_email, e)
+            
+            try:
+                send_pending_authorization_email(user)
+            except Exception as e:
+                logger.exception("Error al encolar email de usuario pendiente para %s: %s", user, e)
 
             return Response(
                 {

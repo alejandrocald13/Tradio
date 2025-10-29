@@ -21,12 +21,21 @@ def send_welcome_email(user, dashboard_url=None, support_email=None):
 
 
 def send_pending_authorization_email(user, support_email=None):
+
+    prof = getattr(user, "profile", None)
+
+    auth_method = "Local"
+    if getattr(user, "auth0_id", "").startswith("google|"):
+        auth_method = "Google"
+    elif getattr(user, "auth0_id", "").startswith("facebook|"):
+        auth_method = "Facebook"
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
+        "authentic_method": auth_method,
         "support_email": support_email or "soporte@tradio.com",
         "submitted_at": now(),
     }
