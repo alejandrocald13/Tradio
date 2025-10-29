@@ -70,10 +70,11 @@ def send_admin_new_user_email(admin_email, user, dashboard_url=None):
 
 
 def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_email=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
         "trade": trade,
