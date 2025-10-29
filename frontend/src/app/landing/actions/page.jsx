@@ -12,6 +12,7 @@ export default function ActionsPage() {
   const [topLosers, setTopLosers] = useState([]);
   const [availableActions, setAvailableActions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const trendClass = { up: styles.positive, down: styles.negative, neutral: styles.neutral };
 
@@ -80,6 +81,12 @@ export default function ActionsPage() {
     fetchMarketData();
   }, []); 
 
+
+  const filteredActions = availableActions.filter(action => 
+    action.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    action.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return <div className={styles.loading}>Loading market data...</div>;
   }
@@ -104,10 +111,13 @@ export default function ActionsPage() {
       <div className={styles.searchSection}>
         <div className={styles.searchContainer}>
           <span className={styles.searchIcon}>Q</span>
+          
           <input 
             type="text" 
             placeholder="SEARCH" 
             className={styles.searchInput}
+            value={searchQuery} // Conecta el valor al estado
+            onChange={(e) => setSearchQuery(e.target.value)} // Actualiza el estado al escribir
           />
         </div>
       </div>
@@ -148,10 +158,10 @@ export default function ActionsPage() {
               
               return (
                 <div key={index} className={styles.marketCard}>
-                   <div className={styles.cardHeader}>
-                    <div className={styles.stockName}>{item.name}</div>
-                    <div className={styles.stockValue}>${item.current_price.toLocaleString()}</div>
-                  </div>
+                    <div className={styles.cardHeader}>
+                     <div className={styles.stockName}>{item.name}</div>
+                     <div className={styles.stockValue}>${item.current_price.toLocaleString()}</div>
+                   </div>
                   <div className={styles.cardFooter}>
                     <div className={styles.stockExchange}>{item.exchange || "NASDAQ"}</div>
                     <div className={styles.stockChange}>
@@ -170,18 +180,23 @@ export default function ActionsPage() {
           <h2 className={styles.actionsTitle}>Available Actions</h2>
           <div className={styles.actionCardsGrid}>
             
-            {availableActions.map((item) => (
+            {filteredActions.map((item) => (
               <div key={item.symbol} className={styles.actionCardWrapper}>
                 <ActionCard
                   symbol={item.symbol}
                   actionName={item.name}
                   price={item.value}
-                  changeText={`${item.change} ${item.changePercent}`}
+                  changeText={`${item.change} (${item.changePercent})`}
                   variantClass={trendClass[item.trend]}
                   graphic={<MiniChart data={item.intraday} />}
                 />
               </div>
             ))}
+
+            
+            {filteredActions.length === 0 && searchQuery.length > 0 && (
+              <p>No se encontraron acciones para "{searchQuery}"</p>
+            )}
 
           </div>
         </div>
@@ -190,3 +205,4 @@ export default function ActionsPage() {
     </div>
   );
 }
+
