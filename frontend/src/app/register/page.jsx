@@ -13,6 +13,7 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { api } from "../lib/axios";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -229,17 +230,18 @@ export default function RegisterPage() {
   // Complete Info
   const saveInfo = async () => {
     try{
+      console.log(formData.birthdate)
       const response = await api.patch('/users/me',{
         profile: {
-          name: formData.dpi,
-          birthDate: formData.birthdate,
+          name: formData.fullName,
+          birth_date: formData.birthdate,
           address: formData.address,
           cellphone: formData.cellphone,
           dpi: formData.dpi
         }
       })
-      console.log("Se ha logrado guardar la información",  response.data)
       alert("Personal Info saved successfully.");
+
     }catch(error){
       console.log(error)
       alert(error)
@@ -417,9 +419,11 @@ export default function RegisterPage() {
                   {/* <button className="btn backBtn" onClick={handleBack}>
                     Back
                   </button> */}
+                  <Link href={`/api/auth/logout?returnTo=/auth-redirect/${2}`}>
                   <button type="submit" className="btn" onClick={saveInfo}>
                     Register
                   </button>
+                  </Link>
                 </div>
               </div>
             )}
