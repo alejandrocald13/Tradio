@@ -3,10 +3,11 @@ from django.utils.timezone import now
 from apps.common.tasks import send_email_task
 
 def send_welcome_email(user, dashboard_url=None, support_email=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
         "dashboard_url": dashboard_url or "https://localhost:3000/landing",

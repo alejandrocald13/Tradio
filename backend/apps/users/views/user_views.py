@@ -21,6 +21,8 @@ from apps.users.models import ProfileState
 from apps.users.utils import log_action
 from apps.users.actions import Action
 
+# celery
+from apps.common.email_service import send_welcome_email
 
 User = get_user_model()
 
@@ -71,9 +73,13 @@ class UserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             user.is_active = True
             user.save(update_fields=["is_active"])
             prof = getattr(user, "profile", None)
+
             if prof:
                 prof.state = self._get_state("habilitado")
                 prof.save(update_fields=["state"])
+
+            send_welcome_email(user)
+            
         log_action(request, request.user, Action.ADMIN_USER_ENABLED)
         return Response({"status": "enabled"})
 
