@@ -6,9 +6,21 @@ from rest_framework import status
 from apps.users.serializers import Auth0UserLoginSerializer, UserSerializer
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 # no-repudio
 from apps.users.utils import log_action
 from apps.users.actions import Action
+
+import logging
+from django.contrib.auth import get_user_model
+
+
+# celery
+
+from apps.common.email_service import send_admin_new_user_email
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
 
 class Auth0LoginView(APIView):
     """
@@ -82,6 +94,19 @@ class Auth0LoginView(APIView):
 
         if profile.state.name.lower() == "pendiente"  and profile.profile_completed == True:
             self.revoke_auth0_token(auth0_token)
+
+            admin_qs = User.objects.filter(is_superuser=True, is_active=True).exclude(email__isnull=True).exclude(email__exact='')
+            admin_emails = list(admin_qs.values_list('email', flat=True))
+
+            if not admin_emails:
+                logger.warning("No se encontraron superusuarios para notificar del nuevo registro: user_id=%s", user.pk)
+            else:
+                for admin_email in admin_emails:
+                    try:
+                        send_admin_new_user_email(admin_email, user)
+                    except Exception as e:
+                        logger.exception("Error al encolar email de nuevo usuario para %s: %s", admin_email, e)
+
             return Response(
                 {
                     "message": "Usuario creado correctamente, pero pendiente de habilitación.",
@@ -138,7 +163,6 @@ class Auth0LoginView(APIView):
 
         log_action(request, user, Action.AUTH_LOGIN)
 
-        print("funciona please")
         response.set_cookie(
             key="access_token",
             value=auth0_token,
