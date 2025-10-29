@@ -6,17 +6,17 @@ import CircularGraph from "./DoughnutGraph";
 import { api } from "../lib/axios";
 
 export default function CardInfoPortafolio(){
-    const [totalAction, setTotalAction] = useState(0)
-    const [currentTotalActions, setCurrentTotalActions] = useState(0)
-    const [wallet, setWallet] = useState(0)
+    const [totalAction, setTotalAction] = useState({total: 0})
+    const [currentTotalActions, setCurrentTotalActions] = useState({total: 0})
+    const [wallet, setWallet] = useState({balance: 0})
     const [totalAssets, setTotalAssets] = useState(0)
 
     useEffect(()=>{
         const getTotalActions = async () =>{
             try{
                 const response = await api.get('/portfolios/total/')
-                setTotalAction(response.data.total)
-                console.log("RESPUESRA1", response.data.total)
+                setTotalAction(response.data)
+                console.log("RESPUESRA1", response.data)
             }catch(error){
                 console.log("Error al obtener el total invertido en acciones", error)
             }
@@ -25,8 +25,8 @@ export default function CardInfoPortafolio(){
         const getCurrentTotalActions = async () =>{
             try{
                 const response = await api.get('/portfolios/current_total/')
-                setCurrentTotalActions(response.data.total)
-                console.log("RESPUESRA2", response.data.total)
+                setCurrentTotalActions(response.data)
+                console.log("RESPUESRA2", response.data)
 
             }catch(error){
                 console.log("Error al obtener el total actual en acciones", error)
@@ -36,8 +36,8 @@ export default function CardInfoPortafolio(){
         const getWallet = async () =>{
             try{
                 const response = await api.get('/wallet/balance/')
-                setWallet(response.data.balance)
-                console.log("RESPUESRA3", response.data.balance)
+                setWallet(response.data)
+                console.log("RESPUESRA3", response.data)
 
             }catch(error){
                 console.log("Error al obtener total en efectivo", error)
@@ -76,11 +76,11 @@ export default function CardInfoPortafolio(){
                         </div>
 
                         <div className="data-container-portafolio">
-                            <p className="value"> ${wallet}</p>
-                            <p className="value"> ${currentTotalActions}</p>
-                            <p className="value"> ${parseFloat(wallet) + parseFloat(currentTotalActions)}</p>
-                            <p className="value"> ${totalAction}</p>
-                            <p className="value"> ${(parseFloat(currentTotalActions) + parseFloat(wallet)) - parseFloat(totalAction)}</p>
+                            <p className="value"> ${wallet.balance}</p>
+                            <p className="value"> ${currentTotalActions.total}</p>
+                            <p className="value"> ${parseFloat(wallet.balance) + parseFloat(currentTotalActions.total)}</p>
+                            <p className="value"> ${totalAction.total}</p>
+                            <p className="value"> ${(parseFloat(currentTotalActions.total) + parseFloat(wallet.balance)) - parseFloat(totalAction.total)}</p>
                         </div>
                     </div>
 
