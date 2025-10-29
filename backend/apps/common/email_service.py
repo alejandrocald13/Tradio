@@ -103,20 +103,22 @@ def send_wallet_movement_email(user, movement, wallet_url=None, support_email=No
     send_email_task.delay(user.email, subject, template, context)
 
 
-def send_report_ready_email(user, report_url, period_from, period_to, support_email=None):
+def send_report_ready_email(user, period_from, period_to, support_email=None, attachment_path=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
-        "report_url": report_url,
-        "period_from": period_from,
-        "period_to": period_to,
+        "report": {
+            "from": period_from,
+            "to": period_to,
+        },
         "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "support_email": support_email or "soporte@tradio.com",
     }
 
     subject = "Tradio | Tu reporte está listo"
     template = "emails/report_ready.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.email, subject, template, context, attachment_path)
