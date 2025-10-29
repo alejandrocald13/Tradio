@@ -1,15 +1,46 @@
-from rest_framework import viewsets, status
+from decimal import Decimal
+from django.db.models import Q
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.core.exceptions import ValidationError
-from market_clock.utils import is_open
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
-from .models import PurchaseTransaction, SaleTransaction
-from .serializers import PurchaseTransactionSerializer, SaleTransactionSerializer
-from .services import TradeService
+from rest_framework.views import APIView
 
-@extend_schema(tags=['transactions'])
+from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
+from apps.transactions_all.serializers import (
+    PurchaseTransactionSerializer,
+    SaleTransactionSerializer,
+)
+
+
+def safe_total(obj):
+    for field in ["total_amount", "total", "amount_total"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            return Decimal(getattr(obj, field))
+
+    qty = getattr(obj, "quantity", None)
+    price = getattr(obj, "unit_price", None)
+    if qty is not None and price is not None:
+        try:
+            return Decimal(qty) * Decimal(price)
+        except Exception:
+            pass
+
+    return Decimal("0")
+
+
+def safe_date(obj):
+    for field in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            dt = getattr(obj, field)
+            try:
+                return dt.strftime("%d/%m/%Y")
+            except Exception:
+                return str(dt)
+    return ""
+
+
 class PurchaseTransactionViewSet(viewsets.ModelViewSet):
+    queryset = PurchaseTransaction.objects.all().select_related("user", "stock")
     serializer_class = PurchaseTransactionSerializer
     permission_classes = [IsAuthenticated]
 
@@ -51,6 +82,7 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
 
 @extend_schema(tags=['transactions'])
 class SaleTransactionViewSet(viewsets.ModelViewSet):
+    queryset = SaleTransaction.objects.all().select_related("user", "stock")
     serializer_class = SaleTransactionSerializer
     permission_classes = [IsAuthenticated]
 
