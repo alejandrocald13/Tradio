@@ -16,6 +16,12 @@ from drf_spectacular.utils import (
 from apps.users.auth0_authentication import Auth0JWTAuthentication
 from apps.wallet.models import Wallet, Movement
 
+# celery
+from apps.common.email_service import send_wallet_movement_email
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 TYPE_LABELS = {
     "TOPUP": "Deposit",
@@ -217,6 +223,19 @@ class WalletDepositView(APIView):
                 total=amount_dec,         
                 transfer_number=code or "",
             )
+            try:
+                send_wallet_movement_email(
+                    user,
+                    movement={
+                        "type": "Depósito",
+                        "amount": str(mv.amount),
+                        "reference": mv.transfer_number,
+                        "balance_after": str(wallet_obj.balance),
+                        "created_at": mv.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error al enviar correo de depósito: {e}")
 
         return Response({
             "detail": "Deposit successful",
@@ -310,6 +329,20 @@ class WalletWithdrawView(APIView):
                 total=-amount_dec,         
                 transfer_number=code or "",
             )
+
+            try:
+                send_wallet_movement_email(
+                    user,
+                    movement={
+                        "type": "Retiro",
+                        "amount": str(mv.amount),
+                        "reference": mv.transfer_number or mv.id,
+                        "balance_after": str(wallet_obj.balance),
+                        "created_at": mv.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error al enviar correo de retiro: {e}")
 
         return Response({
             "detail": "Withdrawal successful",
