@@ -13,31 +13,10 @@ import { getAccessToken } from "@auth0/nextjs-auth0";
 export default function LandingPage() {
 
   const [message, setMessage] = useState(null);
-  const {user, error, isLoading} = useUser();
   const router = useRouter()
-
-  console.log("user", user)
-
-useEffect(() => {
-  if (!isLoading && user) {
-    console.log("user2", user)
-    if (user.is_superuser) {
-      router.push("/adminHome");
-    } else {
-      router.push("/authHome");
-    }
-  }
-}, [user, isLoading]);
-
-  if (isLoading) return <p>Cargando...</p>;
-  if (error) return <p>Error al cargar usuario</p>;
-
 
   return (
     <div className={styles.container}>
-      {user &&(
-        <p>Hola user {user.name}</p>
-      )}
       {/* NAVBAR */}
       <header className={styles.navbar}>
         <div className={styles.logo}></div>
@@ -49,11 +28,11 @@ useEffect(() => {
           </ul>
         </nav>
         <div className={styles.authButtons}>
-          <a href="/api/auth/login">
+          <a href="/api/auth/login?returnTo=/auth-redirect">
             <button className={styles.login}>Login</button>
           </a>
 
-          <a href="/api/auth/signup">
+          <a href="/api/auth/signup?returnTo=/auth-redirect">
             <button className={styles.register}>Register</button>
           </a>
         </div>
