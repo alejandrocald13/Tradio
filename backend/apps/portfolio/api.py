@@ -11,7 +11,7 @@ from .serializers import (
     PortfolioSerializer,
     TotalResponseSerializer,
     StockPerformanceDetailSerializer,
-    PortfolioErrorResponseSerializer
+    PortfolioStockNotFound
 )
 from apps.stock.models import Stock
 
@@ -50,11 +50,16 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
     @extend_schema(
         summary="Total invertido en el portafolio",
         description="Retorna la suma total del costo de todas las acciones activas del usuario",
-        responses={200: TotalResponseSerializer}
+        responses={
+            200: TotalResponseSerializer,
+            204: PortfolioStockNotFound
+            }
     )
     @action(detail=False, methods=['get'])
     def total(self, request):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True)
+        if not portfolios.exists():
+            return Response({"message": "No active portfolios found"}, status=status.HTTP_204_NO_CONTENT)        
         total = sum(portfolio.total_cost for portfolio in portfolios)
         log_action(request, request.user, Action.PORTFOLIO_VIEWED)
         return Response({"total": total}, status=status.HTTP_200_OK)
@@ -63,11 +68,18 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
     @extend_schema(
         summary="Valor actual del portafolio",
         description="Retorna el valor actual total del portafolio basado en los precios actuales de las acciones",
-        responses={200: TotalResponseSerializer}
+        responses={
+            200: TotalResponseSerializer,
+            204: PortfolioStockNotFound
+            }
     )
     @action(detail=False, methods=['get'])
     def current_total(self, request):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True).select_related('stock')
+
+        if not portfolios.exists():
+            return Response({"message": "No active portfolios found"}, status=status.HTTP_204_NO_CONTENT)
+        
         total = sum(portfolio.quantity * float(portfolio.stock.current_price) for portfolio in portfolios)
         log_action(request, request.user, Action.PORTFOLIO_VIEWED)
         return Response({"total": round(total, 2)}, status=status.HTTP_200_OK)
@@ -78,7 +90,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         description="Retorna la acción con mayor cantidad de acciones en el portafolio del usuario",
         responses={
             200: StockPerformanceDetailSerializer,
-            404: PortfolioErrorResponseSerializer
+            204: PortfolioStockNotFound
         }
     )
     @action(detail=False, methods=['get'])
@@ -86,7 +98,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True).select_related('stock')
         
         if not portfolios.exists():
-            return Response({"error": "No active portfolios found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "No active portfolios found"}, status=status.HTTP_204_NO_CONTENT)
         
         max_portfolio = max(portfolios, key=lambda p: p.quantity)
         
@@ -113,7 +125,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         description="Retorna la acción con menor ganancia (peor rendimiento) del portafolio",
         responses={
             200: StockPerformanceDetailSerializer,
-            404: PortfolioErrorResponseSerializer
+            204: PortfolioStockNotFound
         }
     )
     @action(detail=False, methods=['get'])
@@ -121,7 +133,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True).select_related('stock')
         
         if not portfolios.exists():
-            return Response({"error": "No active portfolios found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "No active portfolios found"}, status=status.HTTP_204_NO_CONTENT)
         
         performances = []
         total_quantity = sum(p.quantity for p in portfolios)
@@ -154,7 +166,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         description="Retorna la acción con mayor ganancia (mejor rendimiento) del portafolio",
         responses={
             200: StockPerformanceDetailSerializer,
-            404: PortfolioErrorResponseSerializer
+            204: PortfolioStockNotFound
         }
     )
     @action(detail=False, methods=['get'])
@@ -162,7 +174,7 @@ class PortfolioViewSet(viewsets.ReadOnlyModelViewSet):
         portfolios = Portfolio.objects.filter(user=request.user, is_active=True).select_related('stock')
         
         if not portfolios.exists():
-            return Response({"error": "No active portfolios found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "No active portfolios found"}, status=status.HTTP_204_NO_CONTENT)
         
         performances = []
         total_value = 0
