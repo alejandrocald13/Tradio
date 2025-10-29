@@ -18,28 +18,10 @@ export default function RootLayout({ children }) {
   return (
     <>
     <html lang="en">
-      <UserProvider>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           {children}
         </body>
-      </UserProvider>
     </html>
-    {/*<Auth0Provider
-        domain={process.env.NEXT_PUBLIC_DOMAIN_AUTH0}
-        clientId={process.env.NEXT_PUBLIC_CLIENT_ID_AUTH0}
-        authorizationParams={{
-          redirect_uri:
-            typeof window !== "undefined"
-              ? `${window.location.origin}/callback`
-              : "",
-        }}
-      >
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          {children}
-        </body>
-      </html>
-    </Auth0Provider>*/}
     </>
   );
 }
