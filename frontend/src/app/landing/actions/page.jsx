@@ -103,8 +103,14 @@ export default function ActionsPage() {
           </ul>
         </nav>
         <div className={styles.authButtons}>
-          <button className={styles.login}>Login</button>
-          <button className={styles.register}>Register</button>
+          <a href="/api/auth/login?returnTo=/auth-redirect">
+            <button className={styles.login}>Login</button>
+          </a>
+
+          <a href="/api/auth/signup?returnTo=/auth-redirect">
+            <button className={styles.register}>Register</button>
+          </a>
+
         </div>
       </header>
 
