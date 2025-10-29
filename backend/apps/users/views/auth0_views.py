@@ -73,10 +73,10 @@ class Auth0LoginView(APIView):
         if not profile:
             return Response(
                 {"detail": "El usuario no tiene perfil asociado.",
-                "status": 2,
+                "status": 0,
                 "reason": 1
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_200_OK,
                 
             )
 
@@ -89,7 +89,7 @@ class Auth0LoginView(APIView):
                     "status": 0,
                     "reason": 2
                 },
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_200_OK,
             )
 
         if profile.state.name.lower() != "habilitado" and profile.profile_completed == True:
