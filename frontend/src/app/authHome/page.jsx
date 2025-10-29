@@ -10,9 +10,44 @@ import { api } from "../lib/axios";
 import './authHome.css'
 
 
-
-
 export default function AuthHome() {
+
+    const labels = [
+        "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"
+    ];
+    const data = [102, 98, 105, 107, 101, 95, 110];
+    const refLine = 100;
+
+    const dataGeneral = [
+        {
+        name: 'Tesla',
+        description: 'Más Rentable',
+        percentage: 16,
+        rendimiento: +12
+        }, {
+        name: 'Oracle',
+        description: 'Menos Rentable',
+        percentage: 20,
+        rendimiento: -1.8
+        },{
+        name: 'Amazon',
+        description: 'Mayor Porcentaje',
+        percentage: 25,
+        rendimiento: +1
+        }
+        ,{
+        name: 'Amazon',
+        description: 'Mayor Porcentaje',
+        percentage: 25,
+        rendimiento: +1
+        }
+        ,{
+        name: 'Amazon',
+        description: 'Mayor Porcentaje',
+        percentage: 25,
+        rendimiento: +1
+        }
+    ]
 
     const [portfolioActions, setPortfolioActions] = useState([]);
 

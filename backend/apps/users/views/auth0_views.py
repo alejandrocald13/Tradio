@@ -72,39 +72,58 @@ class Auth0LoginView(APIView):
 
         if not profile:
             return Response(
-                {"detail": "El usuario no tiene perfil asociado."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "El usuario no tiene perfil asociado.",
+                "status": 0,
+                "reason": 1
+                },
+                status=status.HTTP_200_OK,
+                
             )
 
-        if profile.state.name.lower() == "pendiente":
+        if profile.state.name.lower() == "pendiente"  and profile.profile_completed == True:
             self.revoke_auth0_token(auth0_token)
             return Response(
                 {
                     "message": "Usuario creado correctamente, pero pendiente de habilitación.",
                     "user": UserSerializer(user).data,
+                    "status": 0,
+                    "reason": 2
                 },
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_200_OK,
             )
 
-        if profile.state.name.lower() != "habilitado":
+        if profile.state.name.lower() != "habilitado" and profile.profile_completed == True:
             self.revoke_auth0_token(auth0_token)
             return Response(
                 {
                     "message": f"El perfil está '{profile.state.name}'. Acceso restringido.",
                     "user": UserSerializer(user).data,
+                    "status": 0,
+                    "reason": 3
                 },
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_200_OK,
             )
         
         if profile.profile_completed == False:
-            self.revoke_auth0_token(auth0_token)
-            return Response(
+            auth0_token = serializer.validated_data.get("auth0_token")
+            response = Response(
                 {
                     "message": f"El perfil está incompleto'. Acceso restringido.",
                     "user": UserSerializer(user).data,
+                    "status": 1,
                 },
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_200_OK,
             )
+            log_action(request, user, Action.AUTH_LOGIN)
+            response.set_cookie(
+                key="access_token",
+                value=auth0_token,
+                httponly=True,
+                samesite="None",
+                secure=True,
+                max_age=3600,
+            )
+            return response
 
         auth0_token = serializer.validated_data.get("auth0_token")
 
@@ -112,12 +131,14 @@ class Auth0LoginView(APIView):
             {
                 "message": "Inicio de sesión exitoso.",
                 "user": UserSerializer(user).data,
+                "status": 2
             },
             status=status.HTTP_200_OK,
         )
 
         log_action(request, user, Action.AUTH_LOGIN)
 
+        print("funciona please")
         response.set_cookie(
             key="access_token",
             value=auth0_token,
