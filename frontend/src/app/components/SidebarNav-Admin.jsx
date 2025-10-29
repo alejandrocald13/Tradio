@@ -19,7 +19,7 @@ export default function SidebarNavAdmin() {
         { id: "actions",        label: "Actions",       href: "/actionsManage" },
     ];
 
-    const logoutItem = { id: "logout", label: "Logout", href: "/" };
+    const logoutItem = { id: "logout", label: "Logout", href: "/api/auth/logout?returnTo=/landing" };
 
     const DefaultIcons = {
         homeAdmin: (

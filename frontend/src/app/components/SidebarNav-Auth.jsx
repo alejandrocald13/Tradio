@@ -19,7 +19,7 @@ export default function SidebarNav() {
   { id: "portfolio", label: "Portfolio",       href: "/portfolio" },
   ];
 
-  const logoutItem = { id: "logout", label: "Logout", href: "/" };
+  const logoutItem = { id: "logout", label: "Logout", href: "/api/auth/logout?returnTo=/landing" };
 
   const DefaultIcons = {
     authHome: (
@@ -102,13 +102,13 @@ export default function SidebarNav() {
 
   // Acá se detecta si en las acciones hay un tushito mas (/NFLX o cualquier otro), para activar el boton
   // y para que la barra se haga mas pequeña de la normal
-  // const isSectionActive = (href, path) => {
-  //   if (!path) return false;
-  //   if (href === "/") return path === "/";
-  //   return path === href || path.startsWith(href + "/");
-  // };
+  const isSectionActive = (href, path) => {
+    if (!path) return false;
+    if (href === "/") return path === "/";
+    return path === href || path.startsWith(href + "/");
+  };
 
-  // const isCollapsed  = pathname?.startsWith("/actions/");
+  const isCollapsed  = pathname?.startsWith("/actions/");
   //   const {
   //   logout
   // } = useAuth0();
