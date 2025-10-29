@@ -80,6 +80,7 @@ class StockPerformanceSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     symbol = serializers.CharField()
+    exchange = serializers.CharField()
     open_price = serializers.FloatField()
     current_price = serializers.FloatField()
     change_percentage = serializers.FloatField()
@@ -98,6 +99,8 @@ class StockHistoryDataSerializer(serializers.Serializer):
     name = serializers.CharField()
     symbol = serializers.CharField()
     current_price = serializers.FloatField()
+    open_price = serializers.FloatField()
+    change_percentage = serializers.FloatField()
     category = serializers.CharField(allow_null=True)
     data = HistoryDataSerializer()
 
