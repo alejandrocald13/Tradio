@@ -11,6 +11,13 @@ from apps.users.actions import Action
 
 from apps.reports.reports import get_financial_report_data
 
+# celery
+
+from apps.common.email_service import send_report_ready_email
+import logging
+
+logger = logging.getLogger(__name__)
+
 class ReportesEstadoView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -56,9 +63,19 @@ class ReportesEstadoView(APIView):
 
         pdf_data = get_financial_report_data(user, from_date, to_date)
 
-        response = generate_report_pdf(user, from_date, to_date, pdf_data, request=request)
+        response, file_path = generate_report_pdf(user, from_date, to_date, pdf_data, request=request)
 
-
+        try:
+            send_report_ready_email(
+                user,
+                from_date,
+                to_date,
+                None,
+                attachment_path=file_path,
+            )
+        except Exception as e:
+            logger.warning(f"Error al enviar correo de reporte a {user.email}: {e}")
+        
         log_action(request, user, Action.REPORTS_REQUESTED)
 
         return response

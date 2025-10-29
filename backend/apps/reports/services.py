@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-import uuid
+import os
+import tempfile
 
 
 def generate_report_pdf(user, from_date, to_date, data, request=None):
@@ -17,7 +18,6 @@ def generate_report_pdf(user, from_date, to_date, data, request=None):
         "saldo": data.get("saldo", 0),
     })
 
-    # Usar base_url para que WeasyPrint pueda resolver {% static %}
     if request:
         base_url = request.build_absolute_uri('/')  # Ej: http://localhost:8000/
     else:
@@ -25,8 +25,13 @@ def generate_report_pdf(user, from_date, to_date, data, request=None):
 
     pdf_content = HTML(string=html_string, base_url=base_url).write_pdf()
 
+    tmp_dir = tempfile.gettempdir()
+
     filename = f"TReport_{from_date}_{to_date}.pdf"
+    
+    file_path = os.path.join(tmp_dir, filename)
+    
     response = HttpResponse(pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
-    return response
+    return response, file_path

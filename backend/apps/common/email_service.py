@@ -21,12 +21,21 @@ def send_welcome_email(user, dashboard_url=None, support_email=None):
 
 
 def send_pending_authorization_email(user, support_email=None):
+
+    prof = getattr(user, "profile", None)
+
+    auth_method = "Local"
+    if getattr(user, "auth0_id", "").startswith("google|"):
+        auth_method = "Google"
+    elif getattr(user, "auth0_id", "").startswith("facebook|"):
+        auth_method = "Facebook"
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
+        "authentic_method": auth_method,
         "support_email": support_email or "soporte@tradio.com",
         "submitted_at": now(),
     }
@@ -37,12 +46,20 @@ def send_pending_authorization_email(user, support_email=None):
 
 
 def send_admin_new_user_email(admin_email, user, dashboard_url=None):
+    prof = getattr(user, "profile", None)
+
+    auth_method = "Local"
+    if getattr(user, "auth0_id", "").startswith("google|"):
+        auth_method = "Google"
+    elif getattr(user, "auth0_id", "").startswith("facebook|"):
+        auth_method = "Facebook"
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
+        "authentic_method": auth_method,
         "dashboard_url": dashboard_url or "https://localhost:3000/",
         "created_at": getattr(user, "date_joined", now()),
     }
@@ -53,10 +70,11 @@ def send_admin_new_user_email(admin_email, user, dashboard_url=None):
 
 
 def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_email=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
         "trade": trade,
@@ -70,10 +88,11 @@ def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_em
 
 
 def send_wallet_movement_email(user, movement, wallet_url=None, support_email=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
         "movement": movement,
@@ -86,20 +105,22 @@ def send_wallet_movement_email(user, movement, wallet_url=None, support_email=No
     send_email_task.delay(user.email, subject, template, context)
 
 
-def send_report_ready_email(user, report_url, period_from, period_to, support_email=None):
+def send_report_ready_email(user, period_from, period_to, support_email=None, attachment_path=None):
+    prof = getattr(user, "profile", None)
+
     context = {
         "user": {
-            "first_name": getattr(user, "first_name", "") or getattr(user, "name", ""),
-            "username": getattr(user, "username", "") or getattr(user, "email", ""),
+            "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
-        "report_url": report_url,
-        "period_from": period_from,
-        "period_to": period_to,
+        "report": {
+            "from": period_from,
+            "to": period_to,
+        },
         "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "support_email": support_email or "soporte@tradio.com",
     }
 
     subject = "Tradio | Tu reporte está listo"
     template = "emails/report_ready.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.email, subject, template, context, attachment_path)

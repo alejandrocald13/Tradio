@@ -11,6 +11,13 @@ from apps.transactions_all.serializers import (
     SaleTransactionSerializer,
 )
 
+from apps.common.email_service import send_trade_confirmation_email
+
+from django.utils.timezone import now
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def safe_total(obj):
     for field in ["total_amount", "total", "amount_total"]:
@@ -61,12 +68,32 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
         stock_id = data.get("stock")
         quantity = data.get("quantity")
         reference = data.get("reference", "BUY")
+
+
         if not stock_id or not quantity:
             return Response({"detail": "Fields 'stock' and 'quantity' are required"}, status=400)
         try:
             trade = TradeService()
             purchase, wallet, portfolio, unit_price = trade.buy(user=request.user, stock_id=stock_id, quantity=quantity, reference=reference)
             serializer = self.get_serializer(purchase)
+
+            try:
+                total = float(purchase.quantity) * float(purchase.unit_price)
+                send_trade_confirmation_email(
+                    user=request.user,
+                    trade={
+                        "type": "compra",
+                        "symbol": purchase.stock.symbol,
+                        "qty": str(purchase.quantity),
+                        "price": str(purchase.unit_price),
+                        "total": f"{total:.2f}",
+                        "executed_at": purchase.date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "id": purchase.id,
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error enviando correo de confirmación de compra: {e}")
+
             return Response({
                 "message": "Purchase executed successfully",
                 "purchase": serializer.data,
@@ -75,6 +102,7 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
                 "portfolio_quantity": portfolio.quantity,
                 "portfolio_avg_price": portfolio.get_average_price(),
             }, status=status.HTTP_201_CREATED)
+        
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except Exception as e:
@@ -109,6 +137,24 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
             trade = TradeService()
             sale, wallet, portfolio, unit_price = trade.sell(user=request.user, stock_id=stock_id, quantity=quantity, reference=reference)
             serializer = self.get_serializer(sale)
+            try:
+
+                total = float(sale.quantity) * float(sale.unit_price)
+                send_trade_confirmation_email(
+                    user=request.user,
+                    trade={
+                        "type": "venta",
+                        "symbol": sale.stock.symbol,
+                        "qty": str(sale.quantity),
+                        "price": str(sale.unit_price),
+                        "total": f"{total:.2f}",
+                        "executed_at": sale.date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "id": sale.id,
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error enviando correo de confirmación de venta: {e}")
+
             return Response({
                 "message": "Sale executed successfully",
                 "sale": serializer.data,
@@ -117,6 +163,7 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
                 "portfolio_quantity": portfolio.quantity,
                 "portfolio_avg_price": portfolio.get_average_price(),
             }, status=status.HTTP_201_CREATED)
+        
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except Exception as e:
