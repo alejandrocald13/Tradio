@@ -6,6 +6,7 @@ import SidebarNavAdmin from "../components/SidebarNav-Admin"
 import ActionAdminCard from "../components/ActionAdminCard"
 import { api } from "../lib/axios"
 import './adminHome.css'
+import getToken from "../lib/getToken"
 
 export default function AdminHome () {
     const [movesData, setMovesData] = useState([])
@@ -18,13 +19,16 @@ export default function AdminHome () {
         return d.toISOString().slice(0, 10)
     }, [])
 
+
+
     const movesColumns = ['Type', 'User Email', 'Amount']
 
     const [activeActions, setActiveActions] = useState([])
     
     useEffect(() => {
-        const fetchActiveStocks = async () => {
+      const fetchActiveStocks = async () => {
             try {
+
                 const response = await api.get("/stocks-admin/");
                 const stocks = response.data;
 
