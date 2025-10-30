@@ -13,3 +13,5 @@ media/
 
 # SQLITE3
 db.sqlite3
+
+.sonar/
