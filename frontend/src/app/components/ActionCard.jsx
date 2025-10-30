@@ -1,11 +1,19 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import "../styles/ActionCard.css";
 
 
 
 
 export default function ActionCard({ symbol, actionName, price, changeText, variantClass, graphic, basePath = "/actions", }) {
+
+    
+    const pathname = usePathname();
+
+    const adjustedBasePath = pathname.startsWith("/landing/actions")
+        ? "/landing/actions"
+        : basePath;
 
     const finalClass = variantClass ;
     const symbolFromName = (name = "") =>
@@ -14,7 +22,7 @@ export default function ActionCard({ symbol, actionName, price, changeText, vari
     const sym = symbol || symbolFromName(actionName);
 
     return (
-        <Link href={`${basePath}/${sym}`} className="action-card" prefetch>
+        <Link href={`${adjustedBasePath}/${sym}`} className="action-card" prefetch>
             {/* <div className="action-card"> */}
 
             <div className="ac-container-up">
