@@ -11,7 +11,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["name", "birth_date", "address", "cellphone", "dpi", "profile_completed"]
+        fields = ["name", "birth_date", "address", "cellphone", "dpi", "profile_completed","referral_code",
+            "has_used_referral",]
         read_only_fields = ["deleted_at"]
 
     def update(self, instance, validated_data):
