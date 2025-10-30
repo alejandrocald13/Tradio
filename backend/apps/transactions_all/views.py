@@ -1,14 +1,16 @@
 from decimal import Decimal
 from django.db.models import Q
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from django.core.exceptions import ValidationError
 
 from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
     OpenApiResponse,
+    OpenApiExample
 )
 
 from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
@@ -17,7 +19,10 @@ from apps.transactions_all.serializers import (
     SaleTransactionSerializer,
 )
 
+from apps.transactions_all.market_clock.utils import is_open
+
 from apps.common.email_service import send_trade_confirmation_email
+from apps.transactions_all.services import TradeService
 
 from django.utils.timezone import now
 import logging
