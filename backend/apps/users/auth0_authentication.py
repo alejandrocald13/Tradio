@@ -5,11 +5,20 @@ from rest_framework import authentication, exceptions
 
 class Auth0JWTAuthentication(authentication.BaseAuthentication):
     """
-    Valida el token de Auth0 almacenado en la cookie 'access_token'.
+    Valida el token de Auth0 desde:
+    - Header Authorization: Bearer <token>
+    - o cookie 'access_token'
     """
 
     def authenticate(self, request):
-        token = request.COOKIES.get("access_token")
+        auth_header = request.headers.get("Authorization")
+        token = None
+
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+        else:
+            token = request.COOKIES.get("access_token")
+
         if not token:
             return None
 
