@@ -4,20 +4,163 @@ import { useEffect, useMemo, useState } from "react"
 import TableAdmin from "../components/TableAdmin"
 import SidebarNavAdmin from "../components/SidebarNav-Admin"
 import ActionAdminCard from "../components/ActionAdminCard"
-import Link from "next/link"
 import { api } from "../lib/axios"
 import './adminHome.css'
 
 export default function AdminHome () {
-  const [movesData, setMovesData] = useState([])
-  const [txData, setTxData] = useState([])
+    const dayTransactionColumns = ['Type', 'User Email', 'Action', 'Quantity', 'Total', 'Date'];
 
-  const today = useMemo(() => {
-    const d = new Date()
-    // normaliza a fecha local YYYY-MM-DD (evita desfasar a día anterior por zona horaria)
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-    return d.toISOString().slice(0, 10)
-  }, [])
+    const movesColumns = ['Type', 'User Email', 'Amount', 'Date']
+
+
+    const movesData = [
+        {
+            'Type': 'Debit',
+            'User Email': 'dani@gmail.com',
+            'Amount': 100,
+            'Date': '20/07/2024'
+        },
+        {
+            'Type': 'Debit',
+            'User Email': 'dani@gmail.com',
+            'Amount': 100,
+            'Date': '20/07/2024'
+        },
+        {
+            'Type': 'Debit',
+            'User Email': 'dani@gmail.com',
+            'Amount': 100,
+            'Date': '20/07/2024'
+        },
+        {
+            'Type': 'Debit',
+            'User Email': 'dani@gmail.com',
+            'Amount': 100,
+            'Date': '20/07/2024'
+        }
+    ]
+
+    const dayUsers = [
+        {
+            id: 1,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        }, 
+        {
+            id: 2,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 3,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 4,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        }  
+        
+        ,
+        {
+            id: 5,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 6,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 7,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 8,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 9,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 10,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id:11,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        },
+        {
+            id: 12,
+            name: 'Daniela Matul',
+            userName: 'Danim',
+            email: 'dani@gmail.com',
+            age: 19,
+            date: '10-09-2025',
+        }        
+    ]
+
+    const [activeActions, setActiveActions] = useState([])
+    
+    useEffect(() => {
+        const fetchActiveStocks = async () => {
+            try {
+                const response = await api.get("/stocks-admin/");
+                const stocks = response.data;
+
+                const filtered = stocks
+                    .filter(stock => stock.is_active)
+                    .slice(0, 4);
+
+                setActiveActions(filtered);
+            } catch (error) {
+                console.error("Error fetching active stocks:", error);
+                alert("Error fetching active stocks");
+            }
+    };
+        fetchActiveStocks();
+    }, []);
 
   useEffect(() => {
     const fetchDaily = async () => {
@@ -81,19 +224,24 @@ export default function AdminHome () {
             </div>
           </div>
 
-          <div className="section-actions">
-            <div className="actions-summary-container">
-              <div className="summary-header">
-                <h3>Latest Active Actions</h3>
-              </div>
+                    <div className="section-actions">
+                        <div className="actions-summary-container">
+                            <div className="summary-header">
+                                <h3>Some active actions</h3>
+                            </div>
 
-              <div className="summary-actions-list">
-                {activeActions.map((action) => (
-                  <ActionAdminCard key={action.id} title={action.name}>
-                    <div className="action-card-content-admin">
-                      <p className="price-action-do-admin">Price: ${action.price.toFixed(2)}</p>
-                      <p className="category-action-do">Category: {action.category}</p>
-                      <p className="status-action-do">Status: <strong>Active</strong></p>
+                            <div className="summary-actions-list">
+                                {activeActions.map((action) => (
+                                    <ActionAdminCard key={action.id} title={action.name}>
+                                        <div className="action-card-content-admin">
+                                            <p className="price-action-do-admin">Price: ${action.current_price}</p>
+                                            <p className="category-action-do">Category: {action.category_name}</p>
+                                            <p className="status-action-do">Status: <strong>Active</strong></p>
+                                        </div>
+                                    </ActionAdminCard>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                   </ActionAdminCard>
                 ))}

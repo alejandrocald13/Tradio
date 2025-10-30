@@ -16,11 +16,15 @@
   <table class="table" role="table" aria-label="Datos del usuario">
     <tr>
       <th scope="row">Nombre</th>
-      <td>{{ user.first_name|default:user.username }}</td>
+      <td>{{ user.name }}</td>
     </tr>
     <tr>
       <th scope="row">Correo</th>
       <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Método de Autenticación</th>
+      <td>{{ authentic_method }}</td>
     </tr>
     <tr>
       <th scope="row">Fecha de registro</th>

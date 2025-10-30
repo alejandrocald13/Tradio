@@ -4,8 +4,6 @@ from drf_spectacular.utils import extend_schema
 from ..models import Stock
 from ..serializers import StockSerializer
 from ..permissions import IsAdminOrReadOnly
-from ...users.actions import Action
-from ...users.utils import log_action
 
 
 @extend_schema(tags=['stocks'])
@@ -32,7 +30,6 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
         description="Devuelve todas las acciones activas con filtros opcionales"
     )
     def list(self, request, *args, **kwargs):
-        log_action(request, request.user, Action.STOCK_VIEWED)
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
@@ -40,5 +37,4 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
         description="Devuelve el detalle de una acción específica"
     )
     def retrieve(self, request, *args, **kwargs):
-        log_action(request, request.user, Action.STOCK_VIEWED)
         return super().retrieve(request, *args, **kwargs)

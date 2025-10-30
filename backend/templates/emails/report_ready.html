@@ -9,7 +9,7 @@
 
   <h2 style="margin:0 0 8px;font-size:20px;">Reporte generado</h2>
   <p style="margin:0 0 12px;">
-    Hola {{ user.first_name|default:user.username }}, tu reporte <strong>{{ report.title }}</strong> ya está disponible.
+    Hola {{ user.name }}, tu reporte ya está disponible.
   </p>
 
   <p style="margin:0 0 12px;">
@@ -17,11 +17,7 @@
   </p>
 
   <p style="margin:16px 0;">
-    <a class="btn" href="{{ report.download_url|default:'#' }}">Descargar reporte</a>
+    ¡Tu reporte ya está listo! Puedes descargarlo directamente desde el archivo adjunto en este correo.
   </p>
 
-  <div class="hr"></div>
-  <p class="muted">
-    Este enlace es personal y solo estará disponible por tiempo limitado.
-  </p>
 {% endblock %}
