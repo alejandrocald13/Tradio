@@ -1,20 +1,70 @@
+from decimal import Decimal
+from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from django.core.exceptions import ValidationError
-from market_clock.utils import is_open
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
-from .models import PurchaseTransaction, SaleTransaction
-from .serializers import PurchaseTransactionSerializer, SaleTransactionSerializer
-from .services import TradeService
 
-@extend_schema(tags=['transactions'])
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiExample
+)
+
+from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
+from apps.transactions_all.serializers import (
+    PurchaseTransactionSerializer,
+    SaleTransactionSerializer,
+)
+
+from apps.transactions_all.market_clock.utils import is_open
+
+from apps.common.email_service import send_trade_confirmation_email
+from apps.transactions_all.services import TradeService
+
+from django.utils.timezone import now
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def safe_total(obj):
+    for field in ["total_amount", "total", "amount_total"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            return Decimal(getattr(obj, field))
+
+    qty = getattr(obj, "quantity", None)
+    price = getattr(obj, "unit_price", None)
+    if qty is not None and price is not None:
+        try:
+            return Decimal(qty) * Decimal(price)
+        except Exception:
+            pass
+
+    return Decimal("0")
+
+
+def safe_date(obj):
+    for field in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+        if hasattr(obj, field) and getattr(obj, field) is not None:
+            dt = getattr(obj, field)
+            try:
+                return dt.strftime("%d/%m/%Y")
+            except Exception:
+                return str(dt)
+    return ""
+
+
+@extend_schema(tags=["transactions"])
 class PurchaseTransactionViewSet(viewsets.ModelViewSet):
+    queryset = PurchaseTransaction.objects.all().select_related("user", "stock")
     serializer_class = PurchaseTransactionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return PurchaseTransaction.objects.filter(user=self.request.user).order_by('-created_at')
+        return PurchaseTransaction.objects.filter(user=self.request.user).order_by('-date')
 
     @extend_schema(
         summary="Ejecutar compra",
@@ -30,12 +80,32 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
         stock_id = data.get("stock")
         quantity = data.get("quantity")
         reference = data.get("reference", "BUY")
+
+
         if not stock_id or not quantity:
             return Response({"detail": "Fields 'stock' and 'quantity' are required"}, status=400)
         try:
             trade = TradeService()
             purchase, wallet, portfolio, unit_price = trade.buy(user=request.user, stock_id=stock_id, quantity=quantity, reference=reference)
             serializer = self.get_serializer(purchase)
+
+            try:
+                total = float(purchase.quantity) * float(purchase.unit_price)
+                send_trade_confirmation_email(
+                    user=request.user,
+                    trade={
+                        "type": "compra",
+                        "symbol": purchase.stock.symbol,
+                        "qty": str(purchase.quantity),
+                        "price": str(purchase.unit_price),
+                        "total": f"{total:.2f}",
+                        "executed_at": purchase.date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "id": purchase.id,
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error enviando correo de confirmación de compra: {e}")
+
             return Response({
                 "message": "Purchase executed successfully",
                 "purchase": serializer.data,
@@ -44,18 +114,21 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
                 "portfolio_quantity": portfolio.quantity,
                 "portfolio_avg_price": portfolio.get_average_price(),
             }, status=status.HTTP_201_CREATED)
+        
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except Exception as e:
             return Response({"detail": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @extend_schema(tags=['transactions'])
+
 class SaleTransactionViewSet(viewsets.ModelViewSet):
+    queryset = SaleTransaction.objects.all().select_related("user", "stock")
     serializer_class = SaleTransactionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return SaleTransaction.objects.filter(user=self.request.user).order_by('-created_at')
+        return SaleTransaction.objects.filter(user=self.request.user).order_by('-date')
 
     @extend_schema(
         summary="Ejecutar venta",
@@ -77,6 +150,23 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
             trade = TradeService()
             sale, wallet, portfolio, unit_price = trade.sell(user=request.user, stock_id=stock_id, quantity=quantity, reference=reference)
             serializer = self.get_serializer(sale)
+            try:
+                total = float(sale.quantity) * float(sale.unit_price)
+                send_trade_confirmation_email(
+                    user=request.user,
+                    trade={
+                        "type": "venta",
+                        "symbol": sale.stock.symbol,
+                        "qty": str(sale.quantity),
+                        "price": str(sale.unit_price),
+                        "total": f"{total:.2f}",
+                        "executed_at": sale.date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "id": sale.id,
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Error enviando correo de confirmación de venta: {e}")
+
             return Response({
                 "message": "Sale executed successfully",
                 "sale": serializer.data,
@@ -85,7 +175,198 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
                 "portfolio_quantity": portfolio.quantity,
                 "portfolio_avg_price": portfolio.get_average_price(),
             }, status=status.HTTP_201_CREATED)
+        
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except Exception as e:
             return Response({"detail": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class AdminTransactionsReportView(APIView):
+    """
+    GET /api/transactions/report/?type=Purchases|Sale&stock=TSLA&email=x&date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    Respuesta lista para TableAdmin en /transaction/page.jsx
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["transactions"],
+        summary="Reporte admin de transacciones",
+        parameters=[
+            OpenApiParameter(name="type", required=False, type=str, description="Purchases | Sale"),
+            OpenApiParameter(name="stock", required=False, type=str, description="Símbolo del activo (p.ej., TSLA)"),
+            OpenApiParameter(name="email", required=False, type=str, description="Filtro por correo (icontains)"),
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
+    def get(self, request):
+        tx_type = request.query_params.get("type")
+        stock_symbol = request.query_params.get("stock")
+        email_filter = request.query_params.get("email")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        purchase_qs = PurchaseTransaction.objects.all().select_related("user", "stock")
+        sale_qs = SaleTransaction.objects.all().select_related("user", "stock")
+
+        if stock_symbol:
+            purchase_qs = purchase_qs.filter(stock__symbol=stock_symbol)
+            sale_qs = sale_qs.filter(stock__symbol=stock_symbol)
+
+        if email_filter:
+            purchase_qs = purchase_qs.filter(user__email__icontains=email_filter)
+            sale_qs = sale_qs.filter(user__email__icontains=email_filter)
+
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
+
+            purchase_qs = apply_date_filter(
+                purchase_qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+            sale_qs = apply_date_filter(
+                sale_qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        rows = []
+
+        if not tx_type or tx_type == "Purchases":
+            for p in purchase_qs:
+                rows.append({
+                    "Type": "Purchases",
+                    "User Email": getattr(p.user, "email", ""),
+                    "Action": getattr(p.stock, "symbol", "") if getattr(p, "stock", None) else "",
+                    "Quantity": getattr(p, "quantity", ""),
+                    "Total": f"{safe_total(p)}",
+                    "Date": safe_date(p),
+                })
+
+        if not tx_type or tx_type == "Sale":
+            for s in sale_qs:
+                rows.append({
+                    "Type": "Sale",
+                    "User Email": getattr(s.user, "email", ""),
+                    "Action": getattr(s.stock, "symbol", "") if getattr(s, "stock", None) else "",
+                    "Quantity": getattr(s, "quantity", ""),
+                    "Total": f"{safe_total(s)}",
+                    "Date": safe_date(s),
+                })
+
+        return Response(rows)
+
+
+class UserPurchasesView(APIView):
+    """
+    /api/transactions/me/purchases/?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    para la pestaña "Compras" del usuario en purchases-sales/page.jsx
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["transactions"],
+        summary="Compras del usuario autenticado",
+        parameters=[
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
+    def get(self, request):
+        user = request.user
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        qs = PurchaseTransaction.objects.filter(user=user).select_related("stock")
+
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
+            qs = apply_date_filter(
+                qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        data = []
+        for row in qs:
+            data.append({
+                "accion": getattr(row.stock, "name", "-") if getattr(row, "stock", None) else "-",
+                "compra": f"${getattr(row, 'unit_price', Decimal('0'))}",
+                "cantidad": str(getattr(row, "quantity", "")),
+                "fecha": safe_date(row),
+            })
+
+        return Response(data)
+
+
+class UserSalesView(APIView):
+    """
+    /api/transactions/me/sales/?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+    para la pestaña "Ventas" del usuario en purchases-sales/page.jsx
+    calcula % de ganancia usando unit_price vs average_cost si existe
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["transactions"],
+        summary="Ventas del usuario autenticado",
+        parameters=[
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
+    def get(self, request):
+        user = request.user
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        qs = SaleTransaction.objects.filter(user=user).select_related("stock")
+
+        if date_from and date_to:
+            def apply_date_filter(qs, fields):
+                for f in fields:
+                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
+                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
+                return qs
+            qs = apply_date_filter(
+                qs,
+                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
+            )
+
+        data = []
+        for row in qs:
+            sell_price = getattr(row, "unit_price", None)
+            if sell_price is None:
+                sell_price = Decimal("0")
+            else:
+                sell_price = Decimal(sell_price)
+
+            avg_cost = getattr(row, "average_cost", None)
+            if avg_cost is None:
+                avg_cost = Decimal("0")
+            else:
+                avg_cost = Decimal(avg_cost)
+
+            pct_gain = Decimal("0")
+            if avg_cost > 0:
+                pct_gain = ((sell_price - avg_cost) / avg_cost) * Decimal("100")
+
+            data.append({
+                "accion": getattr(row.stock, "name", "-") if getattr(row, "stock", None) else "-",
+                "compra": f"${avg_cost:.2f}",
+                "venta": f"${sell_price:.2f}",
+                "pct": f"{pct_gain:.2f}%",
+                "cantidad": str(getattr(row, "quantity", "")),
+                "fecha": safe_date(row),
+            })
+
+        return Response(data)

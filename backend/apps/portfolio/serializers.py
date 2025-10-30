@@ -34,6 +34,5 @@ class StockPerformanceDetailSerializer(serializers.Serializer):
     weight_percentage = serializers.FloatField()
     performance_percentage = serializers.FloatField()
 
-
-class PortfolioErrorResponseSerializer(serializers.Serializer):
-    error = serializers.CharField()
+class PortfolioStockNotFound(serializers.Serializer):
+    message = serializers.CharField()

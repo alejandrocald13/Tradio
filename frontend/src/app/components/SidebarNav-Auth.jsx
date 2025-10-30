@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import "../styles/SidebarNav-Auth.css";
-import { useAuth0 } from "@auth0/auth0-react";
+//import { useAuth0 } from "@auth0/auth0-react";
 import { api } from "../lib/axios";
 
 
@@ -19,7 +19,7 @@ export default function SidebarNav() {
   { id: "portfolio", label: "Portfolio",       href: "/portfolio" },
   ];
 
-  const logoutItem = { id: "logout", label: "Logout", href: "/" };
+  const logoutItem = { id: "logout", label: "Logout", href: "/api/auth/logout?returnTo=/landing" };
 
   const DefaultIcons = {
     authHome: (
@@ -109,21 +109,20 @@ export default function SidebarNav() {
   };
 
   const isCollapsed  = pathname?.startsWith("/actions/");
-  
-  const {
-    logout
-  } = useAuth0();
+  //   const {
+  //   logout
+  // } = useAuth0();
 
-  async function LogOutWithAuth0(){
-    try {
-      const response = await api.post("auth/logout/")
+  // async function LogOutWithAuth0(){
+  //   try {
+  //     const response = await api.post("auth/logout/")
       
-      logout({ logoutParams: { returnTo: window.location.origin } });
+  //     logout({ logoutParams: { returnTo: window.location.origin } });
 
-    } catch (error) {
-      console.error("No se pudo terminar sesión correctamente.", error)
-    }
-  }
+  //   } catch (error) {
+  //     console.error("No se pudo terminar sesión correctamente.", error)
+  //   }
+  // }
 
   return (
     <div className={`sidebar ${isCollapsed ? "is-collapsed" : ""}`}>

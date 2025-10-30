@@ -14,7 +14,7 @@ export default function TableAdmin({columns, data, btnVerification, getValueInpu
         console.log("Checkeando ", value)
         getValueInputP(value)
     }
-    
+    const lengthColumns = columns.length
 
     return (
         <>
@@ -33,7 +33,7 @@ export default function TableAdmin({columns, data, btnVerification, getValueInpu
                                 <tr key={index}>
                                     {Object.keys(d).map((value) => (
                                         <>
-                                            {(value !== 'enable' && value !== 'id' ) &&(<td>{d[value]}</td>)}
+                                            {(value !== 'enable' && value !== 'id' && (lengthColumns >= 3 && value !== 'Date')) &&(<td>{d[value]}</td>)}
                                         </>
                                     ))}
 

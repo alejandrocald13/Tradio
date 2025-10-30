@@ -6,9 +6,21 @@ from rest_framework import status
 from apps.users.serializers import Auth0UserLoginSerializer, UserSerializer
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 # no-repudio
 from apps.users.utils import log_action
 from apps.users.actions import Action
+
+import logging
+from django.contrib.auth import get_user_model
+
+
+# celery
+
+from apps.common.email_service import send_admin_new_user_email, send_pending_authorization_email
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
 
 class Auth0LoginView(APIView):
     """
@@ -72,39 +84,76 @@ class Auth0LoginView(APIView):
 
         if not profile:
             return Response(
-                {"detail": "El usuario no tiene perfil asociado."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "El usuario no tiene perfil asociado.",
+                "status": 0,
+                "reason": 1
+                },
+                status=status.HTTP_200_OK,
+                
             )
 
-        if profile.state.name.lower() == "pendiente":
+        if profile.state.name.lower() == "pendiente"  and profile.profile_completed == True:
             self.revoke_auth0_token(auth0_token)
+
+            admin_qs = User.objects.filter(is_superuser=True, is_active=True).exclude(email__isnull=True).exclude(email__exact='')
+            admin_emails = list(admin_qs.values_list('email', flat=True))
+
+            if not admin_emails:
+                logger.warning("No se encontraron superusuarios para notificar del nuevo registro: user_id=%s", user.pk)
+            else:
+                for admin_email in admin_emails:
+                    try:
+                        send_admin_new_user_email(admin_email, user)
+                    except Exception as e:
+                        logger.exception("Error al encolar email de nuevo usuario para %s: %s", admin_email, e)
+            
+            try:
+                send_pending_authorization_email(user)
+            except Exception as e:
+                logger.exception("Error al encolar email de usuario pendiente para %s: %s", user, e)
+
             return Response(
                 {
                     "message": "Usuario creado correctamente, pero pendiente de habilitación.",
                     "user": UserSerializer(user).data,
+                    "status": 0,
+                    "reason": 2
                 },
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_200_OK,
             )
 
-        if profile.state.name.lower() != "habilitado":
+        if profile.state.name.lower() != "habilitado" and profile.profile_completed == True:
             self.revoke_auth0_token(auth0_token)
             return Response(
                 {
                     "message": f"El perfil está '{profile.state.name}'. Acceso restringido.",
                     "user": UserSerializer(user).data,
+                    "status": 0,
+                    "reason": 3
                 },
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_200_OK,
             )
         
         if profile.profile_completed == False:
-            self.revoke_auth0_token(auth0_token)
-            return Response(
+            auth0_token = serializer.validated_data.get("auth0_token")
+            response = Response(
                 {
                     "message": f"El perfil está incompleto'. Acceso restringido.",
                     "user": UserSerializer(user).data,
+                    "status": 1,
                 },
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_200_OK,
             )
+            log_action(request, user, Action.AUTH_LOGIN)
+            response.set_cookie(
+                key="access_token",
+                value=auth0_token,
+                httponly=True,
+                samesite="None",
+                secure=True,
+                max_age=3600,
+            )
+            return response
 
         auth0_token = serializer.validated_data.get("auth0_token")
 
@@ -112,6 +161,7 @@ class Auth0LoginView(APIView):
             {
                 "message": "Inicio de sesión exitoso.",
                 "user": UserSerializer(user).data,
+                "status": 2
             },
             status=status.HTTP_200_OK,
         )

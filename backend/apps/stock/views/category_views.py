@@ -21,5 +21,5 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         description="Devuelve todas las categorías existentes en BD"
     )
     def list(self, request, *args, **kwargs):
-        log_action(request, request.user, Action.SEARCH_BY_CATEGORY)
+        # log_action(request, request.user, Action.SEARCH_BY_CATEGORY)
         return super().list(request, *args, **kwargs)

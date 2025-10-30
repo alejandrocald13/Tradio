@@ -1,23 +1,63 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect, useMemo } from "react";
 import "./wallet.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import DataTable from "../components/DataTable";
-import Modal from "../components/Modal"; // ✅ import del modal reutilizable
+import Modal from "../components/Modal";
+import { api } from "../lib/axios";
 
 export default function WalletPage() {
   const [transactions, setTransactions] = useState([]);
+  const [balance, setBalance] = useState(0);
+
   const [showPanel, setShowPanel] = useState(false);
-  const [actionType, setActionType] = useState("");
+  const [actionType, setActionType] = useState(""); // "Deposit" | "Withdrawal"
   const [formData, setFormData] = useState({ bank: "", amount: "", code: "" });
+
   const [showModal, setShowModal] = useState(false);
 
-  const loggedInUser = { name: "John Doe" };
-  const balance = transactions.reduce((acc, t) => acc + t.amount, 0);
+  const fetchWalletData = async () => {
+    try {
+      const res = await api.get("/wallet/me/");
+      setBalance(res.data.balance || 0);
+      setTransactions(res.data.transactions || []);
+    } catch (err) {
+      console.error("Error fetching wallet data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchWalletData();
+  }, []);
+
+  // --- Generador de códigos únicos (no repetidos) ---
+  const existingCodes = useMemo(() => {
+    // Usamos transfer_number si viene del backend, si no, usamos id.
+    return new Set(
+      (transactions || []).map((t) => String(t.transfer_number || t.id || ""))
+    );
+  }, [transactions]);
+
+  const generateUniqueCode = () => {
+    // Prefijo + fecha + random base36 (mayúsculas) => p.e. TRD-20251029-4G9Q2X
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+
+    let code = "";
+    do {
+      const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+      code = `TRD-${y}${m}${d}-${rand}`;
+    } while (existingCodes.has(code));
+    return code;
+  };
 
   const handleOpenPanel = (type) => {
     setActionType(type);
-    setFormData({ bank: "", amount: "", code: "" });
+    const autoCode = generateUniqueCode();
+    setFormData({ bank: "", amount: "", code: autoCode });
     setShowPanel(true);
   };
 
@@ -28,49 +68,70 @@ export default function WalletPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // No permitir edición manual del code
+    if (name === "code") return;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const amountValue = parseFloat(formData.amount);
-    if (isNaN(amountValue) || amountValue <= 0)
-      return alert("Please enter a valid amount.");
+    if (isNaN(amountValue) || amountValue <= 0) {
+      alert("Please enter a valid amount.");
+      return;
+    }
     setShowModal(true);
   };
 
-  const confirmTransaction = () => {
-    const amountValue = parseFloat(formData.amount);
-    const newTransaction = {
-      id: Math.floor(Math.random() * 1000000000).toString(),
-      date: new Date().toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      amount: actionType === "Deposit" ? amountValue : -amountValue,
-      type: actionType,
-    };
+  const confirmTransaction = async () => {
+    try {
+      const payload = {
+        amount: parseFloat(formData.amount),
+        bank: formData.bank,
+        code: formData.code, // enviamos el código autogenerado
+      };
 
-    setTransactions([newTransaction, ...transactions]);
-    setShowPanel(false);
-    setShowModal(false);
-    alert(`Transaction ${actionType} successful!`);
+      if (actionType === "Deposit") {
+        await api.post("/wallet/deposit/", payload);
+      } else if (actionType === "Withdrawal") {
+        await api.post("/wallet/withdraw/", payload);
+      } else {
+        alert("Unknown action type");
+        return;
+      }
+
+      await fetchWalletData();
+
+      setShowPanel(false);
+      setShowModal(false);
+      alert(`Transaction ${actionType} successful!`);
+    } catch (err) {
+      console.error("Error sending transaction:", err);
+      alert("Transaction failed");
+    }
   };
 
   const cancelTransaction = () => setShowModal(false);
 
-  const transactionsColored = transactions.map((t) => ({
-    ...t,
-    amount: (
-      <span className={t.amount >= 0 ? "positive" : "negative"}>
-        {t.amount >= 0 ? `+${t.amount.toFixed(2)}` : t.amount.toFixed(2)}
-      </span>
-    ),
-  }));
+  // Adaptamos el ID que verá la tabla: usar transfer_number si existe
+  const transactionsForTable = useMemo(() => {
+    return (transactions || []).map((t) => {
+      const shownId = t.transfer_number || t.id; // preferimos transfer_number
+      const amt = parseFloat(t.amount);
+      return {
+        ...t,
+        id: shownId, // la tabla sigue esperando key "id"
+        amount: (
+          <span className={amt >= 0 ? "positive" : "negative"}>
+            {amt >= 0 ? `+${amt.toFixed(2)}` : amt.toFixed(2)}
+          </span>
+        ),
+      };
+    });
+  }, [transactions]);
 
   const columns = [
-    { key: "id", label: "Transaction ID" },
+    { key: "id", label: "Transaction ID" }, // mostrará transfer_number si existe
     { key: "date", label: "Date" },
     { key: "amount", label: "Amount (USD)" },
     { key: "type", label: "Type" },
@@ -84,14 +145,20 @@ export default function WalletPage() {
         <div className="balanceCard">
           <div>
             <p className="balanceLabel">Your Balance:</p>
-            <p className="balanceAmount">${balance.toFixed(2)}</p>
+            <p className="balanceAmount">${Number(balance).toFixed(2)}</p>
           </div>
 
           <div className="buttons">
-            <button className="btn deposit" onClick={() => handleOpenPanel("Deposit")}>
+            <button
+              className="btn deposit"
+              onClick={() => handleOpenPanel("Deposit")}
+            >
               Deposit
             </button>
-            <button className="btn withdrawal" onClick={() => handleOpenPanel("Withdrawal")}>
+            <button
+              className="btn withdrawal"
+              onClick={() => handleOpenPanel("Withdrawal")}
+            >
               Withdrawal
             </button>
           </div>
@@ -99,15 +166,25 @@ export default function WalletPage() {
 
         <div className="section">
           <h2 className="sectionTitle">Transaction History</h2>
-          <DataTable mode="transactions" data={transactionsColored} columns={columns} />
+          <DataTable
+            mode="transactions"
+            data={transactionsForTable}
+            columns={columns}
+          />
         </div>
       </main>
 
       {showPanel && (
         <div className="sidePanel">
           <div className="panelHeader">
-            <h3>{actionType === "Deposit" ? "Send Money to App" : "Send Money to Bank"}</h3>
-            <button className="closeBtn" onClick={handleClosePanel}>×</button>
+            <h3>
+              {actionType === "Deposit"
+                ? "Send Money to App"
+                : "Send Money to Bank"}
+            </h3>
+            <button className="closeBtn" onClick={handleClosePanel}>
+              ×
+            </button>
           </div>
 
           <form className="panelForm" onSubmit={handleSubmit}>
@@ -132,6 +209,8 @@ export default function WalletPage() {
                 onChange={handleChange}
                 placeholder="Enter amount"
                 required
+                min="0.01"
+                step="0.01"
               />
             </div>
 
@@ -141,9 +220,8 @@ export default function WalletPage() {
                 type="text"
                 name="code"
                 value={formData.code}
-                onChange={handleChange}
-                placeholder="Enter code"
-                required
+                readOnly
+                title="Auto-generated code"
               />
             </div>
 
@@ -152,7 +230,6 @@ export default function WalletPage() {
             </button>
           </form>
 
-          {/* ✅ Usamos el Modal Component */}
           <Modal
             isOpen={showModal}
             title="Confirmation"
@@ -163,18 +240,24 @@ export default function WalletPage() {
               {actionType === "Deposit" ? "deposit" : "withdraw"}?
             </p>
 
-            <p style={{ marginTop: "8px", fontWeight: 600 }}>
-              {loggedInUser.name}
-            </p>
-            <p>{formData.bank || "Mandiri Bank"}</p>
-
-            <div style={{ marginTop: "10px", fontSize: "14px" }}>
+            <div
+              style={{
+                marginTop: "10px",
+                fontSize: "14px",
+              }}
+            >
               <p>You Send: USD {formData.amount}</p>
-              <p>They Receive: ID 718,612</p>
-              <p>Will Arrive On: 6 Sep 2025</p>
+              <p>Transfer Code: {formData.code}</p>
             </div>
 
-            <div style={{ marginTop: "18px", display: "flex", justifyContent: "center", gap: "12px" }}>
+            <div
+              style={{
+                marginTop: "18px",
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+              }}
+            >
               <button
                 onClick={confirmTransaction}
                 style={{
