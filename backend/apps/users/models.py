@@ -32,6 +32,7 @@ class Profile(models.Model):
     dpi = models.CharField(max_length=20, default='', blank=False)
     auth0_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
     profile_completed = models.BooleanField(default=False, blank=False)
+    has_used_referral = models.BooleanField(default=False, blank=False)
 
     state = models.ForeignKey(
         ProfileState,

@@ -31,9 +31,33 @@ export default function WalletPage() {
     fetchWalletData();
   }, []);
 
+  // --- Generador de códigos únicos (no repetidos) ---
+  const existingCodes = useMemo(() => {
+    // Usamos transfer_number si viene del backend, si no, usamos id.
+    return new Set(
+      (transactions || []).map((t) => String(t.transfer_number || t.id || ""))
+    );
+  }, [transactions]);
+
+  const generateUniqueCode = () => {
+    // Prefijo + fecha + random base36 (mayúsculas) => p.e. TRD-20251029-4G9Q2X
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+
+    let code = "";
+    do {
+      const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+      code = `TRD-${y}${m}${d}-${rand}`;
+    } while (existingCodes.has(code));
+    return code;
+  };
+
   const handleOpenPanel = (type) => {
-    setActionType(type); 
-    setFormData({ bank: "", amount: "", code: "" });
+    setActionType(type);
+    const autoCode = generateUniqueCode();
+    setFormData({ bank: "", amount: "", code: autoCode });
     setShowPanel(true);
   };
 
@@ -44,69 +68,70 @@ export default function WalletPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // No permitir edición manual del code
+    if (name === "code") return;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     const amountValue = parseFloat(formData.amount);
     if (isNaN(amountValue) || amountValue <= 0) {
-        alert("Please enter a valid amount.");
-        return;
+      alert("Please enter a valid amount.");
+      return;
     }
     setShowModal(true);
   };
 
   const confirmTransaction = async () => {
     try {
-        const payload = {
-            amount: parseFloat(formData.amount),
-            bank: formData.bank,
-            code: formData.code,
-        };
+      const payload = {
+        amount: parseFloat(formData.amount),
+        bank: formData.bank,
+        code: formData.code, // enviamos el código autogenerado
+      };
 
-        if (actionType === "Deposit") {
-            await api.post("/wallet/deposit/", payload);
-        } else if (actionType === "Withdrawal") {
-            await api.post("/wallet/withdraw/", payload);
-        } else {
-            alert("Unknown action type");
-            return;
-        }
+      if (actionType === "Deposit") {
+        await api.post("/wallet/deposit/", payload);
+      } else if (actionType === "Withdrawal") {
+        await api.post("/wallet/withdraw/", payload);
+      } else {
+        alert("Unknown action type");
+        return;
+      }
 
-        await fetchWalletData();
+      await fetchWalletData();
 
-        setShowPanel(false);
-        setShowModal(false);
-        alert(`Transaction ${actionType} successful!`);
+      setShowPanel(false);
+      setShowModal(false);
+      alert(`Transaction ${actionType} successful!`);
     } catch (err) {
-        console.error("Error sending transaction:", err);
-        alert("Transaction failed");
+      console.error("Error sending transaction:", err);
+      alert("Transaction failed");
     }
   };
 
   const cancelTransaction = () => setShowModal(false);
 
-  const transactionsColored = useMemo(() => {
-    return transactions.map((t) => ({
-      ...t,
-      amount: (
-        <span
-          className={
-            parseFloat(t.amount) >= 0 ? "positive" : "negative"
-          }
-        >
-          {parseFloat(t.amount) >= 0
-            ? `+${parseFloat(t.amount).toFixed(2)}`
-            : parseFloat(t.amount).toFixed(2)}
-        </span>
-      ),
-    }));
+  // Adaptamos el ID que verá la tabla: usar transfer_number si existe
+  const transactionsForTable = useMemo(() => {
+    return (transactions || []).map((t) => {
+      const shownId = t.transfer_number || t.id; // preferimos transfer_number
+      const amt = parseFloat(t.amount);
+      return {
+        ...t,
+        id: shownId, // la tabla sigue esperando key "id"
+        amount: (
+          <span className={amt >= 0 ? "positive" : "negative"}>
+            {amt >= 0 ? `+${amt.toFixed(2)}` : amt.toFixed(2)}
+          </span>
+        ),
+      };
+    });
   }, [transactions]);
 
   const columns = [
-    { key: "id", label: "Transaction ID" },
+    { key: "id", label: "Transaction ID" }, // mostrará transfer_number si existe
     { key: "date", label: "Date" },
     { key: "amount", label: "Amount (USD)" },
     { key: "type", label: "Type" },
@@ -143,7 +168,7 @@ export default function WalletPage() {
           <h2 className="sectionTitle">Transaction History</h2>
           <DataTable
             mode="transactions"
-            data={transactionsColored}
+            data={transactionsForTable}
             columns={columns}
           />
         </div>
@@ -184,6 +209,8 @@ export default function WalletPage() {
                 onChange={handleChange}
                 placeholder="Enter amount"
                 required
+                min="0.01"
+                step="0.01"
               />
             </div>
 
@@ -193,9 +220,8 @@ export default function WalletPage() {
                 type="text"
                 name="code"
                 value={formData.code}
-                onChange={handleChange}
-                placeholder="Enter code"
-                required
+                readOnly
+                title="Auto-generated code"
               />
             </div>
 
@@ -221,9 +247,7 @@ export default function WalletPage() {
               }}
             >
               <p>You Send: USD {formData.amount}</p>
-              {/* campos falsos no actualizaos de momento*/}
-              <p>They Receive: ID 718,612</p>
-              <p>Will Arrive On: 6 Sep 2025</p>
+              <p>Transfer Code: {formData.code}</p>
             </div>
 
             <div

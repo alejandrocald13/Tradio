@@ -5,6 +5,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+)
+
 from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
 from apps.transactions_all.serializers import (
     PurchaseTransactionSerializer,
@@ -39,12 +45,14 @@ def safe_date(obj):
     return ""
 
 
+@extend_schema(tags=["transactions"])
 class PurchaseTransactionViewSet(viewsets.ModelViewSet):
     queryset = PurchaseTransaction.objects.all().select_related("user", "stock")
     serializer_class = PurchaseTransactionSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["transactions"])
 class SaleTransactionViewSet(viewsets.ModelViewSet):
     queryset = SaleTransaction.objects.all().select_related("user", "stock")
     serializer_class = SaleTransactionSerializer
@@ -58,10 +66,22 @@ class AdminTransactionsReportView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["transactions"],
+        summary="Reporte admin de transacciones",
+        parameters=[
+            OpenApiParameter(name="type", required=False, type=str, description="Purchases | Sale"),
+            OpenApiParameter(name="stock", required=False, type=str, description="Símbolo del activo (p.ej., TSLA)"),
+            OpenApiParameter(name="email", required=False, type=str, description="Filtro por correo (icontains)"),
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
     def get(self, request):
-        tx_type = request.query_params.get("type")           
-        stock_symbol = request.query_params.get("stock")     
-        email_filter = request.query_params.get("email")   
+        tx_type = request.query_params.get("type")
+        stock_symbol = request.query_params.get("stock")
+        email_filter = request.query_params.get("email")
         date_from = request.query_params.get("date_from")
         date_to = request.query_params.get("date_to")
 
@@ -76,7 +96,6 @@ class AdminTransactionsReportView(APIView):
             purchase_qs = purchase_qs.filter(user__email__icontains=email_filter)
             sale_qs = sale_qs.filter(user__email__icontains=email_filter)
 
-       
         if date_from and date_to:
             def apply_date_filter(qs, fields):
                 for f in fields:
@@ -127,6 +146,15 @@ class UserPurchasesView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["transactions"],
+        summary="Compras del usuario autenticado",
+        parameters=[
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
     def get(self, request):
         user = request.user
         date_from = request.query_params.get("date_from")
@@ -165,6 +193,15 @@ class UserSalesView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["transactions"],
+        summary="Ventas del usuario autenticado",
+        parameters=[
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
     def get(self, request):
         user = request.user
         date_from = request.query_params.get("date_from")

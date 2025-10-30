@@ -15,6 +15,8 @@ from drf_spectacular.utils import (
 
 from apps.users.auth0_authentication import Auth0JWTAuthentication
 from apps.wallet.models import Wallet, Movement
+from apps.users.models import Profile
+
 
 
 TYPE_LABELS = {
@@ -130,10 +132,11 @@ class WalletMeView(APIView):
             human_type = TYPE_LABELS.get(mv.type, mv.type)
             movements.append({
                 "id": mv.id,
+                "transfer_number": mv.transfer_number,  # <--- añadido
                 "date": mv.created_at.date().isoformat(),
                 "amount": float(mv.total or mv.amount or 0),
                 "type": human_type,
-            })
+    })
 
         data = {
             "balance": float(wallet_obj.balance),
@@ -319,5 +322,89 @@ class WalletWithdrawView(APIView):
                 "date": mv.created_at.date().isoformat(),
                 "amount": float(mv.total),  # negativo
                 "type": TYPE_LABELS.get(mv.type, mv.type),
+            }
+        }, status=status.HTTP_200_OK)
+
+class ReferralApplyView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["wallet"],
+        summary="Usar un código de referido",
+        description=(
+            "El usuario autenticado ingresa un código de otra persona. "
+            "Se acreditan $5 al dueño del código y se registra un Movement en su wallet. "
+            "Restricciones: no puedes usar tu propio código y solo puedes usar un código una vez."
+        ),
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "code": {"type": "string"},
+                },
+                "required": ["code"],
+            }
+        },
+        responses={
+            200: OpenApiResponse(description="OK"),
+            400: OpenApiResponse(description="Bad Request"),
+            404: OpenApiResponse(description="Not Found"),
+        },
+    )
+    def post(self, request):
+        user = request.user
+        code = (request.data.get("code") or "").strip()
+
+        if not code:
+            return Response({"detail": "Debe proporcionar un código."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            my_profile = Profile.objects.select_related("user").get(user=user)
+        except Profile.DoesNotExist:
+            return Response({"detail": "Perfil del usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        if my_profile.has_used_referral:
+            return Response({"detail": "Ya usaste un código de referido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            owner_profile = Profile.objects.select_related("user").get(referral_code__iexact=code)
+        except Profile.DoesNotExist:
+            return Response({"detail": "Código inválido."}, status=status.HTTP_404_NOT_FOUND)
+
+        if owner_profile.user_id == user.id:
+            return Response({"detail": "No puedes usar tu propio código."}, status=status.HTTP_400_BAD_REQUEST)
+
+        credit_amount = Decimal("5.00")
+
+        with transaction.atomic():
+            owner_wallet, _ = Wallet.objects.select_for_update().get_or_create(
+                user=owner_profile.user,
+                defaults={"balance": Decimal("0.00")}
+            )
+            owner_wallet.balance = owner_wallet.balance + credit_amount
+            owner_wallet.save()
+
+            mv = Movement.objects.create(
+                user=owner_profile.user,
+                type="REFERRAL_CODE",
+                amount=credit_amount,
+                commission=Decimal("0.00"),
+                total=credit_amount,
+                transfer_number=code,  
+            )
+
+            my_profile.has_used_referral = True
+            my_profile.save(update_fields=["has_used_referral"])
+
+        return Response({
+            "detail": "Código aplicado correctamente. Se acreditaron $5 al dueño del código.",
+            "credited_user": owner_profile.user.email,
+            "movement": {
+                "id": mv.id,
+                "date": mv.created_at.date().isoformat(),
+                "amount": float(mv.total),
+                "type": "Referral Bonus",
+                "transfer_number": mv.transfer_number,
             }
         }, status=status.HTTP_200_OK)
