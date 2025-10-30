@@ -1,23 +1,23 @@
 import axios from "axios";
-import { getToken } from "@/app/utils/getToken"; 
+import getToken from "./getToken";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: {
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-  },
-  withCredentials: false,
+    },
+    withCredentials: false,
 });
 
 api.interceptors.request.use(async (config) => {
-  try {
-    const token = await getToken(); 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+        const token = await getToken(); 
+        if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        }
+    } catch (error) {
+        console.warn("No se pudo obtener el token:", error);
     }
-  } catch (error) {
-    console.warn("No se pudo obtener el token:", error);
-  }
-  return config;
+    return config;
 });
