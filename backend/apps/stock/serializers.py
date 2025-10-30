@@ -68,8 +68,10 @@ class HistoryDataSerializer(serializers.Serializer):
 
 
 class HistoryResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     stock = serializers.CharField()
     symbol = serializers.CharField()
+    exchange = serializers.CharField()
     last = serializers.FloatField()
     days = serializers.IntegerField()
     interval = serializers.CharField()

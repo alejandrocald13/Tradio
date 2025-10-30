@@ -1,29 +1,50 @@
 "use client";
 
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import ActionCard from "../components/ActionCard";
 import SidebarNav from "../components/SidebarNav-Auth";
+import ActionCard from "../components/ActionCard";
 import MiniChart from "../components/MiniChart";
 import Searcher from "../components/Searcher";
-import { MOCK } from "../data/mockQuotes";
+import { api } from "@/app/lib/axios";
 import "./actions.css";
 import "../styles/sharedActionDetail.css";
 
 export default function Actions() {
+    const lastTyped = useRef("");
     const router = useRouter();
-    const symbols = Object.keys(MOCK);
+    const [stocks, setStocks] = useState([]);
+    const [symbols, setSymbols] = useState([]);
     const trendClass = { up: "td-up", down: "td-down", neutral: "td-neutral" };
 
+    useEffect(() => {
+        const fetchStocks = async () => {
+            try {
+                const { data } = await api.get("/stocks-history/all_history/");
+                setStocks(data.stocks);
+                setSymbols(data.stocks.map((s) => s.symbol.toUpperCase())); 
+            } catch (error) {
+                console.error("Error fetching stocks:", error);
+            }
+        };
+        fetchStocks();
+    }, []);
+
     const getValue = (value) => {
-        if (!value) return;
-
-        const searchTerm = value.trim().toUpperCase();
-        const foundSymbol = symbols.find((sym) => sym.toUpperCase() === searchTerm);
-        const basePath = "/actions";
-        const targetSymbol = foundSymbol || searchTerm;
-
-        router.push(`${basePath}/${targetSymbol}`);
+        const cleaned = value.trim().toUpperCase();
+        if (cleaned !== "") {
+            lastTyped.current = cleaned;
+            return;
+        }
+        if (lastTyped.current) {
+            const exists = symbols.includes(lastTyped.current);
+            if (exists) {
+                router.push(`/actions/${lastTyped.current}`);
+            }
+        }
+        lastTyped.current = "";
     };
+
 
     return (
         <>
@@ -31,28 +52,27 @@ export default function Actions() {
             <div className="page-container">
                 <div className="action-container">
                     <div className="search-divspace">
-                        <Searcher placeholderI="Search by symbol" getValue={getValue} />
+                        <Searcher symbols={symbols} placeholderI="Search by symbol" getValue={getValue} />
                     </div>
 
                     <div className="cards-divspace">
-                        {symbols.map((sym) => {
-                            const data = MOCK[sym];
-                            const changeAbs = data.last - data.prevClose;
-                            const changePct = data.prevClose ? (changeAbs / data.prevClose) * 100 : 0;
-                            const sign = changeAbs > 0 ? "+" : changeAbs < 0 ? "-" : "";
-                            const amountText = `${sign}${Math.abs(changeAbs).toFixed(2)}`;
-                            const pctText = `(${sign}${Math.abs(changePct).toFixed(2)}%)`;
+                        {stocks.map((stock) => {
+                            const todayPrices = stock.data.c.map(Number);
+                            const last = Number(stock.current_price);
+                            const first = todayPrices[0];
+                            let changeAbs = last - first;
+                            let changePct = (changeAbs / first) * 100;
                             const trend = changeAbs > 0 ? "up" : changeAbs < 0 ? "down" : "neutral";
 
                             return (
                                 <ActionCard
-                                    key={sym}
-                                    symbol={sym}
-                                    actionName={data.name}
-                                    price={`$${data.last.toLocaleString()}`}
-                                    changeText={`${amountText} ${pctText}`}
+                                    key={stock.symbol}
+                                    symbol={stock.symbol}
+                                    actionName={stock.name}
+                                    price={`$${last.toFixed(2)}`}
+                                    changeText={`${changeAbs.toFixed(2)} (${changePct.toFixed(2)}%)`}
                                     variantClass={trendClass[trend]}
-                                    graphic={<MiniChart data={data.intraday} />}
+                                    graphic={<MiniChart data={todayPrices} />}
                                 />
                             );
                         })}

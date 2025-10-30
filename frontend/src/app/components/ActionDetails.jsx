@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import BigChart from "./BigChart";
 import SlideActionPanel from "./SlideActionPanel";
 import BuySellContent from "./BuySellContent";
@@ -11,17 +11,19 @@ export default function ActionDetails({
   price = 0,
   change = "—",
   changeTone = "neutral",
-  tabs = ["1D","5D","1M","6M","1Y","5Y"],
+  tabs = ["1D", "5D", "1M", "6M", "1Y", "5Y"],
   dataByTab = {},
   isPublic = false,
+  currentTab,
+  onTabChange,
+  id = 0,
 }) {
   const [isBuyOpen, setIsBuyOpen] = useState(false);
   const [isSellOpen, setIsSellOpen] = useState(false);
-  const [tab, setTab] = useState(tabs[0] ?? "1D");
 
   const { data = [], labels = [], ref } = useMemo(
-    () => dataByTab[tab] || {},
-    [tab, dataByTab]
+    () => dataByTab[currentTab] || {},
+    [currentTab, dataByTab]
   );
 
   const refLine = Number.isFinite(Number(ref)) ? Number(ref) : undefined;
@@ -30,6 +32,28 @@ export default function ActionDetails({
     changeTone === "up"   ? "td-up"   :
     changeTone === "down" ? "td-down" :
     "td-neutral";
+
+  const isMarketOpen = () => {
+    const now = new Date();
+
+    const guatemalaTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'America/Guatemala' })
+    );
+
+    const day = guatemalaTime.getDay();
+    if (day === 0 || day === 6) return false;
+
+    const hour = guatemalaTime.getHours();
+    const minute = guatemalaTime.getMinutes();
+    const currentTime = hour * 60 + minute;
+
+    const startTime = 8 * 60;
+    const endTime = 20 * 60;
+
+    return currentTime >= startTime && currentTime <= endTime;
+  };
+
+  const marketClosed = !isMarketOpen();
 
   return (
     <div className="td-card">
@@ -42,15 +66,17 @@ export default function ActionDetails({
           {!isPublic && (
             <>
               <button
-                onClick={() => setIsBuyOpen(true)}
-                className="td-button-bs td-button-bs-primary"
+                onClick={() => !marketClosed && setIsBuyOpen(true)}
+                disabled={marketClosed}
+                className={`td-button-bs td-button-bs-primary ${marketClosed ? "td-disabled-market" : ""}`}
               >
                 Buy
               </button>
 
               <button
-                onClick={() => setIsSellOpen(true)}
-                className="td-button-bs"
+                onClick={() => !marketClosed && setIsSellOpen(true)}
+                disabled={marketClosed}
+                className={`td-button-bs ${marketClosed ? "td-disabled-market" : ""}`}
               >
                 Sell
               </button>
@@ -69,8 +95,8 @@ export default function ActionDetails({
           <button
             key={t}
             type="button"
-            onClick={() => setTab(t)}
-            className={`td-tab ${t === tab ? "td-active" : ""}`}
+            onClick={() => onTabChange(t)}
+            className={`td-tab ${t === currentTab ? "td-active" : ""}`}
           >
             {t}
           </button>
@@ -79,7 +105,7 @@ export default function ActionDetails({
 
       <div className="td-chartBox">
         <BigChart
-          chartKey={`${title}-${tab}`}
+          chartKey={`${title}-${currentTab}`}
           data={data}
           labels={labels}
           refLine={refLine}
@@ -90,6 +116,7 @@ export default function ActionDetails({
 
       <SlideActionPanel isOpen={isBuyOpen} onClose={() => setIsBuyOpen(false)}>
         <BuySellContent
+          id={id}
           mode="buy"
           data={{ title, subtitle, price, funds: 500 }}
           isOpen={isBuyOpen}
@@ -100,6 +127,7 @@ export default function ActionDetails({
 
       <SlideActionPanel isOpen={isSellOpen} onClose={() => setIsSellOpen(false)}>
         <BuySellContent
+          id={id}
           mode="sell"
           data={{ title, subtitle, price }}
           isOpen={isSellOpen}

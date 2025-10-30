@@ -12,6 +12,8 @@ from ..serializers import (
     ErrorResponseSerializer
 )
 from ..permissions import IsAdminOrReadOnly
+from ...users.actions import Action
+from ...users.utils import log_action
 
 
 @extend_schema(tags=['stocks-history'])
@@ -73,6 +75,7 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
             stock_db = Stock.objects.get(symbol=symbol.upper(), is_active=True)
             current_price_db = float(stock_db.current_price)
             stock_name = str(stock_db.name)
+            exchange = str(stock_db.exchange)
         except Stock.DoesNotExist:
             return Response(
                 {"error": "Stock not found in database"},
@@ -82,6 +85,9 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
         try:
             stock = yf.Ticker(symbol.upper())
             end_date = datetime.now()
+            if end_date.weekday() >= 5:
+                days_to_subtract = end_date.weekday() - 4
+                end_date -= timedelta(days=days_to_subtract)
             start_date = end_date - timedelta(days=days)
             
             hist = stock.history(start=start_date, end=end_date, interval=interval)
@@ -101,8 +107,10 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
             
             return Response(
                 {
+                    "id": stock_db.id,
                     "stock": stock_name,
                     "symbol": symbol.upper(),
+                    "exchange": exchange,
                     "last": current_price_db,
                     "days": days,
                     "interval": interval,
@@ -138,12 +146,19 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
+        end_date = datetime.now()
+        if end_date.weekday() >= 5:
+            days_to_subtract = end_date.weekday() - 4
+            end_date = end_date - timedelta(days=days_to_subtract)
+        
+        start_date = end_date - timedelta(days=1)
+        
         results = []
         
         for stock_db in stocks:
             try:
                 ticker = yf.Ticker(stock_db.symbol)
-                hist = ticker.history(period='5d', interval='1d')
+                hist = ticker.history(start=start_date, end=end_date, interval='1h')
                 
                 if not hist.empty:
                     hist = hist.tail(7)
@@ -158,7 +173,6 @@ class StockHistoryViewSet(viewsets.GenericViewSet):
                     close_prices.append(current_price_db)
 
                     open_price = float(close_prices[0])
-                
                     change_percentage = round(((current_price_db - open_price) / open_price) * 100, 2)           
 
                     results.append({

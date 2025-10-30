@@ -135,3 +135,51 @@
   pointer-events: none;
   z-index: 20;
 }
+
+.td-disabled-market {
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.td-disabled-market::after {
+  content: "Market closed\A (Mon–Fri, 8:00 to 20:00)";
+  position: absolute;
+  top: -48px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #354642;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: pre;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.td-disabled-market:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.td-disabled-market::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #354642;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.td-disabled-market:hover::before {
+  opacity: 1;
+}
