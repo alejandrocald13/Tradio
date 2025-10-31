@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./referrals.module.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import { api } from "../lib/axios";
+import Modal from "../components/Modal";
 
 export default function ReferralsPage() {
   const [generatedCode, setGeneratedCode] = useState("");
@@ -11,31 +12,63 @@ export default function ReferralsPage() {
   const [tab, setTab] = useState("referrals");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", body: null });
 
-  // Mostrar el código de referido propio desde /users/me
+
+  const showModal = (title, content) => {
+    setModalContent({
+      title,
+      body: (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "20px",
+            textAlign: "center",
+          }}
+        >
+          {typeof content === "string" ? <p>{content}</p> : content}
+          <button
+            className={styles.sendBtn}
+            onClick={() => setIsModalOpen(false)}
+            style={{ width: "100px" }}
+          >
+            OK
+          </button>
+        </div>
+      ),
+    });
+    setIsModalOpen(true);
+  };
+
+  
   const handleShowCode = async () => {
     try {
       setLoading(true);
       const res = await api.get("/users/me");
       const code = res?.data?.profile?.referral_code || "";
+
       if (!code) {
-        alert("Aún no tienes código de referido configurado.");
+        showModal("Aviso", "Aún no tienes código de referido configurado.");
         setGeneratedCode("");
         return;
       }
+
       setGeneratedCode(code.toUpperCase());
     } catch (err) {
       console.error("Error al obtener el código:", err);
-      alert("No se pudo obtener tu código. Intenta de nuevo.");
+      showModal("Error", "No se pudo obtener tu código. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Usar el código de otra persona (envía POST a /wallet/referral/apply/)
+ 
   const handleSubmitReferral = async () => {
     if (!referralInput) {
-      alert("Por favor ingresa un código de referido.");
+      showModal("Alerta", "Por favor ingresa un código de referido.");
       return;
     }
 
@@ -47,16 +80,17 @@ export default function ReferralsPage() {
 
       if (res.status === 200) {
         const detail = res.data?.detail || "Código aplicado correctamente.";
-        alert(`${detail}\nDueño del código: ${res.data?.credited_user}`);
+        const creditedUser = res.data?.credited_user || "Usuario desconocido";
+        showModal("Éxito", `${detail}\nDueño del código: ${creditedUser}`);
       } else {
-        alert("No se pudo aplicar el código. Intenta de nuevo.");
+        showModal("Error", "No se pudo aplicar el código. Intenta de nuevo.");
       }
     } catch (err) {
       console.error("Error aplicando código:", err);
       const msg =
         err.response?.data?.detail ||
         "Ocurrió un error al usar el código. Verifica que sea válido.";
-      alert(msg);
+      showModal("Error", msg);
     } finally {
       setSubmitting(false);
       setReferralInput("");
@@ -65,7 +99,7 @@ export default function ReferralsPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      <SidebarNav/>
+      <SidebarNav />
 
       <main className={styles.main}>
         <div className={styles.container}>
@@ -93,9 +127,7 @@ export default function ReferralsPage() {
               </div>
 
               <div className={styles.cardRight}>
-                <div className={styles.codeDisplay}>
-                  {generatedCode || ""}
-                </div>
+                <div className={styles.codeDisplay}>{generatedCode || ""}</div>
               </div>
             </div>
 
@@ -128,6 +160,15 @@ export default function ReferralsPage() {
           </section>
         </div>
       </main>
+
+     
+      <Modal
+        isOpen={isModalOpen}
+        title={modalContent.title}
+        onClose={() => setIsModalOpen(false)}
+      >
+        {modalContent.body}
+      </Modal>
     </div>
   );
 }
