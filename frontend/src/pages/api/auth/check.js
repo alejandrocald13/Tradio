@@ -11,15 +11,16 @@ export default async function handler(req, res) {
     }
 
     const accessToken = session.user?.accessToken;
+    const idToken = session.user?.idToken;
 
     if (!accessToken) {
       console.log("Sesión encontrada, pero sin accessToken");
       return res.status(401).json({ status: "no_token" });
     }
 
-    console.log("Token leído desde sesión:", accessToken);
+    // console.log("Token leído desde sesión:", accessToken);
 
-    const response = await api.post("/auth/login/", { auth0_token: accessToken });
+    const response = await api.post("/auth/login/", { auth0_token: idToken });
 
     const rawSetCookie = response.headers.get("set-cookie");
     const data = response.data

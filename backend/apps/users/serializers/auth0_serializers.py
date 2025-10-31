@@ -92,7 +92,7 @@ class Auth0UserLoginSerializer(serializers.Serializer):
         if profile:
             return profile.user
                 
-        base_username = slugify(name.replace(" ", "")) or "user"
+        base_username = slugify(name.replace(" ", ""))
         username = base_username
         counter = 1
 

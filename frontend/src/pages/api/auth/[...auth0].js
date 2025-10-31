@@ -6,6 +6,7 @@ export default handleAuth({
       await handleCallback(req, res, {
         afterCallback: async (_req, _res, session) => {
           session.user.accessToken = session.accessToken;
+          session.user.idToken = session.idToken;
           return session;
         },
       });
