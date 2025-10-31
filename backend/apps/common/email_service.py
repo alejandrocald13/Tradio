@@ -10,7 +10,6 @@ def send_welcome_email(user, dashboard_url=None, support_email=None):
             "name": getattr(prof, "name", ""),
             "email": getattr(user, "email", ""),
         },
-        "dashboard_url": dashboard_url or "https://localhost:3000/landing",
         "now": now(),
         "support_email": support_email or "soporte@tradio.com",
     }
@@ -60,7 +59,6 @@ def send_admin_new_user_email(admin_email, user, dashboard_url=None):
             "email": getattr(user, "email", ""),
         },
         "authentic_method": auth_method,
-        "dashboard_url": dashboard_url or "https://localhost:3000/",
         "created_at": getattr(user, "date_joined", now()),
     }
 
@@ -78,7 +76,6 @@ def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_em
             "email": getattr(user, "email", ""),
         },
         "trade": trade,
-        "trade_detail_url": trade_detail_url or "https://localhost:3000/transaction",
         "support_email": support_email or "soporte@tradio.com",
     }
 
@@ -96,16 +93,15 @@ def send_wallet_movement_email(user, movement, wallet_url=None, support_email=No
             "email": getattr(user, "email", ""),
         },
         "movement": movement,
-        "wallet_url": wallet_url or "https://localhost:3000/wallet",
         "support_email": support_email or "soporte@tradio.com",
     }
 
-    subject = f"Tradio | {movement.get('type','').title()} de wallet Q{movement.get('amount','')}"
+    subject = f"Tradio | {movement.get('type','').title()} de wallet ${movement.get('amount','')}"
     template = "emails/wallet_movement.html"
     send_email_task.delay(user.email, subject, template, context)
 
 
-def send_report_ready_email(user, period_from, period_to, support_email=None, attachment_path=None):
+def send_report_ready_email(user, period_from, period_to, support_email=None, pdf_base64=None):
     prof = getattr(user, "profile", None)
 
     context = {
@@ -123,4 +119,5 @@ def send_report_ready_email(user, period_from, period_to, support_email=None, at
 
     subject = "Tradio | Tu reporte está listo"
     template = "emails/report_ready.html"
-    send_email_task.delay(user.email, subject, template, context, attachment_path)
+
+    send_email_task.delay(user.id, subject, template, context, pdf_base64)

@@ -1,5 +1,5 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | {{ movement.type|title }} de wallet Q{{ movement.amount }}{% endblock %}
+{% block subject %}Tradio | {{ movement.type|title }} de wallet ${{ movement.amount }}{% endblock %}
 
 {% block content %}
   <div style="display:none;max-height:0;overflow:hidden;">Tu saldo ha cambiado.</div>
@@ -9,14 +9,14 @@
 
   <table class="table" role="table" aria-label="Detalle de movimiento">
     <tr><th scope="row">Tipo</th><td>{{ movement.type|title }}</td></tr>
-    <tr><th scope="row">Monto</th><td>Q{{ movement.amount }}</td></tr>
+    <tr><th scope="row">Monto</th><td>${{ movement.amount }}</td></tr>
     <tr><th scope="row">Referencia</th><td>{{ movement.reference }}</td></tr>
-    <tr><th scope="row">Saldo posterior</th><td>Q{{ movement.balance_after }}</td></tr>
+    <tr><th scope="row">Saldo posterior</th><td>${{ movement.balance_after }}</td></tr>
     <tr><th scope="row">Fecha/hora</th><td>{{ movement.created_at }}</td></tr>
   </table>
 
   <p style="margin:16px 0 0;">
-    <a class="btn-outline" href="{{ wallet_url|default:'#' }}">Ver wallet</a>
+    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">Ir a Tradio</a>
   </p>
 
   <div class="hr"></div>

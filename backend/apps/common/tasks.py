@@ -1,39 +1,60 @@
 from celery import shared_task
 from django.template.loader import render_to_string
-import os
-import base64
+from django.contrib.auth.models import User
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+from sendgrid.helpers.mail import (
+    Mail,
+    Attachment,
+    FileContent,
+    FileName,
+    FileType,
+    Disposition,
+)
+import os
+
 
 @shared_task(bind=True, name="apps.common.tasks.send_email_task")
+def send_email_task(self, user_id, subject, template_name, context, pdf_base64=None):
+    """
+    Envía un correo con SendGrid usando un template HTML.
+    Si se pasa pdf_base64, se adjunta como archivo PDF.
+    """
 
-def send_email_task(self, to_email, subject, template_name, context, attachment_path=None):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return {"status": "skipped", "reason": "user deleted"}
+
     html_content = render_to_string(template_name, context)
 
     message = Mail(
-        from_email=os.environ.get('FROM_EMAIL', 'no-reply@example.com'),
-        to_emails=to_email,
+        from_email=os.environ.get("FROM_EMAIL"),
+        to_emails=user.email,
         subject=subject,
-        html_content=html_content
+        html_content=html_content,
     )
 
-    if attachment_path and os.path.exists(attachment_path):
-        with open(attachment_path, "rb") as f:
-            file_data = f.read()
-            encoded_file = base64.b64encode(file_data).decode()
+    if pdf_base64:
 
-        attached_file = Attachment(
-            FileContent(encoded_file),
-            FileName(os.path.basename(attachment_path)),
+        attachment = Attachment(
+            FileContent(pdf_base64),
+            FileName(f"T_{context['report']['from']}_{context['report']['to']}.pdf"),
             FileType("application/pdf"),
             Disposition("attachment"),
         )
-        message.attachment = attached_file
+        message.attachment = attachment
 
-    sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    response = sg.send(message)
-    return {
-        "status_code": response.status_code,
-        "to": to_email,
-        "subject": subject,
-    }
+    try:
+        sg = SendGridAPIClient(os.environ["SENDGRID_API_KEY"])
+        response = sg.send(message)
+        return {
+            "status": "sent",
+            "from": os.environ.get("FROM_EMAIL"),
+            "to": user.email,
+            "subject": subject,
+            "code": response.status_code,
+        }
+
+    except Exception as e:
+        self.retry(exc=e, countdown=10, max_retries=3)
+        return {"status": "error", "error": str(e)}

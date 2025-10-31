@@ -25,13 +25,9 @@ def generate_report_pdf(user, from_date, to_date, data, request=None):
 
     pdf_content = HTML(string=html_string, base_url=base_url).write_pdf()
 
-    tmp_dir = tempfile.gettempdir()
-
     filename = f"TReport_{from_date}_{to_date}.pdf"
-    
-    file_path = os.path.join(tmp_dir, filename)
     
     response = HttpResponse(pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
-    return response, file_path
+    return response, pdf_content
