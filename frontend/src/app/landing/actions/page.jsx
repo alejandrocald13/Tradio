@@ -97,7 +97,7 @@ export default function ActionsPage() {
         <div className={styles.logo}></div>
         <nav>
           <ul className={styles.menu}>
-            <li><a href="/landing" className={styles.link}>HOME</a></li>
+            <li><a href="/" className={styles.link}>HOME</a></li>
             <li><a href="/landing/actions" className={`${styles.link} ${styles.active}`}>ACTION</a></li>
             <li><a href="/landing/about-us" className={styles.link}>ABOUT US</a></li>
           </ul>
