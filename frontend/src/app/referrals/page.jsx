@@ -70,13 +70,13 @@ export default function ReferralsPage() {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.headerRow}>
-            <h1 className={styles.title}>Código de referidos</h1>
+            <h1 className={styles.title}>Referral code</h1>
           </div>
 
           <p className={styles.description}>
-            Invita a tus amigos a unirse y gana. <br />
-            Cada persona que se registre con tu código hará que recibas{" "}
-            <strong>$5 de regalo.</strong>
+            Invite your friends to join and win. <br />
+            Each person who registers with your code will earn you{" "}
+            <strong>$5 in rewards.</strong>
           </p>
 
           <section className={styles.cards}>
@@ -88,7 +88,7 @@ export default function ReferralsPage() {
                   onClick={handleShowCode}
                   disabled={loading}
                 >
-                  {loading ? "Cargando..." : "Mostrar código"}
+                  {loading ? "loading..." : "Show code"}
                 </button>
               </div>
 
@@ -102,7 +102,7 @@ export default function ReferralsPage() {
             {/* Usar código */}
             <div className={styles.card}>
               <div className={styles.cardLeftLabel}>
-                Ingresar código de <br /> referido
+                Enter referral <br /> code
               </div>
 
               <div className={styles.cardRight}>
@@ -110,7 +110,7 @@ export default function ReferralsPage() {
                   <input
                     className={styles.codeInput}
                     type="text"
-                    placeholder="Código"
+                    placeholder="Code"
                     value={referralInput}
                     onChange={(e) => setReferralInput(e.target.value)}
                     disabled={submitting}
@@ -120,7 +120,7 @@ export default function ReferralsPage() {
                     onClick={handleSubmitReferral}
                     disabled={submitting}
                   >
-                    {submitting ? "Enviando..." : "Enviar"}
+                    {submitting ? "Sending..." : "Send"}
                   </button>
                 </div>
               </div>
