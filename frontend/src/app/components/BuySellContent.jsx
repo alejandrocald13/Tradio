@@ -119,9 +119,7 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
 
                     <div className="slide-info">
                         {isBuy && (
-                            <p>
-                                <p><strong>{fundsLabel}</strong> ${funds.toFixed(2)}</p>
-                            </p>
+                            <p><strong>{fundsLabel}</strong> ${funds.toFixed(2)}</p>
                         )}
                         <p> <strong>{priceLabel}</strong> ${numPrice.toFixed(2)} </p>
                         {!isBuy && (

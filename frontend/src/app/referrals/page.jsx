@@ -65,7 +65,7 @@ export default function ReferralsPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      <SidebarNav activeTab={tab} setTab={setTab} />
+      <SidebarNav/>
 
       <main className={styles.main}>
         <div className={styles.container}>
