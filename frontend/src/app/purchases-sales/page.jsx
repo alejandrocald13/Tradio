@@ -60,13 +60,13 @@ export default function ComprasVentasPage() {
 
     return {
       metrics: {
-        "Total vendido": `$${totalVendido.toFixed(2)}`,
-        "Total comprado": `$${totalComprado.toFixed(2)}`,
-        "Balance General": `$${balanceGeneral.toFixed(2)}`,
+        "Total sales": `$${totalVendido.toFixed(2)}`,
+        "Total purchases": `$${totalComprado.toFixed(2)}`,
+        "Overall Balance": `$${balanceGeneral.toFixed(2)}`,
       },
       graphData: {
-        clasificacion: ["Compra", "Venta"],
-        name: "Compras/Ventas",
+        clasificacion: ["Purchase", "Sale"],
+        name: "Purchases/Sales",
         dataL: [totalComprado, totalVendido],
         widthSend: 200,
         heightSend: 200,
@@ -125,19 +125,19 @@ export default function ComprasVentasPage() {
   const currentData = tab === "compras" ? comprasData : ventasData;
 
   const columnsCompras = [
-    { key: "accion", label: "Acción" },
-    { key: "compra", label: "Compra" },
-    { key: "cantidad", label: "# Acciones" },
-    { key: "fecha", label: "Fecha compra" },
+    { key: "accion", label: "Action" },
+    { key: "compra", label: "Purchase" },
+    { key: "cantidad", label: "# Actions" },
+    { key: "fecha", label: "Purchase Date" },
   ];
 
   const columnsVentas = [
-    { key: "accion", label: "Acción" },
-    { key: "compra", label: "Compra" },
-    { key: "venta", label: "Venta" },
+    { key: "accion", label: "Action" },
+    { key: "compra", label: "Purchase" },
+    { key: "venta", label: "Sale" },
     { key: "pct", label: "%" },
-    { key: "cantidad", label: "# Acciones" },
-    { key: "fecha", label: "Fecha venta" },
+    { key: "cantidad", label: "# Actions" },
+    { key: "fecha", label: "Sale Date" },
   ];
 
   return (
@@ -151,14 +151,14 @@ export default function ComprasVentasPage() {
               <ArrowLeft size={28} />
             </button>
             <h1 className={styles.title}>
-              {tab === "compras" ? "Compras" : "Ventas"}
+              {tab === "compras" ? "Purchases" : "Sales"}
             </h1>
             <div style={{ width: 28 }} />
           </div>
 
           <div className={styles.contenedorFiltro}>
             <div className={styles.dateFilter}>
-              <label className={styles.dateLabel}>Desde:</label>
+              <label className={styles.dateLabel}>Since:</label>
               <input
                 type="date"
                 className={styles.dateInput}
@@ -166,7 +166,7 @@ export default function ComprasVentasPage() {
                 onChange={(e) => setDateFrom(e.target.value)}
               />
 
-              <label className={styles.dateLabel}>Hasta:</label>
+              <label className={styles.dateLabel}>To:</label>
               <input
                 type="date"
                 className={styles.dateInput}
@@ -203,7 +203,7 @@ export default function ComprasVentasPage() {
                 }`}
                 onClick={() => setTab("compras")}
               >
-                Compras
+                Purchases
               </button>
               <button
                 className={`${styles.switchBtn} ${
@@ -211,7 +211,7 @@ export default function ComprasVentasPage() {
                 }`}
                 onClick={() => setTab("ventas")}
               >
-                Ventas
+                Sales
               </button>
             </div>
           </div>
