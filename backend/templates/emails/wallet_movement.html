@@ -5,7 +5,7 @@
   <div style="display:none;max-height:0;overflow:hidden;">Tu saldo ha cambiado.</div>
 
   <h2 style="margin:0 0 8px;font-size:20px;">Movimiento de wallet</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.first_name|default:user.username }}, registramos el siguiente movimiento en tu wallet.</p>
+  <p style="margin:0 0 12px;">Hola {{ user.name }}, registramos el siguiente movimiento en tu wallet.</p>
 
   <table class="table" role="table" aria-label="Detalle de movimiento">
     <tr><th scope="row">Tipo</th><td>{{ movement.type|title }}</td></tr>
