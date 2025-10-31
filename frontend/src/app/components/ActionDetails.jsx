@@ -33,27 +33,27 @@ export default function ActionDetails({
     changeTone === "down" ? "td-down" :
     "td-neutral";
 
-  const isMarketOpen = () => {
-    const now = new Date();
+  // const isMarketOpen = () => {
+  //   const now = new Date();
 
-    const guatemalaTime = new Date(
-      now.toLocaleString('en-US', { timeZone: 'America/Guatemala' })
-    );
+  //   const guatemalaTime = new Date(
+  //     now.toLocaleString('en-US', { timeZone: 'America/Guatemala' })
+  //   );
 
-    const day = guatemalaTime.getDay();
-    if (day === 0 || day === 6) return false;
+  //   const day = guatemalaTime.getDay();
+  //   if (day === 0 || day === 6) return false;
 
-    const hour = guatemalaTime.getHours();
-    const minute = guatemalaTime.getMinutes();
-    const currentTime = hour * 60 + minute;
+  //   const hour = guatemalaTime.getHours();
+  //   const minute = guatemalaTime.getMinutes();
+  //   const currentTime = hour * 60 + minute;
 
-    const startTime = 8 * 60;
-    const endTime = 20 * 60;
+  //   const startTime = 8 * 60;
+  //   const endTime = 20 * 60;
 
-    return currentTime >= startTime && currentTime <= endTime;
-  };
+  //   return currentTime >= startTime && currentTime <= endTime;
+  // };
 
-  const marketClosed = !isMarketOpen();
+  const marketClosed = false;
 
   return (
     <div className="td-card">

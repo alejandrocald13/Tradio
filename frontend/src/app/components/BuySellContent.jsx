@@ -46,16 +46,16 @@ export default function BuySellContent({ id, mode = "buy", data = {}, isOpen, on
     }, [isOpen]);
 
     useEffect(() => {
-        const fetchWallet = async () => {
+        const fetchWalletBalance = async () => {
             try {
-                const { data } = await api.get("/wallet/balance/");
-                setFunds(Number(data.balance));
+                const res = await api.get("/wallet/me/");
+                setFunds(res.data.balance || 0);
             } catch (err) {
-                console.error("Error loading wallet balance:", err);
+                console.error("Error fetching wallet balance:", err);
             }
         };
 
-        if (isOpen) fetchWallet();
+        if (isOpen) fetchWalletBalance();
     }, [isOpen]);
 
     useEffect(() => {

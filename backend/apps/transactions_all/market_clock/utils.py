@@ -2,10 +2,14 @@ from datetime import datetime, time
 import pytz
 
 def is_open():
-    tz = pytz.timezone("America/New_York")
+    tz = pytz.timezone("America/Guatemala")
     now = datetime.now(tz)
-    if now.weekday() >= 5:
+
+    if now.weekday() in (5, 6):
         return False
-    open_time = time(9, 30)
-    close_time = time(16, 0)
-    return open_time <= now.time() <= close_time
+
+    open_time = time(8, 0)
+    close_time = time(20, 0) 
+
+    # return open_time <= now.time() <= close_time
+    return True
