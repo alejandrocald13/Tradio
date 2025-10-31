@@ -4,6 +4,8 @@ from apps.reports.utils import validate_dates
 from apps.reports.services import generate_report_pdf
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
+import base64
+
 
 # non-repudiation
 from apps.users.utils import log_action
@@ -63,15 +65,16 @@ class ReportesEstadoView(APIView):
 
         pdf_data = get_financial_report_data(user, from_date, to_date)
 
-        response, file_path = generate_report_pdf(user, from_date, to_date, pdf_data, request=request)
+        response, pdf_content = generate_report_pdf(user, from_date, to_date, pdf_data, request=request)
+        
+        pdf_base64 = base64.b64encode(pdf_content).decode()
 
         try:
             send_report_ready_email(
-                user,
+                user, 
                 from_date,
-                to_date,
-                None,
-                attachment_path=file_path,
+                to_date, 
+                pdf_base64=pdf_base64
             )
         except Exception as e:
             logger.warning(f"Error al enviar correo de reporte a {user.email}: {e}")
