@@ -103,8 +103,11 @@
     cursor: pointer;
 }
 
-.action-card-content-admin{
-    height: 100%;
+.action-card-content-admin {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 7rem;
 }
 
 .actions-summary-container {
@@ -132,36 +135,51 @@
 
 .summary-actions-list {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 0.2rem;
+    gap: 1rem;
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.action-info-group {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    max-height: 33.7rem;
-    overflow-y: auto;
+    gap: 0.6rem;
+    text-align: center;
 }
 
 .price-action-do-admin {
-    display: flex;
-    font-size: 18px;
-    margin: 10px 0 10px 0;
-    justify-content: center;
-}
-
-.category-action-do {
-    display: flex;
-    font-size: 18px;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-}
-
-.status-action-do {
-    display: flex;
-    font-size: 18px;
-    justify-content: right;
     font-size: 18px;
     color: #4E635E;
 }
 
+.category-action-do {
+    font-size: 18px;
+    color: #4E635E;
+    margin: 0;
+}
+
+.status-action-do {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 18px;
+    color: #4E635E;
+    margin-top: auto;
+}
+
 .status-action-do strong {
     color: #216152;
+}
+
+@media (max-width: 1400px) {
+    .action-card-content-admin {
+        justify-content: flex-end;
+        min-height: 100%;
+    }
 }
