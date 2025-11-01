@@ -44,7 +44,7 @@ export default function TableAdmin({columns, data, btnVerification, getValueInpu
                                     ))}
 
                                     { btnVerification &&(
-                                        <td><ButtonSwitch id={d.id} value={d.enable} getValue={getValueInput}/></td>
+                                        <td><ButtonSwitch id={d.id} value={d.enable} getValue={getValueInput} email={d.email}/></td>
                                     )}
                                 </tr>
                         ))}
