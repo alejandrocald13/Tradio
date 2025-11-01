@@ -130,6 +130,7 @@
 
 /* Flecha a la izquierda */
 .backArrow {
+  all: unset;
   position: absolute;
   left: 0;
   cursor: pointer;
