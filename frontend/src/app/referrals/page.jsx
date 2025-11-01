@@ -23,7 +23,8 @@ export default function ReferralsPage() {
           const res = await api.get("/users/me");
           const profile = res?.data?.profile;
           if (profile && profile.has_used_referral) {
-            setHasAppliedCode(true);
+            setHasAppliedCode(true);
+
           }
         } catch (err) {
           console.error("Error checking referral status:", err);
@@ -159,21 +160,45 @@ export default function ReferralsPage() {
 
               <div className={styles.cardRight}>
                 <div className={styles.inputWrap}>
-                  <input
-                    className={styles.codeInput}
-                    type="text"
-                    placeholder="Code"
-                    value={referralInput}
-                    onChange={(e) => setReferralInput(e.target.value)}
-                    disabled={submitting || hasAppliedCode || checkingStatus}
-                  />
-                  <button
-                    className={styles.sendBtn}
-                    onClick={handleSubmitReferral}
-                    disabled={submitting || hasAppliedCode || checkingStatus}
-                  >
-                    {submitting ? "Sending..." : "Send"}
-                  </button>
+                  <div className={styles.tooltipWrapper}>
+                    <input
+                      className={`${styles.codeInput} ${
+                        hasAppliedCode ? styles.disabledInput : ""
+                      }`}
+                      type="text"
+                      placeholder="Code"
+                      value={referralInput}
+                      onChange={(e) => setReferralInput(e.target.value)}
+                      disabled={submitting || hasAppliedCode || checkingStatus}
+                    />
+
+
+                  </div>
+
+                  <div className={styles.tooltipWrapper}>
+                    <button
+                      className={`${styles.sendBtn} ${
+                        hasAppliedCode ? styles.disabledAfterUse : ""
+                      }`}
+                      onClick={() => {
+                        if (hasAppliedCode) return;
+                        handleSubmitReferral();
+                      }}
+                      disabled={submitting || hasAppliedCode || checkingStatus}
+                    >
+                      {hasAppliedCode
+                        ? "Send"
+                        : submitting
+                        ? "Sending..."
+                        : "Send"}
+                    </button>
+                      {hasAppliedCode && (
+                      <div className={styles.tooltip}>
+                        You have already applied a reference code.
+                      </div>
+                    )}
+                  </div>
+
                 </div>
               </div>
             </div>

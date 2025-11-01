@@ -217,6 +217,47 @@
   box-sizing: border-box;
 }
 
+.tooltipWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+}
+
+.tooltipWrapper:hover .tooltip {
+  opacity: 1;
+}
+
+.disabledInput {
+  cursor: not-allowed;
+  background-color: #f1f1f1;
+}
+
+.disabledAfterUse {
+  background-color: #4e635e !important;
+  color: #fff !important;
+  cursor: not-allowed;
+  border: 1px solid #aaa;
+  transform: none !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
 /* RESPONSIVE BREAKPOINTS */
 @media (max-width: 1024px) {
   .main {
