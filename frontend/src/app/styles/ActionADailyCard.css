@@ -1,0 +1,39 @@
+.action-card-aDaily {
+    display: flex;
+    flex-direction: column;  
+    background-color: #fff;
+    margin: 0px 15px 20px 15px;
+    width: 40%;
+    min-height: 12rem;
+    border-radius: 20px;
+    padding: 30px 20px 7px 20px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.title-action-card-aDaily {
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+
+.children-action-card-aDaily {
+    height: 100%;
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 1400px) {
+    .action-card-aDaily {
+        height: 14rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .action-card-aDaily {
+        width: 80%;
+        height: 12rem;
+        min-height: 12rem;
+    }
+}

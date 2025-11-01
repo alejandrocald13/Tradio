@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from "react"
 import TableAdmin from "../components/TableAdmin"
 import SidebarNavAdmin from "../components/SidebarNav-Admin"
 import ActionAdminCard from "../components/ActionAdminCard"
+import ActionADailyCard from "../components/ActionADailyCard"
 import { api } from "../lib/axios"
 import './adminHome.css'
-import getToken from "../lib/getToken"
 
 export default function AdminHome () {
     const [movesData, setMovesData] = useState([])
@@ -97,19 +97,21 @@ export default function AdminHome () {
                 <h3>Some active actions</h3>
               </div>
 
-          <div className="summary-actions-list">
-            {activeActions.map((action) => (
-              <ActionAdminCard key={action.id} title={action.name}>
-                  <div className="action-card-content-admin">
-                    <p className="price-action-do-admin">Price: ${action.current_price}</p>
-                    <p className="category-action-do">Category: {action.category_name}</p>
-                    <p className="status-action-do">Status: <strong>Active</strong></p>
-                  </div>
-              </ActionAdminCard>
-            ))}
-          </div>
-          </div>
+              <div className="summary-actions-list">
+                {activeActions.map((action) => (
+                  <ActionADailyCard key={action.id} title={action.name}>
+                    <div className="action-card-content-admin">
+                      <div className="action-info-group">
+                        <p className="price-action-do-admin">Price: ${action.current_price}</p>
+                        <p className="category-action-do">Category: {action.category_name}</p>
+                      </div>
+                      <p className="status-action-do">Status: <strong>Active</strong></p>
                     </div>
+                  </ActionADailyCard>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
