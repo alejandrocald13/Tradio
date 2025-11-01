@@ -1,11 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./actions.module.css";
+import { useRouter } from "next/navigation";
+
 
 import { api } from "../../lib/axios"; 
 
 import ActionCard from "@/app/components/ActionCard";
 import MiniChart from "@/app/components/MiniChart";
+import Searcher from "@/app/components/Searcher";
 
 export default function ActionsPage() {
   const [topGainers, setTopGainers] = useState([]);
@@ -13,8 +16,24 @@ export default function ActionsPage() {
   const [availableActions, setAvailableActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  
 
   const trendClass = { up: styles.positive, down: styles.negative, neutral: styles.neutral };
+  const lastTyped = useRef("");
+
+  const getValue = (value) => {
+    const cleaned = value.trim().toUpperCase();
+    if (cleaned !== "") {
+        lastTyped.current = cleaned;
+        return;
+    }
+    if (lastTyped.current.length >= 1) {
+        const basePath = "/landing/actions";
+        router.push(`${basePath}/${lastTyped.current}`);
+    }
+    lastTyped.current = "";
+  };
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -115,17 +134,18 @@ export default function ActionsPage() {
       </header>
 
       <div className={styles.searchSection}>
-        <div className={styles.searchContainer}>
-          <span className={styles.searchIcon}>Q</span>
+        <Searcher placeholderI="Search by symbol" getValue={getValue} />
+        {/*<div className={styles.searchContainer}>
           
-          <input 
+          
+           <input 
             type="text" 
             placeholder="SEARCH" 
             className={styles.searchInput}
             value={searchQuery} // Conecta el valor al estado
             onChange={(e) => setSearchQuery(e.target.value)} // Actualiza el estado al escribir
           />
-        </div>
+        </div> */}
       </div>
 
       <section className={styles.marketSection}>
