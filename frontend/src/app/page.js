@@ -1,20 +1,11 @@
 "use client";
 import styles from "./landing/landing.module.css";
 import { Rocket, Shield } from "lucide-react"; 
-import { api } from "./lib/axios";
-import { useEffect, useState } from "react";
+import Link from "next/link";
 
-
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { useRouter } from "next/navigation";
-import { getAccessToken } from "@auth0/nextjs-auth0";
 
 
 export default function LandingPage() {
-
-  const [message, setMessage] = useState(null);
-  const router = useRouter()
-
   return (
     <div className={styles.container}>
       {/* NAVBAR */}
@@ -22,19 +13,19 @@ export default function LandingPage() {
         <div className={styles.logo}></div>
         <nav>
           <ul className={styles.menu}>
-            <li><a href="/" className={`${styles.link} ${styles.active}`}>HOME</a></li>
-            <li><a href="/landing/actions" className={styles.link}>ACTION</a></li>
-            <li><a href="/landing/about-us" className={styles.link}>ABOUT US</a></li>
+            <li><Link href="/" className={`${styles.link} ${styles.active}`}>HOME</Link></li>
+            <li><Link href="/landing/actions" className={styles.link}>ACTION</Link></li>
+            <li><Link href="/landing/about-us" className={styles.link}>ABOUT US</Link></li>
           </ul>
         </nav>
         <div className={styles.authButtons}>
-          <a href="/api/auth/login?returnTo=/auth-redirect">
+          <Link href="/api/auth/login?returnTo=/auth-redirect">
             <button className={styles.login}>Login</button>
-          </a>
+          </Link>
 
-          <a href="/api/auth/signup?returnTo=/auth-redirect">
+          <Link href="/api/auth/signup?returnTo=/auth-redirect">
             <button className={styles.register}>Register</button>
-          </a>
+          </Link>
         </div>
       </header>
 
