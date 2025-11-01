@@ -71,6 +71,7 @@ export default function ComprasVentasPage() {
         widthSend: 200,
         heightSend: 200,
         num: 2,
+        display: false
       },
     };
   }, [comprasData, ventasData]);
