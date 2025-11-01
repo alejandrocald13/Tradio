@@ -3,147 +3,15 @@
 import './portfolio.css'
 import GreetingPortafolio from '../components/GreetingPortfolio'
 import CardInfoPortafolio from '../components/GeneralBalancePortfolio'
-import ActionPortfolio from '../components/ActionPortfolio'
 import { useEffect, useState } from 'react';
 import SidebarNav from '../components/SidebarNav-Auth';
 import CardActionsPortfolio from '../components/CardActionsPortfolio';
-import { api } from '../lib/axios';
 
 
 export default function Portafolio (){
     // Datos que voy a necesitar para portafolio
     // Datos de acciones
-    const [getDate, setgetDate] = useState(false)
-    const [getInforme, setGetInforme] = useState(false)
-    const [date1, setdate1] = useState("");
-    const [date2, setdate2] = useState("");
     const [seeAction, setSeeAction] = useState(false)
-
-    // Aqui guardaremos la info para cada tarjeta
-    const [highestPerformanceAction, setHighestPerformanceAction] = useState({
-        name: '-', weight_percentage: 0, performance_percentage: 0
-    })
-    const [lowestPerformanceAction, setLowestPerformanceAction] = useState({
-        name: '-', weight_percentage: 0, performance_percentage: 0
-    })
-
-    const [highestWeightAction, setHighestWeightAction] = useState({
-        name: '-', weight_percentage: 0, performance_percentage: 0
-    })
-
-    useEffect(()=>{
-        const getHighestPerformanceAction = async () => {
-            try{
-                const response = await api.get('/portfolios/highest_performance/')
-
-                console.log('HighestPerformanceAction', response.data)
-                setHighestPerformanceAction(response.data)
-            }catch(error){
-                console.log("HighestPerformanceAction ERROR", error)
-                alert(error)
-            }
-        }
-
-        const getLowestPerformanceAction = async () => {
-            try{
-                const response = await api.get('/portfolios/lowest_performance/')
-
-                console.log('LowesttPerformanceAction', response.data)
-                setLowestPerformanceAction(response.data)
-            }catch(error){
-                console.log("LowestPerformanceAction ERROR", error)
-                alert(error)
-            }
-        } 
-
-        const getHighestWeightAction = async () => {
-            try{
-                const response = await api.get('/portfolios/highest_weight/')
-
-                console.log('HighestWeightAction', response.data)
-                setHighestWeightAction(response.data)
-            }catch(error){
-                console.log("HighestWeightAction ERROR", error)
-                alert(error)
-            }
-        }
-        getHighestPerformanceAction()
-        getLowestPerformanceAction()
-        getHighestWeightAction()
-        
-
-    }, [])
-    
-    const hoy = new Date().toISOString().split("T")[0];
-    const handleChangeD1 = (e) => {
-        setdate1(e.target.value);
-    };
-
-    const handleChangeD2 = (e) => {
-        setdate2(e.target.value);
-    };
-
-    const dataGeneral = [
-        {
-        name: highestPerformanceAction.name,
-        description: 'Más Rentable',
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
-        percentage: highestPerformanceAction.weight_percentage,
-        rendimiento: highestPerformanceAction.performance_percentage
-        }, {
-        name: lowestPerformanceAction.name,
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 9.041l-4.349-5.436L7 6.646 3.354 3l-.708.707L7 8.061l2.959-2.959 3.65 4.564.781-.625z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 9.854a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v3.5h-3.5a.5.5 0 00-.5.5z" clipRule="evenodd"></path></svg>,
-        description: 'Menos Rentable',
-        percentage: lowestPerformanceAction.weight_percentage,
-        rendimiento: lowestPerformanceAction.performance_percentage
-        },{
-        svg: <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"></path><path fillRule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clipRule="evenodd"></path><path fillRule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clipRule="evenodd"></path></svg>,        
-        name: highestWeightAction.name,
-        description: 'Mayor Porcentaje',
-        percentage: highestWeightAction.weight_percentage,
-        rendimiento: highestWeightAction.performance_percentage
-        }
-    ]
-    
-    const validateDate = () => {
-        const fechaInicio = new Date(date1);
-        const fechaFin = new Date(date2);
-
-        const diffMs = Math.abs(fechaFin - fechaInicio);
-        const diffDias = diffMs / (1000 * 60 * 60 * 24);
-
-        if (diffDias <=90){
-            return diffDias;
-        }else{
-            throw new Error('El tiempo excede los tres meses')
-        }
-    }
-    const clickInforme = async () => {
-
-        try{
-            validateDate()
-            const response = await api.post('/reports/',{
-                from: date1, 
-                to: date2
-            })
-            console.log("Se logro :) con estas fechas", response.data)
-        }catch(error){
-            console.log("No funciono :(", error)
-            alert(error)
-        }
-        clickGetDate()
-    }
-    const clickGetDate =async() => {
-        if (!getDate && !getInforme){
-            setgetDate(true)
-        }else{
-
-            setgetDate(false)
-            setGetInforme(false)
-            setdate1('');
-            setdate2('');
-        }
-    }
 
     return (
         <>
@@ -153,7 +21,7 @@ export default function Portafolio (){
                     <div className="vertical-container-info-portafolio">
                         <GreetingPortafolio message={'Let’s see how your portfolio is growing today.'}/>
                         
-                        <div className={seeAction ? "card-info-container-portafolio2" : "card-info-container-portafolio3"}>
+                        <div className="main-card-info-container-portafolio">
                             <div className="all-content">
                                 <div className="btnContainers">
                                     
@@ -165,77 +33,12 @@ export default function Portafolio (){
                                     </button>
                                 </div>
                                 {seeAction && (
-                                    <>
-                                        <CardActionsPortfolio/>
-                                    </>
+                                    <CardActionsPortfolio/>   
                                 )}
 
                                 {!seeAction && (
                                     <CardInfoPortafolio/>
                                 )}
-                            </div>
-                        </div>
-
-                        {!seeAction &&( <div className="cap-container-portafolio">
-                            {dataGeneral.map((dat, index) =>(
-                                    <ActionPortfolio key={index} data={dat}>
-                                        <div className="subtitles">
-                                            <p>Portfolio Weight:</p>
-                                            <p>Performance:</p>
-                                        </div>
-                                        <div className="data">
-                                            <p>{dat.percentage}%</p>
-                                            <p>{dat.rendimiento}%</p>
-                                        </div>
-                                    </ActionPortfolio>
-                            ))
-                            }
-                        </div>)}
-                    </div>
-                    
-                    <div className="aux-conteiner-p">
-                        <div className="vertical-container-actions-portafolio">
-                            <div className="btn-container">
-
-                                <button className="btn-get-date-email-portfolio" onClick={clickGetDate}>
-                                    <p className="btn-title">Send Email Report</p>
-                                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path></svg>
-                                </button>
-                            </div>
-
-                            {getDate && (<div className="inputs-date-portfolio">
-                                <div className="date-inputs-portfolio">
-                                    <p>Desde:</p>
-                                    <input 
-                                        type="date" 
-                                        value={date1} 
-                                        onChange={handleChangeD1} 
-                                        max={hoy} 
-                                    />
-                                </div>
-
-                                <div className="date-inputs-portfolio">
-                                    <p>Hasta:</p>
-                                    <input 
-                                        type="date" 
-                                        value={date2} 
-                                        onChange={handleChangeD2} 
-                                        max={hoy} 
-                                    />
-                                </div>
-
-                                <div className="getPDF">
-                                    <button className="btn-get-pdf" onClick={clickInforme}>
-                                        Enviar Informe
-                                    </button>
-                                </div>
-                            </div>)}
-
-                            <div className="btn-container">
-                                <a href="/purchases-sales">
-                                    <p className="btn-title">Historial</p>
-                                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M715.8 493.5L335 165.1c-14.2-12.2-35-1.2-35 18.5v656.8c0 19.7 20.8 30.7 35 18.5l380.8-328.4c10.9-9.4 10.9-27.6 0-37z"></path></svg>
-                                </a>
                             </div>
                         </div>
                     </div>

@@ -24,7 +24,6 @@ export default function CardActionsPortfolio() {
                 console.log('Portafolio :)', response.data)
                 setClasification(data.map(dat => dat.stock_name));
                 setPercentage(data.map(dat => dat.weight_percentage))
-                console.log('clase', clasification)
             }catch(err){
                 console.log("Portafolio no se obtuvieron", error)
             }
@@ -33,27 +32,28 @@ export default function CardActionsPortfolio() {
     }, [])
 
     const graphData = {
-        clasificacion: clasification,
-        name: 'Balance General',
+        clasificacion: ['darion', 'klk', 'darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk'],
+        name: 'Percentage(%)',
         dataL: percentage,
-        widthSend: 230,
-        heightSend: 230,
-        num: portfolio.length
+        widthSend: 250,
+        heightSend: 250,
+        num: portfolio.length,
+        display: false
     }
     return (
         <>
             <div className="main-container-CAP">
                 <div className="info-CAP-container">
                     <div className="CAP-graph">
-                        <h1 className="title-CAP">Acciones Compradas</h1>
+                        <h1 className="title-CAP">Purchased Shares</h1>
                         <DoughnutGraph graphData={graphData}/>
                     </div>
                     <div className="CAP-actions">
                         
                         {portfolio.map((dat, index) =>(
                             <ActionPortfolio key={index} data={dat}>
-                                <p>Stock: {dat.stock}</p>
-                                <p>Cost: {dat.total_cost / dat.quantity}</p>
+                                <p>Stock: {dat.quantity}</p>
+                                <p>Cost: {(dat.total_cost / dat.quantity).toFixed(2)}</p>
                             </ActionPortfolio>
                         ))}
                     </div>

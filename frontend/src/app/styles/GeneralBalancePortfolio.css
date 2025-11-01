@@ -1,40 +1,88 @@
 .card-info-container-portafolio {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  margin: 15px;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 15px;
+    padding: 30px;
 }
 
 .graph {
     display: flex;
-    width: 50%;
     align-items: center;
     justify-content: center;
 }
 
-.more-Info-portafolio {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
+.card-info-container-portafolio {
+    display: flex;
+    width: 100%;
+    gap: 80px;
 }
 
 
+.more-Info-portafolio {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 25px;
+    color: #222;
+    min-width: 48%;
+    margin: 0 20px 0 0px;
+}
+
+.more-Info-portafolio h1 {
+    font-size: 20px;
+    color: #2e3d38;
+    padding-bottom: 6px;
+    text-align: center;
+}
+
+.section-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.section-group h4 {
+    font-size: 14px;
+    color: #5f726b;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .data-container-portafolio {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.data-container-portafolio  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.data-container-portafolio  .title {
+    color: #555;
+    font-weight: 600;
 }
 
 .data-container-portafolio .value {
-  color: #888;   
-  font-weight: 500;
-}
-
-.data-container-portafolio .label{
-  color: #000;   
-  font-weight: 600;
-  text-align: start;
+    font-weight: 300;
+    color: #222;
 }
 
 
+.cap-container-portafolio{
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: 2px dashed #8ebaac;
+    
+}
+
+.cap-container-portafolio .subtitles{
+    font-weight: 100;
+}
