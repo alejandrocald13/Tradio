@@ -16,7 +16,7 @@ def send_welcome_email(user, dashboard_url=None, support_email=None):
 
     subject = "Tradio | Tu cuenta fue aprobada"
     template = "emails/bienvenida.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.id, subject, template, context)
 
 
 def send_pending_authorization_email(user, support_email=None):
@@ -41,10 +41,10 @@ def send_pending_authorization_email(user, support_email=None):
 
     subject = "Tradio | Estamos revisando tu cuenta"
     template = "emails/pending_authorization.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.id, subject, template, context)
 
 
-def send_admin_new_user_email(admin_email, user, dashboard_url=None):
+def send_admin_new_user_email(admin, user, dashboard_url=None):
     prof = getattr(user, "profile", None)
 
     auth_method = "Local"
@@ -64,7 +64,7 @@ def send_admin_new_user_email(admin_email, user, dashboard_url=None):
 
     subject = "Tradio | Nuevo usuario pendiente de aprobación"
     template = "emails/admin_new_user.html"
-    send_email_task.delay(admin_email, subject, template, context)
+    send_email_task.delay(admin.id, subject, template, context)
 
 
 def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_email=None):
@@ -81,7 +81,7 @@ def send_trade_confirmation_email(user, trade, trade_detail_url=None, support_em
 
     subject = f"Tradio | Confirmación de {trade.get('type','').title()} – {trade.get('symbol','')}"
     template = "emails/trade_confirm.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.id, subject, template, context)
 
 
 def send_wallet_movement_email(user, movement, wallet_url=None, support_email=None):
@@ -98,7 +98,7 @@ def send_wallet_movement_email(user, movement, wallet_url=None, support_email=No
 
     subject = f"Tradio | {movement.get('type','').title()} de wallet ${movement.get('amount','')}"
     template = "emails/wallet_movement.html"
-    send_email_task.delay(user.email, subject, template, context)
+    send_email_task.delay(user.id, subject, template, context)
 
 
 def send_report_ready_email(user, period_from, period_to, support_email=None, pdf_base64=None):

@@ -96,16 +96,15 @@ class Auth0LoginView(APIView):
             self.revoke_auth0_token(auth0_token)
 
             admin_qs = User.objects.filter(is_superuser=True, is_active=True).exclude(email__isnull=True).exclude(email__exact='')
-            admin_emails = list(admin_qs.values_list('email', flat=True))
 
-            if not admin_emails:
+            if not admin_qs:
                 logger.warning("No se encontraron superusuarios para notificar del nuevo registro: user_id=%s", user.pk)
             else:
-                for admin_email in admin_emails:
+                for admin in admin_qs:
                     try:
-                        send_admin_new_user_email(admin_email, user)
+                        send_admin_new_user_email(admin, user)
                     except Exception as e:
-                        logger.exception("Error al encolar email de nuevo usuario para %s: %s", admin_email, e)
+                        logger.exception("Error al encolar email de nuevo usuario para %s: %s", admin.email, e)
             
             try:
                 send_pending_authorization_email(user)
