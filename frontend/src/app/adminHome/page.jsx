@@ -80,14 +80,14 @@ export default function AdminHome () {
             <div className="container-UC">
               <h3>Daily Movements</h3>
               <div className="tableContainer">
-                <TableAdmin columns={movesColumns} data={movesData} btnVerification={false}/>
+                <TableAdmin columns={movesColumns} data={movesData} btnVerification={false} type={'home'}/>
               </div>
             </div>
 
             <div className="container-UC">
               <h3>Daily Transactions</h3>
               <div className="tableContainer">
-                <TableAdmin columns={transationColumns} data={txData} btnVerification={false}/>
+                <TableAdmin columns={transationColumns} data={txData} btnVerification={false} type={'home'}/>
               </div>
             </div>
           </div>
