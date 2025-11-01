@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import styles from "./referrals.module.css";
 import SidebarNav from "../components/SidebarNav-Auth";
 import { api } from "../lib/axios";
@@ -14,7 +14,26 @@ export default function ReferralsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: "", body: null });
+  const [hasAppliedCode, setHasAppliedCode] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
 
+  useEffect(() => {
+      const checkReferralStatus = async () => {
+        try {
+          const res = await api.get("/users/me");
+          const profile = res?.data?.profile;
+          if (profile && profile.has_used_referral) {
+            setHasAppliedCode(true);
+          }
+        } catch (err) {
+          console.error("Error checking referral status:", err);
+        } finally {
+          setCheckingStatus(false);
+        }
+      };
+
+      checkReferralStatus();
+    }, []);
 
   const showModal = (title, content) => {
     setModalContent({
@@ -82,6 +101,7 @@ export default function ReferralsPage() {
         const detail = res.data?.detail || "Código aplicado correctamente.";
         const creditedUser = res.data?.credited_user || "Usuario desconocido";
         showModal("Éxito", `${detail}\nDueño del código: ${creditedUser}`);
+        setHasAppliedCode(true);
       } else {
         showModal("Error", "No se pudo aplicar el código. Intenta de nuevo.");
       }
@@ -145,12 +165,12 @@ export default function ReferralsPage() {
                     placeholder="Code"
                     value={referralInput}
                     onChange={(e) => setReferralInput(e.target.value)}
-                    disabled={submitting}
+                    disabled={submitting || hasAppliedCode || checkingStatus}
                   />
                   <button
                     className={styles.sendBtn}
                     onClick={handleSubmitReferral}
-                    disabled={submitting}
+                    disabled={submitting || hasAppliedCode || checkingStatus}
                   >
                     {submitting ? "Sending..." : "Send"}
                   </button>
