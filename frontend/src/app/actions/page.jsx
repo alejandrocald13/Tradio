@@ -70,7 +70,7 @@ export default function Actions() {
                                     symbol={stock.symbol}
                                     actionName={stock.name}
                                     price={`$${last.toFixed(2)}`}
-                                    changeText={`${changeAbs.toFixed(2)} (${changePct.toFixed(2)}%)`}
+                                    changeText={`${changeAbs > 0 ? '+' : ''}${changeAbs.toFixed(2)} (${changePct > 0 ? '+' : ''}${changePct.toFixed(2)}%)`}
                                     variantClass={trendClass[trend]}
                                     graphic={<MiniChart data={todayPrices} />}
                                 />
