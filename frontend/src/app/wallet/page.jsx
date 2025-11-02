@@ -12,7 +12,7 @@ export default function WalletPage() {
   const [balance, setBalance] = useState(0);
 
   const [showPanel, setShowPanel] = useState(false);
-  const [actionType, setActionType] = useState(""); // "Deposit" | "Withdrawal"
+  const [actionType, setActionType] = useState(""); 
   const [formData, setFormData] = useState({ bank: "", amount: "", code: "" });
 
   const [showModal, setShowModal] = useState(false);
@@ -31,16 +31,13 @@ export default function WalletPage() {
     fetchWalletData();
   }, []);
 
-  // --- Generador de códigos únicos (no repetidos) ---
   const existingCodes = useMemo(() => {
-    // Usamos transfer_number si viene del backend, si no, usamos id.
     return new Set(
       (transactions || []).map((t) => String(t.transfer_number || t.id || ""))
     );
   }, [transactions]);
 
   const generateUniqueCode = () => {
-    // Prefijo + fecha + random base36 (mayúsculas) => p.e. TRD-20251029-4G9Q2X
     const date = new Date();
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -68,7 +65,6 @@ export default function WalletPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // No permitir edición manual del code
     if (name === "code") return;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -88,39 +84,34 @@ export default function WalletPage() {
       const payload = {
         amount: parseFloat(formData.amount),
         bank: formData.bank,
-        code: formData.code, // enviamos el código autogenerado
+        code: formData.code,
       };
 
       if (actionType === "Deposit") {
         await api.post("/wallet/deposit/", payload);
       } else if (actionType === "Withdrawal") {
         await api.post("/wallet/withdraw/", payload);
-      } else {
-        alert("Unknown action type");
-        return;
       }
 
       await fetchWalletData();
-
       setShowPanel(false);
       setShowModal(false);
       alert(`Transaction ${actionType} successful!`);
     } catch (err) {
-      console.error("Error sending transaction:", err);
+      console.error("Error:", err);
       alert("Transaction failed");
     }
   };
 
   const cancelTransaction = () => setShowModal(false);
 
-  // Adaptamos el ID que verá la tabla: usar transfer_number si existe
   const transactionsForTable = useMemo(() => {
     return (transactions || []).map((t) => {
-      const shownId = t.transfer_number || t.id; // preferimos transfer_number
+      const shownId = t.transfer_number || t.id;
       const amt = parseFloat(t.amount);
       return {
         ...t,
-        id: shownId, // la tabla sigue esperando key "id"
+        id: shownId,
         amount: (
           <span className={amt >= 0 ? "positive" : "negative"}>
             {amt >= 0 ? `+${amt.toFixed(2)}` : amt.toFixed(2)}
@@ -131,7 +122,7 @@ export default function WalletPage() {
   }, [transactions]);
 
   const columns = [
-    { key: "id", label: "Transaction ID" }, // mostrará transfer_number si existe
+    { key: "id", label: "Transaction ID" },
     { key: "date", label: "Date" },
     { key: "amount", label: "Amount (USD)" },
     { key: "type", label: "Type" },
@@ -149,16 +140,10 @@ export default function WalletPage() {
           </div>
 
           <div className="buttons">
-            <button
-              className="btn deposit"
-              onClick={() => handleOpenPanel("Deposit")}
-            >
+            <button className="btn deposit" onClick={() => handleOpenPanel("Deposit")}>
               Deposit
             </button>
-            <button
-              className="btn withdrawal"
-              onClick={() => handleOpenPanel("Withdrawal")}
-            >
+            <button className="btn withdrawal" onClick={() => handleOpenPanel("Withdrawal")}>
               Withdrawal
             </button>
           </div>
@@ -177,114 +162,40 @@ export default function WalletPage() {
       {showPanel && (
         <div className="sidePanel">
           <div className="panelHeader">
-            <h3>
-              {actionType === "Deposit"
-                ? "Send Money to App"
-                : "Send Money to Bank"}
-            </h3>
-            <button className="closeBtn" onClick={handleClosePanel}>
-              ×
-            </button>
+            <h3>{actionType === "Deposit" ? "Send Money to App" : "Send Money to Bank"}</h3>
+            <button className="closeBtn" onClick={handleClosePanel}>×</button>
           </div>
 
           <form className="panelForm" onSubmit={handleSubmit}>
             <div className="formGroup">
               <label>Bank:</label>
-              <input
-                type="text"
-                name="bank"
-                value={formData.bank}
-                onChange={handleChange}
-                placeholder="Enter bank name"
-                required
-              />
+              <input type="text" name="bank" value={formData.bank} onChange={handleChange} placeholder="Bank name" required />
             </div>
 
             <div className="formGroup">
               <label>Amount:</label>
-              <input
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleChange}
-                placeholder="Enter amount"
-                required
-                min="0.01"
-                step="0.01"
-              />
+              <input type="number" name="amount" value={formData.amount} onChange={handleChange} placeholder="Amount" required min="0.01" step="0.01" />
             </div>
 
             <div className="formGroup">
               <label>Code:</label>
-              <input
-                type="text"
-                name="code"
-                value={formData.code}
-                readOnly
-                title="Auto-generated code"
-              />
+              <input type="text" name="code" value={formData.code} readOnly />
             </div>
 
-            <button type="submit" className="sendBtn">
-              Send Money
-            </button>
+            <button type="submit" className="sendBtn">Send Money</button>
           </form>
 
-          <Modal
-            isOpen={showModal}
-            title="Confirmation"
-            onClose={cancelTransaction}
-          >
-            <p>
-              Are you sure you want to{" "}
-              {actionType === "Deposit" ? "deposit" : "withdraw"}?
-            </p>
+          <Modal isOpen={showModal} title="Confirmation" onClose={cancelTransaction}>
+            <p>Are you sure you want to {actionType === "Deposit" ? "deposit" : "withdraw"}?</p>
 
-            <div
-              style={{
-                marginTop: "10px",
-                fontSize: "14px",
-              }}
-            >
+            <div style={{ marginTop: "10px", fontSize: "14px" }}>
               <p>You Send: USD {formData.amount}</p>
               <p>Transfer Code: {formData.code}</p>
             </div>
 
-            <div
-              style={{
-                marginTop: "18px",
-                display: "flex",
-                justifyContent: "center",
-                gap: "12px",
-              }}
-            >
-              <button
-                onClick={confirmTransaction}
-                style={{
-                  background: "#4e635e",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 18px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                Confirm
-              </button>
-
-              <button
-                onClick={cancelTransaction}
-                style={{
-                  background: "#b5b5b5",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 18px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
+            <div className="modal-actions">
+              <button onClick={confirmTransaction}>Confirm</button>
+              <button className="cancel-btn" onClick={cancelTransaction}>Cancel</button>
             </div>
           </Modal>
         </div>

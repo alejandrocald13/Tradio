@@ -1,13 +1,13 @@
+/* ========== LAYOUT GENERAL ========== */
 .container {
   display: flex;
   height: 100vh;
   width: 100%;
   background-color: #f9fafb;
   overflow: hidden;
-  /* font-family: "Inter", sans-serif; */
 }
 
-/* Fixed Sidebar */
+/* Sidebar */
 .sidebar {
   position: fixed;
   left: 0;
@@ -38,11 +38,11 @@
   margin-left: 72px;
 }
 
-/* === SECTIONS === */
+/* ========== SECTIONS / CARDS ========== */
 .section {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -52,45 +52,44 @@
 
 .sectionTitle {
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #111827;
   margin: 0;
 }
 
-/* === BALANCE CARD === */
+/* Balance card */
 .balanceCard {
   background: #e1eae3;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   padding: 2rem 3rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  flex-shrink: 0;
 }
 
 .balanceLabel {
   font-size: 1.2rem;
   color: #2d483a;
+  font-weight: 400;
 }
 
 .balanceAmount {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #28352a;
 }
 
+/* ========== BUTTONS ========== */
 .buttons {
   display: flex;
   gap: 1rem;
   margin-top: 0.3rem;
-  justify-content: flex-start;
 }
 
-/* === BUTTONS === */
 .btn {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   padding: 0.8rem 1.8rem;
   border-radius: 12px;
   border: 2px solid transparent;
@@ -113,7 +112,7 @@
 }
 
 .btn.withdrawal {
-  background: #fff;
+  background: white;
   color: #516d5f;
   border-color: #516d5f;
   display: flex;
@@ -125,7 +124,7 @@
   background: #f2f9f5;
 }
 
-/* === TABLE === */
+/* ========== TABLE ========== */
 .tableContainer {
   width: 100%;
   border-radius: 12px;
@@ -140,17 +139,16 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* scrollbar neutral */
 .tableScroll::-webkit-scrollbar {
   width: 6px;
 }
-
 .tableScroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c9c9c9;
   border-radius: 4px;
 }
-
 .tableScroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #c9c9c9;
 }
 
 .tableScroll table {
@@ -166,37 +164,31 @@
   top: 0;
 }
 
-.tableScroll th {
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 2px solid #e5e7eb;
-  white-space: nowrap;
-}
-
+.tableScroll th,
 .tableScroll td {
   padding: 1rem;
-  border-bottom: 1px solid #f1f3f5;
-  color: #4b5563;
+  text-align: left;
+  font-weight: 400;
+  color: #374151;
+  border-bottom: none;
   white-space: nowrap;
 }
 
+/* remove hover row color */
 .tableScroll tr:hover {
-  background-color: #f9fafb;
+  background-color: transparent;
 }
 
 .positive {
   color: #16a34a;
-  font-weight: 600;
+  font-weight: 400;
 }
-
 .negative {
   color: #dc2626;
-  font-weight: 600;
+  font-weight: 400;
 }
 
-/* === SIDE PANEL === */
+/* ========== SIDE PANEL ========== */
 .sidePanel {
   position: fixed;
   top: 0;
@@ -204,7 +196,7 @@
   width: 380px;
   height: 100vh;
   background: #fff;
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
   padding: 2rem;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -224,7 +216,7 @@
 .panelHeader h3 {
   font-size: 1.5rem;
   color: #111827;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .closeBtn {
@@ -240,7 +232,7 @@
   justify-content: center;
 }
 
-/* === PANEL FORM === */
+/* ========== FORM PANEL ========== */
 .panelForm {
   display: flex;
   flex-direction: column;
@@ -257,34 +249,38 @@
 .panelForm label {
   font-size: 1rem;
   color: #374151;
-  font-weight: 600;
+  font-weight: 400;
 }
 
+/* Inputs premium */
 .panelForm input {
-  padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid #d1d5db;
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid #d8d8d8;
   font-size: 1rem;
-  background-color: #f9fafb;
+  background-color: #f4f5f5;
   width: 100%;
   box-sizing: border-box;
-  transition: all 0.3s ease;
+  transition: border-color .2s, background-color .2s;
+  font-weight: 400;
+  box-shadow: none;
 }
 
 .panelForm input:focus {
   outline: none;
   border-color: #516d5f;
   background-color: #fff;
-  box-shadow: 0 0 0 3px rgba(81, 109, 95, 0.1);
+  box-shadow: none;
 }
 
+/* Send button */
 .sendBtn {
   background-color: #516d5f;
   color: #fff;
   border: none;
   padding: 0.9rem 1.5rem;
   border-radius: 10px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -295,18 +291,68 @@
   background-color: #3d5547;
 }
 
+/* ========== MODAL ========== */
+.modal-overlay {
+  background: rgba(0,0,0,0.12);
+  backdrop-filter: blur(3px);
+}
 
+.modal-content {
+  background: #fff !important;
+  border-radius: 14px !important;
+  padding: 1.8rem !important;
+  width: 380px !important;
+  max-width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: none !important;
+}
+
+.modal-content p {
+  font-size: 1rem;
+  color: #374151;
+  font-weight: 400;
+}
+
+.modal-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.modal-actions button {
+  background: #516d5f;
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+
+.modal-actions button:hover {
+  background: #3d5547;
+}
+
+.modal-actions .cancel-btn {
+  background: #dadada;
+  color: #333;
+}
+.modal-actions .cancel-btn:hover {
+  background: #bfbfbf;
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .main {
     padding: 1rem;
   }
-
   .balanceCard {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-
   .sidePanel {
     width: 100%;
     border-radius: 0;
