@@ -40,11 +40,12 @@
 
 .logo {
   width: 100%;
-  max-width: 140px;
+  max-width: 300px; /* AUMENTADO */
   height: auto;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   object-fit: contain;
 }
+
 
 .pageName {
   color: white;
@@ -329,7 +330,7 @@
   }
 
   .logo {
-    max-width: 100px;
+    max-width: 160px;
     margin-bottom: 12px;
   }
 
@@ -378,7 +379,7 @@
   }
 
   .logo {
-    max-width: 85px;
+    max-width: 130px;
   }
 
   .pageName {

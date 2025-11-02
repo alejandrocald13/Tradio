@@ -253,8 +253,8 @@ export default function RegisterPage() {
       <div className="container">
         {/* Lado Izquierdo */}
         <div className="left">
-          <img src="/logo.png" alt="Logo" className="logo" />
-          <h2 className="pageName">Tradio</h2>
+          <img src="/logo_tradio_white.png" alt="Tradio Logo" className="logo" />
+
         </div>
 
         {/* Lado Derecho */}

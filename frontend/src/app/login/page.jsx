@@ -11,8 +11,9 @@ export default function LoginPage() {
       <div className="container">
         {/* Panel izquierdo */}
         <div className="left">
-          <img src="/logo.png" alt="Logo" className="logo" />
-          <h2 className="pageName">Tradio</h2>
+          <img src="/logo_tradio_white.png" alt="Tradio Logo" className="logo" /> 
+          
+
         </div>
 
         {/* Panel derecho */}
@@ -33,11 +34,12 @@ export default function LoginPage() {
                 placeholder="Password"
                 required
               />
-              <button
-                type="button"
-                className="eyeBtn"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+           <button
+            type="button"
+            className="toggleIcon"
+            onClick={() => setShowPassword(!showPassword)}
+                >
+
                 {showPassword ? (
                   <FiEyeOff className="icon" />
                 ) : (

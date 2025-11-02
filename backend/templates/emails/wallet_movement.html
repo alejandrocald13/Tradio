@@ -1,24 +1,35 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | {{ movement.type|title }} de wallet ${{ movement.amount }}{% endblock %}
+{% block subject %}Tradio | Wallet {{ movement.type|title }} - ${{ movement.amount }}{% endblock %}
 
 {% block content %}
-  <div style="display:none;max-height:0;overflow:hidden;">Tu saldo ha cambiado.</div>
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Your wallet balance has changed.
+  </div>
 
-  <h2 style="margin:0 0 8px;font-size:20px;">Movimiento de wallet</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.name }}, registramos el siguiente movimiento en tu wallet.</p>
+  <h2 style="margin:0 0 8px;font-size:20px;">Wallet Activity</h2>
 
-  <table class="table" role="table" aria-label="Detalle de movimiento">
-    <tr><th scope="row">Tipo</th><td>{{ movement.type|title }}</td></tr>
-    <tr><th scope="row">Monto</th><td>${{ movement.amount }}</td></tr>
-    <tr><th scope="row">Referencia</th><td>{{ movement.reference }}</td></tr>
-    <tr><th scope="row">Saldo posterior</th><td>${{ movement.balance_after }}</td></tr>
-    <tr><th scope="row">Fecha/hora</th><td>{{ movement.created_at }}</td></tr>
+  <p style="margin:0 0 12px;">
+    Hi {{ user.name }}, we recorded the following movement in your wallet.
+  </p>
+
+  <table class="table" role="table" aria-label="Movement details">
+    <tr><th scope="row">Type</th><td>{{ movement.type|title }}</td></tr>
+    <tr><th scope="row">Amount</th><td>${{ movement.amount }}</td></tr>
+    <tr><th scope="row">Reference</th><td>{{ movement.reference }}</td></tr>
+    <tr><th scope="row">New Balance</th><td>${{ movement.balance_after }}</td></tr>
+    <tr><th scope="row">Date / Time</th><td>{{ movement.created_at }}</td></tr>
   </table>
 
   <p style="margin:16px 0 0;">
-    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">Ir a Tradio</a>
+    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">
+      Go to Tradio Dashboard
+    </a>
   </p>
 
   <div class="hr"></div>
-  <p class="muted">Si no fuiste tú, cambia tu contraseña y contáctanos de inmediato.</p>
+
+  <p class="muted">
+    If this action was not performed by you, please reset your password immediately  
+    and contact our support team.
+  </p>
 {% endblock %}

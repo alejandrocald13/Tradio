@@ -123,7 +123,10 @@ export default function ActionsPage() {
   return (
     <div className={styles.container}>
       <header className={styles.navbar}>
-        <div className={styles.logo}></div>
+       <div className={styles.logo}>
+        <img src="/logo_tradio_icon.png" alt="Tradio Logo" className={styles.logoImage} />
+        </div>
+
         <nav>
           <ul className={styles.menu}>
             <li><a href="/" className={styles.link}>HOME</a></li>
