@@ -99,10 +99,11 @@ export default function Movements () {
                                         />
                                     </div>
                                 </div>
-
-                                <button className="apply-filter-btn" onClick={changeShowFiler}>
-                                    Apply Filter
-                                </button>
+                                <div className="filter-btns">
+                                    <button className="apply-filter-btn" onClick={() => {setTypeSelected(''), setdate1(''), setdate2(''), changeShowFiler()}}>
+                                        Clear
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -111,8 +112,10 @@ export default function Movements () {
                         placeholderI={'Enter email'}
                         getValue={getDataSearcher}
                     />
-                </div>
 
+                    
+                </div>
+                
                 <div className="table-transaction-M">
                     <TableAdmin
                         columns={movesColumns}
