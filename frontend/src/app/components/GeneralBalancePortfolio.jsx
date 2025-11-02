@@ -48,13 +48,14 @@ export default function CardInfoPortafolio(){
         }
     ]
 
-        useEffect(()=>{
+    useEffect(()=>{
 
         const getHighestPerformanceAction = async () => {
             try{
                 const response = await api.get('/portfolios/highest_performance/')
 
                 console.log('HighestPerformanceAction', response.data)
+
                 setHighestPerformanceAction(response.data)
             }catch(error){
                 console.log("HighestPerformanceAction ERROR", error)
@@ -79,6 +80,7 @@ export default function CardInfoPortafolio(){
                 const response = await api.get('/portfolios/highest_weight/')
 
                 console.log('HighestWeightAction', response.data)
+                
                 setHighestWeightAction(response.data)
             }catch(error){
                 console.log("HighestWeightAction ERROR", error)
@@ -96,8 +98,13 @@ export default function CardInfoPortafolio(){
         const getTotalActions = async () =>{
             try{
                 const response = await api.get('/portfolios/total/')
-                setTotalAction(response.data)
-                console.log("RESPUESRA1", response.data)
+                if (response.status === 204){
+                    console.log("Entre")
+                    setTotalAction(0)
+                }else{
+                    setTotalAction(response.data)
+                }
+                console.log("RESPUESRA1", response)
             }catch(error){
                 console.log("Error al obtener el total invertido en acciones", error)
             }
@@ -106,7 +113,7 @@ export default function CardInfoPortafolio(){
         const getCurrentTotalActions = async () =>{
             try{
                 const response = await api.get('/portfolios/current_total/')
-                setCurrentTotalActions(response.data)
+                setCurrentTotalActions(response.data ? response.data : 0)
                 console.log("RESPUESRA2", response.data)
 
             }catch(error){
@@ -117,7 +124,7 @@ export default function CardInfoPortafolio(){
         const getWallet = async () =>{
             try{
                 const response = await api.get('/wallet/me')
-                setWallet(response.data)
+                setWallet(response.data ? response.data: 0)
                 console.log("RESPUESRA3", response.data)
 
             }catch(error){
@@ -156,11 +163,11 @@ export default function CardInfoPortafolio(){
                             <div className="data-container-portafolio">
                                 <div className="row">
                                     <p className="title">Cash</p>
-                                    <p className="value">${wallet.balance.toFixed(2)}</p>
+                                    <p className="value">${wallet.balance ? wallet.balance.toFixed(2) : 0}</p>
                                 </div>
                                 <div className="row">
                                     <p className="title">Assets</p>
-                                    <p className="value">${currentTotalActions.total.toFixed(2)}</p>
+                                    <p className="value">${currentTotalActions.total ? currentTotalActions.total.toFixed(2) : 0}</p>
                                 </div>
                             </div>
                         </div>
@@ -170,17 +177,15 @@ export default function CardInfoPortafolio(){
                             <div className="data-container-portafolio">
                                 <div className="row">
                                     <p className="title">Total Assets</p>
-                                    <p className="value">${(parseFloat(wallet.balance) + parseFloat(currentTotalActions.total)).toFixed(2)}</p>
+                                    <p className="value">${ wallet.balance && currentTotalActions.total ? (parseFloat(wallet.balance) + parseFloat(currentTotalActions.total)).toFixed(2) : 0}</p>
                                 </div>
                                 <div className="row">
                                     <p className="title">Total Invested</p>
-                                    <p className="value">${totalAction.total.toFixed(2)}</p>
+                                    <p className="value">${totalAction.total ? totalAction.total.toFixed(2): 0 }</p>
                                 </div>
                                 <div className="row">
                                     <p className="title">Accumulated Result</p>
-                                    <p className="value">${(
-                                        (parseFloat(currentTotalActions.total) + parseFloat(wallet.balance)) -
-                                        parseFloat(totalAction.total)).toFixed(2)}
+                                    <p className="value">${currentTotalActions.total && wallet.balance && totalAction.total ? ((parseFloat(currentTotalActions.total) + parseFloat(wallet.balance)) - parseFloat(totalAction.total)).toFixed(2) : 0}
                                     </p>
                                 </div>
                             </div>
@@ -190,13 +195,18 @@ export default function CardInfoPortafolio(){
             </div>
                                 {( <div className="cap-container-portafolio">
                             {dataGeneral.map((dat, index) =>(
-                                    <ActionPortfolio key={index} data={dat}>
-                                        <div className="subtitles">
-                                            <p>Weight: {(dat.percentage).toFixed(2)}%</p>
-                                            <p>Performance: {(dat.rendimiento).toFixed(2)}%</p>
-                                        </div>
+                                <>
+                                    {highestPerformanceAction && lowestPerformanceAction && highestWeightAction && (
+                                        <ActionPortfolio key={index} data={dat}>
+                                            <div className="subtitles">
+                                                <p>Weight: {(dat.percentage).toFixed(2)}%</p>
+                                                <p>Performance: {(dat.rendimiento).toFixed(2)}%</p>
+                                            </div>
 
-                                    </ActionPortfolio>
+                                        </ActionPortfolio>
+                                    )}    
+                                </>
+                                    
                             ))
                             }
                     </div>)}
