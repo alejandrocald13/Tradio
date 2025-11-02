@@ -32,7 +32,7 @@ export default function CardActionsPortfolio() {
     }, [])
 
     const graphData = {
-        clasificacion: ['darion', 'klk', 'darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk','darion', 'klk'],
+        clasificacion: clasification,
         name: 'Percentage(%)',
         dataL: percentage,
         widthSend: 250,

@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import "./wallet.css";
-import SidebarNav from "../components/SidebarNav-Auth";
-import DataTable from "../components/DataTable";
-import Modal from "../components/Modal";
-import { api } from "../lib/axios";
+import SidebarNav from "../../../components/SidebarNav-Auth";
+import DataTable from "../../../components/DataTable";
+import Modal from "../../../components/Modal";
+import { api } from "../../../lib/axios";
 
 export default function WalletPage() {
   const [transactions, setTransactions] = useState([]);

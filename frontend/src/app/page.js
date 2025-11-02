@@ -11,8 +11,8 @@ export default function LandingPage() {
       {/* NAVBAR */}
       <header className={styles.navbar}>
        <a href="/" className={styles.logo}>
-    <img src="/logo_tradio_icon.png" alt="Tradio Logo" className={styles.logoImage} />
-    </a>
+      <img src="/logo_tradio_icon.png" alt="Tradio Logo" className={styles.logoImage} />
+      </a>
 
         <nav>
           <ul className={styles.menu}>

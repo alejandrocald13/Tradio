@@ -2,9 +2,9 @@
 
 import { useState,useEffect } from "react";
 import styles from "./referrals.module.css";
-import SidebarNav from "../components/SidebarNav-Auth";
-import { api } from "../lib/axios";
-import Modal from "../components/Modal";
+import SidebarNav from "../../../components/SidebarNav-Auth";
+import { api } from "../../../lib/axios";
+import Modal from "../../../components/Modal";
 
 export default function ReferralsPage() {
   const [generatedCode, setGeneratedCode] = useState("");

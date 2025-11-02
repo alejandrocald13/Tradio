@@ -12,6 +12,7 @@ export default function AuthRedirectPage() {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
         const res = await fetch(`${baseUrl}/api/auth/check`, { cache: "no-store" });
+        console.log("hilo", res)
 
         if (!res.ok) {
           console.error("Error obteniendo estado del usuario:", res.status);

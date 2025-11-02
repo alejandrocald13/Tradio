@@ -1,11 +1,11 @@
 "use client";
 
 import './portfolio.css'
-import GreetingPortafolio from '../components/GreetingPortfolio'
-import CardInfoPortafolio from '../components/GeneralBalancePortfolio'
+import GreetingPortafolio from '@/app/components/GreetingPortfolio'
+import CardInfoPortafolio from '@/app/components/GeneralBalancePortfolio'
 import { useEffect, useState } from 'react';
-import SidebarNav from '../components/SidebarNav-Auth';
-import CardActionsPortfolio from '../components/CardActionsPortfolio';
+import SidebarNav from '@/app/components/SidebarNav-Auth';
+import CardActionsPortfolio from '@/app/components/CardActionsPortfolio';
 
 
 export default function Portafolio (){

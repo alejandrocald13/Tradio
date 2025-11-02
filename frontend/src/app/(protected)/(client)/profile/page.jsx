@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import "./settingsprofile.css";
-import SidebarNav from "../components/SidebarNav-Auth";
-import Modal from "../components/Modal";
+import SidebarNav from "@/app/components/SidebarNav-Auth";
+import Modal from "@/app/components/Modal";
 import {
   FaUser,
   FaPhone,
@@ -12,7 +12,7 @@ import {
   FaEnvelope,
   FaCheckCircle,
 } from "react-icons/fa";
-import { api } from "../lib/axios";
+import { api } from "@/app/lib/axios";
 
 export default function SettingsProfile() {
   const [userEmail, setUserEmail] = useState("user@example.com"); // Auth0 email (read-only)
