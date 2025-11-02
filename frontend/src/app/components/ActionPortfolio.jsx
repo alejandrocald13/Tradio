@@ -19,9 +19,10 @@ export default function ActionPortfolio({data, children}){
                 <div className="container-info1-AP">
                     
                     <h1>{data.name || data.stock_name}</h1>
-                    <p>{data.description || `Active: ${data.is_active}`}</p>
+                    <p>{ data.description || data.stock_symbol}</p>
                 </div>
                 <div className="container-info2-AP">
+                    {data.is_active &&(<p>{`Active: ${data.is_active}`}</p>)}
                     {children}
                 </div>
             </div>

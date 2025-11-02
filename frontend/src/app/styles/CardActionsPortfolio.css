@@ -41,12 +41,10 @@
     justify-content: center;
 }
 
-@media (max-width: 1260px) {
-    .CAP-actions{
-    min-width: 100%;
-    height: auto;
-    max-height: 400px;
-    overflow-y: auto;
+.container-info1-AP{
+    min-width: 30%;
+}
 
-    }
+.container-info2-AP p {
+  width: 200px;
 }

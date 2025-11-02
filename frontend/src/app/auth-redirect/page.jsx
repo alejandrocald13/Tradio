@@ -15,7 +15,7 @@ export default function AuthRedirectPage() {
 
         if (!res.ok) {
           console.error("Error obteniendo estado del usuario:", res.status);
-          router.push("/error-auth");
+          router.push("/auth-redirect/a");
           return;
         }
 
@@ -38,7 +38,7 @@ export default function AuthRedirectPage() {
         router.push("/");
       } catch (err) {
         console.error("Error verificando usuario:", err);
-        router.push("/error-auth");
+        router.push("/auth-redirect/a");
       }
     };
 

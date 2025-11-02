@@ -45,7 +45,7 @@ export default function users() {
                     const response = await api.post(`/users/${statusValue.id}/disable/`)
                     console.log("Se ha deshabilitado el usuario", response.data)
                 }
-                setConfirmation(!statusValue)
+                setConfirmation(prev => !prev)
             }catch(error){
                 alert(error)
             }
@@ -82,8 +82,8 @@ export default function users() {
                     <div className="container-modal">
                         <div className="p-cpntainer">
                             <p className="p">Are you sure you want to change the user's status?</p>
-                            {statusValue?.value === true && (<p className="p-switch">The user {statusValue.id} will be enabled</p>)}
-                            {statusValue?.value === false && (<p className="p-switch" >The user {statusValue.id} will be disabled</p>)}
+                            {statusValue?.value === true && (<p className="p-switch">The user {statusValue.email} will be enabled</p>)}
+                            {statusValue?.value === false && (<p className="p-switch" >The user {statusValue.email} will be disabled</p>)}
                         </div>
 
                         <div className="btns">

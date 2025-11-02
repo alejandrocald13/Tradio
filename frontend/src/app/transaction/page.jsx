@@ -99,7 +99,7 @@ export default function Transaction(){
                                         <option value="">Select Action</option>
                                         {actions.map((action) => (
                                             <option key={action.id} value={action.symbol}>
-                                                {action.name}
+                                                {action.symbol}
                                             </option>
                                         ))}
                                     </select>
@@ -130,9 +130,9 @@ export default function Transaction(){
 
                                 <button
                                     className="apply-filter-btn"
-                                    onClick={changeShowFiler}
+                                    onClick={() => {setTypeSelected(''), setSelectedAction(''),setdate1(''), setdate2(''), changeShowFiler()}}
                                 >
-                                    Close Filter
+                                    Clear
                                 </button>
                             </div>
                         )}

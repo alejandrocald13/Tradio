@@ -51,6 +51,7 @@ export default function DoughnutGraph({graphData}) {
         cutout: "55%",
         plugins: {
             legend: {
+                display: graphData.display,
                 position: "bottom",
                 labels: {
                     boxWidth: 15,            
