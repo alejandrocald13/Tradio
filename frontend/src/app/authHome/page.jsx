@@ -12,43 +12,6 @@ import './authHome.css'
 
 export default function AuthHome() {
 
-    const labels = [
-        "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"
-    ];
-    const data = [102, 98, 105, 107, 101, 95, 110];
-    const refLine = 100;
-
-    const dataGeneral = [
-        {
-        name: 'Tesla',
-        description: 'Más Rentable',
-        percentage: 16,
-        rendimiento: +12
-        }, {
-        name: 'Oracle',
-        description: 'Menos Rentable',
-        percentage: 20,
-        rendimiento: -1.8
-        },{
-        name: 'Amazon',
-        description: 'Mayor Porcentaje',
-        percentage: 25,
-        rendimiento: +1
-        }
-        ,{
-        name: 'Amazon',
-        description: 'Mayor Porcentaje',
-        percentage: 25,
-        rendimiento: +1
-        }
-        ,{
-        name: 'Amazon',
-        description: 'Mayor Porcentaje',
-        percentage: 25,
-        rendimiento: +1
-        }
-    ]
-
     const [portfolioActions, setPortfolioActions] = useState([]);
 
     const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -146,6 +109,11 @@ export default function AuthHome() {
                 const sortedDates = Object.keys(dailyNetFlow).sort();
                 const sortedValues = sortedDates.map(date => dailyNetFlow[date]);
 
+                if (sortedDates.length === 1) {
+                    sortedValues.unshift(sortedValues[0]);
+                    sortedDates.unshift("");
+                }
+
                 setHistoryLabels(sortedDates);
                 setHistoryData(sortedValues);
 
@@ -181,14 +149,34 @@ export default function AuthHome() {
                                     <span className="legend-dot red"></span> Money Out (Purchases)
                                 </div>
                             </div>
+                            <div className={`graph-wallet-content ${ historyData.length > 0 ? "with-chart" : "empty" }`}>
+                                {historyData.length > 0 ? (
+                                    <BigChart
+                                        chartKey="portfolio-balance-history"
+                                        data={historyData}
+                                        labels={historyLabels}
+                                        refLine={0}
+                                        height={385}
+                                    />
+                                ) : (<div className="empty-state-auth">
+                                        <svg
+                                            className="empty-state-icon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 1024 1024"
+                                        >
+                                            <path d="M888 792H200V168c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v688c0 4.4 3.6 8 8 
+                                            8h752c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM305.8 637.7c3.1 3.1 8.1 3.1 11.3 0l138.3-137.6L583 628.5c3.1 3.1 8.2 3.1 11.3 
+                                            0l275.4-275.3c3.1-3.1 3.1-8.2 0-11.3l-39.6-39.6a8.03 8.03 0 0 0-11.3 0l-230 229.9L461.4 404a8.03 8.03 0 0 0-11.3 0L266.3 
+                                            586.7a8.03 8.03 0 0 0 0 11.3l39.5 39.7z" />
+                                        </svg>
 
-                            <BigChart
-                                chartKey="portfolio-balance-history"
-                                data={historyData}
-                                labels={historyLabels}
-                                refLine={0}  
-                                height={385}
-                            />      
+                                        <h4>No balance data yet</h4>
+                                        <p className="empty-state-text">
+                                            You don’t have any transactions to display for the last 15 days.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="direct-access">
@@ -214,7 +202,7 @@ export default function AuthHome() {
                     <div className="div-container-actions-portfolio">
 
                         <div className="container-all-actions-portfolio">
-                            <h3>Some of your shares</h3>
+                            <h3>Some of your actions</h3>
                             <div className="portfolio-actions">
                                 {portfolioActions.length > 0 ? (
                                     portfolioActions.slice(0, 5).map((item, index) => (
@@ -239,7 +227,25 @@ export default function AuthHome() {
                                         </ActionPortfolio>
                                     ))
                                 ) : (
-                                    <p className="no-portfolio-message">No portfolio actions yet.</p>
+                                    // <p className="no-portfolio-message">No portfolio actions yet.</p>
+                                    <div className="empty-portfolio-state">
+                                        <svg
+                                            className="empty-portfolio-icon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 1024 1024"
+                                        >
+                                            <path d="M864 256H160c-35.3 0-64 28.7-64 64v384c0 35.3 28.7 64 64 64h704c35.3 0 64-28.7 64-64V320c0-35.3-28.7-64-64-64zM160 704V320h704v384H160z"/>
+                                            <path d="M512 416a96 96 0 1 0 96 96 96.11 96.11 0 0 0-96-96zm0 144a48 48 0 1 1 48-48 48.05 48.05 0 0 1-48 48z"/>
+                                        </svg>
+
+                                        <h4>No portfolio actions yet</h4>
+                                        <p>Add some actions to see your portfolio summary here.</p>
+
+                                        <Link href="/actions" className="empty-portfolio-btn">
+                                            Go check out some actions to buy.
+                                        </Link>
+                                    </div>
+
                                 )}
                             </div>
                         </div>
