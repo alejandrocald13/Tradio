@@ -32,6 +32,9 @@ from apps.users.actions import Action
 from django.utils.timezone import now
 import logging
 
+from datetime import datetime, timedelta
+from django.db.models import DateTimeField, DateField
+
 logger = logging.getLogger(__name__)
 
 
@@ -396,15 +399,44 @@ class AdminTransactionsReportView(APIView):
             purchase_qs = purchase_qs.filter(user__email__icontains=email_filter)
             sale_qs = sale_qs.filter(user__email__icontains=email_filter)
         if date_from and date_to:
-            for qs, model in [(purchase_qs, PurchaseTransaction), (sale_qs, SaleTransaction)]:
-                fields = [f.name for f in model._meta.get_fields()]
-                for candidate in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
-                    if candidate in fields:
-                        if model is PurchaseTransaction:
-                            purchase_qs = qs.filter(**{f"{candidate}__range": [date_from, date_to]})
-                        else:
-                            sale_qs = qs.filter(**{f"{candidate}__range": [date_from, date_to]})
-                        break
+            # --------- FILTRO CORREGIDO: incluye TODO el día 'date_to' ---------
+            try:
+                df = datetime.fromisoformat(date_from).date()
+            except Exception:
+                df = None
+            try:
+                dt = datetime.fromisoformat(date_to).date()
+            except Exception:
+                dt = None
+
+            if df and dt:
+                for (qs_name, qs, model) in [
+                    ("purchase", purchase_qs, PurchaseTransaction),
+                    ("sale", sale_qs, SaleTransaction),
+                ]:
+                    fields_map = {f.name: f for f in model._meta.get_fields() if hasattr(f, "attname")}
+                    for candidate in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+                        if candidate in fields_map:
+                            field = fields_map[candidate]
+                            if isinstance(field, DateTimeField):
+                                start = datetime.combine(df, datetime.min.time())
+                                end = datetime.combine(dt + timedelta(days=1), datetime.min.time())
+                                if qs_name == "purchase":
+                                    purchase_qs = qs.filter(**{
+                                        f"{candidate}__gte": start,
+                                        f"{candidate}__lt": end,
+                                    })
+                                else:
+                                    sale_qs = qs.filter(**{
+                                        f"{candidate}__gte": start,
+                                        f"{candidate}__lt": end,
+                                    })
+                            elif isinstance(field, DateField):
+                                if qs_name == "purchase":
+                                    purchase_qs = qs.filter(**{f"{candidate}__range": [df, dt]})
+                                else:
+                                    sale_qs = qs.filter(**{f"{candidate}__range": [df, dt]})
+                            break
 
         if not tx_type or tx_type == "purchases":
             for p in purchase_qs:
