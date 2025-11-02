@@ -1,28 +1,39 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | Tu cuenta fue aprobada{% endblock %}
+{% block subject %}Tradio | Your account has been approved{% endblock %}
 
 {% block content %}
-  <!-- Preheader (vista previa en inbox) -->
-  <div style="display:none;max-height:0;overflow:hidden;">Tu acceso ya está activo. Entra al dashboard para empezar.</div>
+  <!-- Preheader (inbox preview) -->
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Your access is now active. Log in to your dashboard to get started.
+  </div>
 
-  <p class="pill pill-ok" aria-label="Estado">Aprobada</p>
-  <h2 style="margin:12px 0 8px;font-size:22px;">¡Bienvenido/a!</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.name }}, tu cuenta ha sido aprobada y ya puedes operar en la plataforma.</p>
-  <p style="margin:0 0 20px;">Compra y vende activos, gestiona tu wallet y recibe reportes bajo demanda desde tu panel.</p>
+  <p class="pill pill-ok" aria-label="Status">Approved</p>
+
+  <h2 style="margin:12px 0 8px;font-size:22px;">Welcome to Tradio!</h2>
+
+  <p style="margin:0 0 12px;">
+    Hi {{ user.name }}, your account has been successfully approved and you now have full access to the platform.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    Trade assets, manage your wallet, and access on-demand reports directly from your dashboard.
+  </p>
 
   <p style="margin:20px 0;">
-    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">Ir a Tradio</a>
+    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">
+      Go to Tradio Dashboard
+    </a>
   </p>
 
   <div class="hr"></div>
 
-  <table class="table" role="table" aria-label="Datos de alta">
+  <table class="table" role="table" aria-label="Account information">
     <tr>
-      <th scope="row">Usuario</th>
+      <th scope="row">User Email</th>
       <td>{{ user.email }}</td>
     </tr>
     <tr>
-      <th scope="row">Fecha de alta</th>
+      <th scope="row">Account Approved On</th>
       <td>{{ now|date:"Y-m-d H:i" }}</td>
     </tr>
   </table>

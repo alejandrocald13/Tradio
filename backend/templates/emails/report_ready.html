@@ -1,23 +1,24 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | Tu reporte está listo: {{ report.title }}{% endblock %}
+{% block subject %}Tradio | Your report is ready: {{ report.title }}{% endblock %}
 
 {% block content %}
   <!-- Preheader -->
   <div style="display:none;max-height:0;overflow:hidden;">
-    Tu reporte ya fue generado. Descárgalo desde el enlace.
+    Your report has been generated. Download it from the attachment.
   </div>
 
-  <h2 style="margin:0 0 8px;font-size:20px;">Reporte generado</h2>
+  <h2 style="margin:0 0 8px;font-size:20px;">Report Ready</h2>
+
   <p style="margin:0 0 12px;">
-    Hola {{ user.name }}, tu reporte ya está disponible.
+    Hi {{ user.name }}, your report is now available.
   </p>
 
   <p style="margin:0 0 12px;">
-    Rango de fechas: {{ report.from }} — {{ report.to }}
+    Date range: {{ report.from }} — {{ report.to }}
   </p>
 
   <p style="margin:16px 0;">
-    ¡Tu reporte ya está listo! Puedes descargarlo directamente desde el archivo adjunto en este correo.
+    Your report has been successfully generated.  
+    You can download it directly from the attachment included in this email.
   </p>
-
 {% endblock %}

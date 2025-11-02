@@ -1,26 +1,36 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | Confirmación de {{ trade.type|title }} – {{ trade.symbol }}{% endblock %}
+{% block subject %}Tradio | {{ trade.type|title }} Confirmation – {{ trade.symbol }}{% endblock %}
 
 {% block content %}
-  <div style="display:none;max-height:0;overflow:hidden;">Tu orden se ejecutó correctamente.</div>
+  <div style="display:none;max-height:0;overflow:hidden;">
+    Your order has been successfully executed.
+  </div>
 
-  <h2 style="margin:0 0 8px;font-size:20px;">Orden ejecutada</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.name }}, tu operación ha sido confirmada.</p>
+  <h2 style="margin:0 0 8px;font-size:20px;">Order Executed</h2>
 
-  <table class="table" role="table" aria-label="Resumen de la operación">
-    <tr><th scope="row">Tipo</th><td>{{ trade.type|upper }}</td></tr>
-    <tr><th scope="row">Símbolo</th><td>{{ trade.symbol }}</td></tr>
-    <tr><th scope="row">Cantidad</th><td>{{ trade.qty }}</td></tr>
-    <tr><th scope="row">Precio</th><td>${{ trade.price }}</td></tr>
+  <p style="margin:0 0 12px;">
+    Hi {{ user.name }}, your trade has been successfully confirmed.
+  </p>
+
+  <table class="table" role="table" aria-label="Trade summary">
+    <tr><th scope="row">Type</th><td>{{ trade.type|upper }}</td></tr>
+    <tr><th scope="row">Symbol</th><td>{{ trade.symbol }}</td></tr>
+    <tr><th scope="row">Quantity</th><td>{{ trade.qty }}</td></tr>
+    <tr><th scope="row">Price</th><td>${{ trade.price }}</td></tr>
     <tr><th scope="row">Total</th><td>${{ trade.total }}</td></tr>
-    <tr><th scope="row">Fecha/hora</th><td>{{ trade.executed_at }}</td></tr>
-    <tr><th scope="row">ID operación</th><td>{{ trade.id }}</td></tr>
+    <tr><th scope="row">Execution Time</th><td>{{ trade.executed_at }}</td></tr>
+    <tr><th scope="row">Trade ID</th><td>{{ trade.id }}</td></tr>
   </table>
 
   <p style="margin:16px 0 0;">
-    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">Ir a Tradio</a>
+    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">
+      Go to Tradio Dashboard
+    </a>
   </p>
 
   <div class="hr"></div>
-  <p class="muted">Este registro queda disponible en tu historial con fines de auditoría.</p>
+
+  <p class="muted">
+    This transaction has been recorded and can be reviewed in your history for audit purposes.
+  </p>
 {% endblock %}

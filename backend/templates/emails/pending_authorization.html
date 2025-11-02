@@ -1,29 +1,39 @@
 {% extends "emails/_base.html" %}
-{% block subject %}Tradio | Tu cuenta está pendiente de autorización{% endblock %}
+{% block subject %}Tradio | Your account is pending approval{% endblock %}
 
 {% block content %}
   <!-- Preheader -->
   <div style="display:none;max-height:0;overflow:hidden;">
-    Un administrador debe aprobar tu cuenta antes de que puedas operar.
+    An administrator must approve your account before you can start trading.
   </div>
 
-  <h2 style="margin:0 0 8px;font-size:20px;">Tu cuenta aún no está activa</h2>
-  <p style="margin:0 0 12px;">Hola {{ user.name }}, gracias por registrarte en Tradio.</p>
+  <h2 style="margin:0 0 8px;font-size:20px;">Your Account Is Under Review</h2>
+
   <p style="margin:0 0 12px;">
-    Has iniciado sesión con el correo <strong>{{ user.email }}</strong> mediante 
+    Hi {{ user.name }}, thank you for registering with Tradio.
+  </p>
+
+  <p style="margin:0 0 12px;">
+    You signed up using <strong>{{ user.email }}</strong> via 
     <strong>{{ authentic_method }}</strong>.
   </p>
+
   <p style="margin:0 0 20px;">
-    Tu cuenta se encuentra en estado <strong>pendiente de autorización</strong>.  
-    Un administrador revisará tu solicitud y te notificaremos por correo cuando sea aprobada.
+    Your account is currently <strong>pending verification</strong>.  
+    Our team is reviewing your information and you will receive an email  
+    as soon as your access is approved.
   </p>
 
   <p style="margin:20px 0;">
-    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">Ir a Tradio</a>
+    <a class="btn-outline" href="{{ wallet_url|default:'https://tradio-sigma.vercel.app' }}">
+      Go to Tradio Dashboard
+    </a>
   </p>
 
   <div class="hr"></div>
+
   <p class="muted">
-    Si tienes dudas, contáctanos en {{ support_email|default:"soporte@tradio.com" }}.
+    If you have any questions, feel free to contact us at  
+    {{ support_email|default:"support@tradio.com" }}.
   </p>
 {% endblock %}

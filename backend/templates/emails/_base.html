@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>{% block subject %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      /* Identidad Tradio */
+      /* Tradio Identity */
       :root{
         --bg:#F6F7FB; --card:#FFFFFF; --border:#E5E7EB; --text:#111827; --muted:#6B7280;
         --ink:#1F2937; --cta:#111827; --cta-alt:#2563EB; --ok:#16A34A; --warn:#D97706; --err:#DC2626;
@@ -24,7 +24,6 @@
       .table{width:100%;border-collapse:collapse;margin-top:8px}
       .table th,.table td{border:1px solid var(--border);padding:8px 10px;text-align:left;font-size:14px}
       .table th{background:#f9fafb;color:var(--ink)}
-      /* Mobile */
       @media (max-width:480px){
         .card{padding:18px}
         .btn,.btn-outline{width:100%;text-align:center}
@@ -39,8 +38,10 @@
         {% block content %}{% endblock %}
       </div>
       <p class="muted" style="margin-top:12px;">
-        Este correo fue enviado automáticamente por Tradio. Si no reconoces esta acción, escribe a
-        {{ support_email|default:"soporte@tradio.com" }}.
+        You're receiving this email because you’re a registered Tradio user.  
+        If you didn’t request this action or believe this email was sent in error,  
+        please reach out to us at {{ support_email|default:"support@tradio.com" }} —  
+        our team is here to help.
       </p>
     </div>
   </body>
