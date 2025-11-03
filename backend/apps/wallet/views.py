@@ -1,8 +1,9 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
 from django.utils.dateparse import parse_date
+import uuid
 
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -11,15 +12,17 @@ from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
     OpenApiResponse,
+    OpenApiExample,
+    inline_serializer,
 )
 
 from apps.users.auth0_authentication import Auth0JWTAuthentication
 from apps.wallet.models import Wallet, Movement
 from apps.users.models import Profile
-
-
-# celery
 from apps.common.email_service import send_wallet_movement_email
+
+from apps.users.utils import log_action
+from apps.users.actions import Action
 
 import logging
 
@@ -31,41 +34,51 @@ TYPE_LABELS = {
     "REFERRAL_CODE": "Referral Bonus",
 }
 
+def _q(x: Decimal) -> Decimal:
+    return x.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-@extend_schema(
-    tags=['wallet'],
-    summary="Lista los movimientos de la wallet (admin view)",
-    description=(
-        "Historial de movimientos de TODOS los usuarios.\n\n"
-        "Filtros opcionales:\n"
-        "- email=<user email substring>\n"
-        "- type=TOPUP|WITHDRAW|REFERRAL_CODE\n"
-        "- date_from=YYYY-MM-DD\n"
-        "- date_to=YYYY-MM-DD\n\n"
-        "Devuelve una lista con llaves: "
-        "Type, User Email, Amount, Date (lo que consume /movements en admin)."
-    ),
-    parameters=[
-        OpenApiParameter(name="email", required=False, type=str),
-        OpenApiParameter(name="type", required=False, type=str),
-        OpenApiParameter(name="date_from", required=False, type=str),
-        OpenApiParameter(name="date_to", required=False, type=str),
-    ],
-    responses={
-        200: OpenApiResponse(description="OK"),
-        401: OpenApiResponse(description="Unauthorized"),
-    }
-)
+def _commission(amount_dec: Decimal) -> Decimal:
+    return _q(amount_dec * Decimal("0.0365")) if amount_dec > Decimal("100") else Decimal("3.00")
+
+def _safe_transfer_number(requested_code: str | None, prefix: str | None = None) -> str:
+    """
+    Si el cliente envía un transfer_number (code) y ya existe, devolvemos cadena vacía
+    para que el modelo Movement autogenere uno único en save().
+    Si se pasa un prefix, lo usamos para construir uno único con el código.
+    """
+    code = (requested_code or "").strip()
+    if prefix:
+        candidate = f"{prefix}-{code.upper()}-{uuid.uuid4().hex[:6].upper()}"
+        return candidate
+    if not code:
+        return "" 
+    if Movement.objects.filter(transfer_number=code).exists():
+        return "" 
+    return code
+
+
 class WalletMovementListView(APIView):
-    """
-    GET /api/wallet/movements/
-    Vista ADMIN: lista movimientos de cualquier usuario,
-    con filtros, para la página /movements del admin.
-    """
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["wallet"],
+        summary="Listado de movimientos de wallet (admin)",
+        parameters=[
+            OpenApiParameter(name="email", required=False, type=str, description="Filtro por email (icontains)"),
+            OpenApiParameter(name="type", required=False, type=str, description="TOPUP | WITHDRAW | REFERRAL_CODE"),
+            OpenApiParameter(name="date_from", required=False, type=str, description="YYYY-MM-DD"),
+            OpenApiParameter(name="date_to", required=False, type=str, description="YYYY-MM-DD"),
+        ],
+        responses={200: OpenApiResponse(description="OK")},
+    )
     def get(self, request):
+        # no repudio: consulta de movimientos (admin)
+        try:
+            log_action(request, request.user, Action.REPORTS_REQUESTED)
+        except Exception:
+            logger.debug("No-repudio: fallo log REPORTS_REQUESTED", exc_info=True)
+
         email_filter = request.query_params.get("email")
         type_filter = request.query_params.get("type")
         date_from = request.query_params.get("date_from")
@@ -96,100 +109,94 @@ class WalletMovementListView(APIView):
                 "Type": human_type,
                 "User Email": mv.user.email,
                 "Amount": float(mv.total or mv.amount or 0),
+                "Commission": float(mv.commission or 0),           # <<--- NUEVO
                 "Date": mv.created_at.date().isoformat(),
             })
+
+        # no repudio: listado generado
+        try:
+            log_action(request, request.user, Action.REPORTS_GENERATED)
+        except Exception:
+            logger.debug("No-repudio: fallo log REPORTS_GENERATED", exc_info=True)
 
         return Response(data, status=status.HTTP_200_OK)
 
 
 class WalletMeView(APIView):
-    """
-    GET /api/wallet/me/
-    Devuelve balance actual del usuario autenticado
-    + SU historial personal (no de todos).
-    """
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["wallet"],
-        summary="Estado de la wallet del usuario autenticado",
-        description=(
-            "Devuelve el balance actual de la wallet y el historial de movimientos "
-            "del usuario autenticado."
-        ),
-        responses={
-            200: OpenApiResponse(description="OK"),
-            401: OpenApiResponse(description="Unauthorized"),
-        },
+        summary="Mi wallet: balance y movimientos",
+        responses={200: OpenApiResponse(description="OK")},
     )
     def get(self, request):
+        # no repudio: vista de transacciones del usuario
+        try:
+            log_action(request, request.user, Action.TRANSACTIONS_VIEWED)
+        except Exception:
+            logger.debug("No-repudio: fallo log TRANSACTIONS_VIEWED", exc_info=True)
+
         user = request.user
 
         wallet_obj, _ = Wallet.objects.get_or_create(
-            user=user,
-            defaults={"balance": Decimal("0.00")}
+            user=user, defaults={"balance": Decimal("0.00")}
         )
 
         moves_qs = Movement.objects.filter(user=user).order_by("-created_at")
 
         movements = []
         for mv in moves_qs:
-            human_type = TYPE_LABELS.get(mv.type, mv.type)
             movements.append({
                 "id": mv.id,
-                "transfer_number": mv.transfer_number,  # <--- añadido
+                "transfer_number": mv.transfer_number,
                 "date": mv.created_at.date().isoformat(),
                 "amount": float(mv.total or mv.amount or 0),
-                "type": human_type,
-    })
+                "commission": float(mv.commission or 0),            # opcionalmente también aquí
+                "type": TYPE_LABELS.get(mv.type, mv.type),
+            })
 
-        data = {
+        return Response({
             "balance": float(wallet_obj.balance),
             "transactions": movements,
-        }
-
-        return Response(data, status=status.HTTP_200_OK)
+        }, status=status.HTTP_200_OK)
 
 
 class WalletDepositView(APIView):
-    """
-    POST /api/wallet/deposit/
-    Body:
-    {
-      "amount": 100.50,
-      "bank": "Banco Industrial",
-      "code": "ABC123"
-    }
-
-    Lógica:
-    - suma al balance
-    - registra Movement con type='TOPUP'
-    """
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["wallet"],
-        summary="Depositar dinero en la wallet del usuario",
-        description="Aumenta el balance del usuario y registra un movimiento TOPUP.",
-        request={
-            "application/json": {
-                "type": "object",
-                "properties": {
-                    "amount": {"type": "number"},
-                    "bank": {"type": "string"},
-                    "code": {"type": "string"},
-                },
-                "required": ["amount"],
-            }
-        },
+        summary="Depósito en wallet",
+        request=inline_serializer(
+            name="WalletDepositRequest",
+            fields={
+                "amount": serializers.DecimalField(max_digits=12, decimal_places=2),
+                "bank": serializers.CharField(required=False, allow_blank=True),
+                "code": serializers.CharField(required=False, allow_blank=True),
+            },
+        ),
         responses={
-            200: OpenApiResponse(description="OK"),
-            400: OpenApiResponse(description="Bad Request"),
+            200: OpenApiResponse(description="Deposit successful"),
+            400: OpenApiResponse(description="Invalid amount / Amount must be > 0"),
         },
+        examples=[
+            OpenApiExample(
+                "Ejemplo de depósito",
+                value={"amount": "120.00", "bank": "BBVA", "code": "TRX-123"},
+                request_only=True,
+            )
+        ],
     )
     def post(self, request):
+        # no repudio: solicitud de depósito
+        try:
+            log_action(request, request.user, Action.FUNDS_DEPOSIT_REQUESTED)
+        except Exception:
+            logger.debug("No-repudio: fallo log FUNDS_DEPOSIT_REQUESTED", exc_info=True)
+
         user = request.user
         amount = request.data.get("amount")
         bank = request.data.get("bank")
@@ -198,34 +205,31 @@ class WalletDepositView(APIView):
         try:
             amount_dec = Decimal(str(amount))
             if amount_dec <= 0:
-                return Response(
-                    {"detail": "Amount must be > 0"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"detail": "Amount must be > 0"}, status=400)
         except Exception:
-            return Response(
-                {"detail": "Invalid amount"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "Invalid amount"}, status=400)
 
         with transaction.atomic():
             wallet_obj, _ = Wallet.objects.select_for_update().get_or_create(
-                user=user,
-                defaults={"balance": Decimal("0.00")}
+                user=user, defaults={"balance": Decimal("0.00")}
             )
 
-            new_balance = wallet_obj.balance + amount_dec
-            wallet_obj.balance = new_balance
+            commission = _commission(amount_dec)
+            net = _q(amount_dec - commission)
+
+            wallet_obj.balance = _q(wallet_obj.balance + net)
             wallet_obj.save()
 
+            transfer_number = _safe_transfer_number(code)
             mv = Movement.objects.create(
                 user=user,
                 type="TOPUP",
-                amount=amount_dec,
-                commission=Decimal("0.00"),
-                total=amount_dec,         
-                transfer_number=code or "",
+                amount=_q(amount_dec),
+                commission=commission,
+                total=net,
+                transfer_number=transfer_number,
             )
+
             try:
                 send_wallet_movement_email(
                     user,
@@ -237,8 +241,19 @@ class WalletDepositView(APIView):
                         "created_at": mv.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                     },
                 )
+                # no repudio: correo enviado
+                try:
+                    log_action(request, request.user, Action.EMAIL_MOVEMENT_SENT)
+                except Exception:
+                    logger.debug("No-repudio: fallo log EMAIL_MOVEMENT_SENT", exc_info=True)
             except Exception as e:
                 logger.warning(f"Error al enviar correo de depósito: {e}")
+
+        # no repudio: depósito confirmado
+        try:
+            log_action(request, request.user, Action.FUNDS_DEPOSIT_CONFIRMED)
+        except Exception:
+            logger.debug("No-repudio: fallo log FUNDS_DEPOSIT_CONFIRMED", exc_info=True)
 
         return Response({
             "detail": "Deposit successful",
@@ -249,47 +264,43 @@ class WalletDepositView(APIView):
                 "amount": float(mv.total),
                 "type": TYPE_LABELS.get(mv.type, mv.type),
             }
-        }, status=status.HTTP_200_OK)
+        }, status=200)
 
 
 class WalletWithdrawView(APIView):
-    """
-    POST /api/wallet/withdraw/
-    Body:
-    {
-      "amount": 50.00,
-      "bank": "Banco Industrial",
-      "code": "XYZ999"
-    }
-
-    Lógica:
-    - resta del balance (no deja negativo)
-    - registra Movement con type='WITHDRAW'
-    """
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["wallet"],
-        summary="Retirar dinero de la wallet del usuario",
-        description="Disminuye el balance del usuario y registra un movimiento WITHDRAW.",
-        request={
-            "application/json": {
-                "type": "object",
-                "properties": {
-                    "amount": {"type": "number"},
-                    "bank": {"type": "string"},
-                    "code": {"type": "string"},
-                },
-                "required": ["amount"],
-            }
-        },
+        summary="Retiro desde wallet",
+        request=inline_serializer(
+            name="WalletWithdrawRequest",
+            fields={
+                "amount": serializers.DecimalField(max_digits=12, decimal_places=2),
+                "bank": serializers.CharField(required=False, allow_blank=True),
+                "code": serializers.CharField(required=False, allow_blank=True),
+            },
+        ),
         responses={
-            200: OpenApiResponse(description="OK"),
-            400: OpenApiResponse(description="Bad Request"),
+            200: OpenApiResponse(description="Withdrawal successful"),
+            400: OpenApiResponse(description="Invalid amount / Amount must be > 0 / Insufficient funds"),
         },
+        examples=[
+            OpenApiExample(
+                "Ejemplo de retiro",
+                value={"amount": "50.00", "bank": "BBVA", "code": "TRX-987"},
+                request_only=True,
+            )
+        ],
     )
     def post(self, request):
+        # no repudio: solicitud de retiro
+        try:
+            log_action(request, request.user, Action.FUNDS_WITHDRAWAL_REQUESTED)
+        except Exception:
+            logger.debug("No-repudio: fallo log FUNDS_WITHDRAWAL_REQUESTED", exc_info=True)
+
         user = request.user
         amount = request.data.get("amount")
         bank = request.data.get("bank")
@@ -298,39 +309,32 @@ class WalletWithdrawView(APIView):
         try:
             amount_dec = Decimal(str(amount))
             if amount_dec <= 0:
-                return Response(
-                    {"detail": "Amount must be > 0"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"detail": "Amount must be > 0"}, status=400)
         except Exception:
-            return Response(
-                {"detail": "Invalid amount"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "Invalid amount"}, status=400)
 
         with transaction.atomic():
             wallet_obj, _ = Wallet.objects.select_for_update().get_or_create(
-                user=user,
-                defaults={"balance": Decimal("0.00")}
+                user=user, defaults={"balance": Decimal("0.00")}
             )
 
-            if wallet_obj.balance < amount_dec:
-                return Response(
-                    {"detail": "Insufficient funds"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            commission = _commission(amount_dec)
+            net = _q(amount_dec + commission)
 
-            new_balance = wallet_obj.balance - amount_dec
-            wallet_obj.balance = new_balance
+            if wallet_obj.balance < net:
+                return Response({"detail": "Insufficient funds"}, status=400)
+
+            wallet_obj.balance = _q(wallet_obj.balance - net)
             wallet_obj.save()
 
+            transfer_number = _safe_transfer_number(code)
             mv = Movement.objects.create(
                 user=user,
                 type="WITHDRAW",
-                amount=amount_dec,
-                commission=Decimal("0.00"),
-                total=-amount_dec,         
-                transfer_number=code or "",
+                amount=_q(amount_dec),
+                commission=commission,
+                total=-net,
+                transfer_number=transfer_number,
             )
 
             try:
@@ -344,8 +348,19 @@ class WalletWithdrawView(APIView):
                         "created_at": mv.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                     },
                 )
+                # no repudio: correo enviado
+                try:
+                    log_action(request, request.user, Action.EMAIL_MOVEMENT_SENT)
+                except Exception:
+                    logger.debug("No-repudio: fallo log EMAIL_MOVEMENT_SENT", exc_info=True)
             except Exception as e:
                 logger.warning(f"Error al enviar correo de retiro: {e}")
+
+        # no repudio: retiro confirmado
+        try:
+            log_action(request, request.user, Action.FUNDS_WITHDRAWAL_CONFIRMED)
+        except Exception:
+            logger.debug("No-repudio: fallo log FUNDS_WITHDRAWAL_CONFIRMED", exc_info=True)
 
         return Response({
             "detail": "Withdrawal successful",
@@ -353,10 +368,11 @@ class WalletWithdrawView(APIView):
             "movement": {
                 "id": mv.id,
                 "date": mv.created_at.date().isoformat(),
-                "amount": float(mv.total),  # negativo
+                "amount": float(mv.total),
                 "type": TYPE_LABELS.get(mv.type, mv.type),
             }
-        }, status=status.HTTP_200_OK)
+        }, status=200)
+
 
 class ReferralApplyView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -364,80 +380,81 @@ class ReferralApplyView(APIView):
 
     @extend_schema(
         tags=["wallet"],
-        summary="Usar un código de referido",
-        description=(
-            "El usuario autenticado ingresa un código de otra persona. "
-            "Se acreditan $5 al dueño del código y se registra un Movement en su wallet. "
-            "Restricciones: no puedes usar tu propio código y solo puedes usar un código una vez."
+        summary="Aplicar código de referido",
+        request=inline_serializer(
+            name="ReferralApplyRequest",
+            fields={
+                "code": serializers.CharField(),
+            },
         ),
-        request={
-            "application/json": {
-                "type": "object",
-                "properties": {
-                    "code": {"type": "string"},
-                },
-                "required": ["code"],
-            }
-        },
         responses={
-            200: OpenApiResponse(description="OK"),
-            400: OpenApiResponse(description="Bad Request"),
-            404: OpenApiResponse(description="Not Found"),
+            200: OpenApiResponse(description="Código aplicado"),
+            400: OpenApiResponse(description="Errores de validación (p.ej., ya usado / propio)"),
+            404: OpenApiResponse(description="Perfil o código no encontrado"),
         },
+        examples=[
+            OpenApiExample(
+                "Ejemplo de referral",
+                value={"code": "FRIEND-ABC123"},
+                request_only=True,
+            )
+        ],
     )
     def post(self, request):
         user = request.user
         code = (request.data.get("code") or "").strip()
 
         if not code:
-            return Response({"detail": "Debe proporcionar un código."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Debe proporcionar un código."}, status=400)
 
         try:
             my_profile = Profile.objects.select_related("user").get(user=user)
         except Profile.DoesNotExist:
-            return Response({"detail": "Perfil del usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-        if my_profile.has_used_referral:
-            return Response({"detail": "Ya usaste un código de referido."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            owner_profile = Profile.objects.select_related("user").get(referral_code__iexact=code)
-        except Profile.DoesNotExist:
-            return Response({"detail": "Código inválido."}, status=status.HTTP_404_NOT_FOUND)
-
-        if owner_profile.user_id == user.id:
-            return Response({"detail": "No puedes usar tu propio código."}, status=status.HTTP_400_BAD_REQUEST)
-
-        credit_amount = Decimal("5.00")
+            return Response({"detail": "Perfil del usuario no encontrado."}, status=404)
 
         with transaction.atomic():
+            my_profile = Profile.objects.select_for_update().select_related("user").get(pk=my_profile.pk)
+
+            if getattr(my_profile, "has_used_referral", False):
+                return Response({"detail": "Ya usaste un código de referido."}, status=400)
+
+            try:
+                owner_profile = Profile.objects.select_related("user").get(referral_code__iexact=code)
+            except Profile.DoesNotExist:
+                return Response({"detail": "Código inválido."}, status=404)
+
+            if owner_profile.user_id == user.id:
+                return Response({"detail": "No puedes usar tu propio código."}, status=400)
+
+            credit_amount = Decimal("5.00")
+
             owner_wallet, _ = Wallet.objects.select_for_update().get_or_create(
-                user=owner_profile.user,
-                defaults={"balance": Decimal("0.00")}
+                user=owner_profile.user, defaults={"balance": Decimal("0.00")}
             )
-            owner_wallet.balance = owner_wallet.balance + credit_amount
+            owner_wallet.balance = _q(owner_wallet.balance + credit_amount)
             owner_wallet.save()
 
+            ref_transfer = _safe_transfer_number(code, prefix="REF")
             mv = Movement.objects.create(
                 user=owner_profile.user,
                 type="REFERRAL_CODE",
                 amount=credit_amount,
                 commission=Decimal("0.00"),
                 total=credit_amount,
-                transfer_number=code,  
+                transfer_number=ref_transfer,
             )
 
             my_profile.has_used_referral = True
-            my_profile.save(update_fields=["has_used_referral"])
+            my_profile.save()
 
-        return Response({
-            "detail": "Código aplicado correctamente. Se acreditaron $5 al dueño del código.",
-            "credited_user": owner_profile.user.email,
-            "movement": {
-                "id": mv.id,
-                "date": mv.created_at.date().isoformat(),
-                "amount": float(mv.total),
-                "type": "Referral Bonus",
-                "transfer_number": mv.transfer_number,
-            }
-        }, status=status.HTTP_200_OK)
+        try:
+            log_action(request, request.user, Action.REFERRAL_CODE_APPLIED)
+        except Exception:
+            logger.debug("No-repudio: fallo log REFERRAL_CODE_APPLIED", exc_info=True)
+
+        try:
+            log_action(request, owner_profile.user, Action.REFERRAL_REWARD_GRANTED)
+        except Exception:
+            logger.debug("No-repudio: fallo log REFERRAL_REWARD_GRANTED", exc_info=True)
+
+        return Response({"detail": "Código aplicado"}, status=200)
