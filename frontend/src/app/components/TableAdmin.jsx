@@ -38,7 +38,7 @@ export default function TableAdmin({columns, data, btnVerification, getValueInpu
                                                 {(value !== 'enable' && value !== 'id' && value !== 'Date') &&(<td>{d[value]}</td>)}
                                             </>
                                         )}
-                                        {(value !== 'enable' && value !== 'id') &&(<td>{d[value]}</td>)}
+                                        {type !== 'home' &&(value !== 'enable' && value !== 'id') &&(<td>{d[value]}</td>)}
                                             
                                         </>
                                     ))}

@@ -1,6 +1,6 @@
 
 "use client";
-import styles from "../purchases-sales/purchases-sales.module.css";
+import styles from "../(protected)/(client)/purchases-sales/purchases-sales.module.css";
 
 export default function ModalForm({ tab, form, setForm, onSubmit, onClose }) {
   return (

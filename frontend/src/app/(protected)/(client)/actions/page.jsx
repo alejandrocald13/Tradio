@@ -2,13 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import SidebarNav from "../components/SidebarNav-Auth";
-import ActionCard from "../components/ActionCard";
-import MiniChart from "../components/MiniChart";
-import Searcher from "../components/Searcher";
+import SidebarNav from "@/app/components/SidebarNav-Auth";
+import ActionCard from "@/app/components/ActionCard";
+import MiniChart from "@/app//components/MiniChart";
+import Searcher from "@/app/components/Searcher";
 import { api } from "@/app/lib/axios";
 import "./actions.css";
-import "../styles/sharedActionDetail.css";
+import "@/app/styles/sharedActionDetail.css";
 
 export default function Actions() {
     const lastTyped = useRef("");

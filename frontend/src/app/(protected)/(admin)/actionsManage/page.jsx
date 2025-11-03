@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import SidebarNavAdmin from "../components/SidebarNav-Admin";
-import ActionAdminCard from "../components/ActionAdminCard";
-import ButtonSwitch from "../components/ButtonSwitch";
-import Modal from "../components/Modal";
-import Searcher from "../components/Searcher";
-import { api } from "../lib/axios";
+import SidebarNavAdmin from "@/app/components/SidebarNav-Admin";
+import ActionAdminCard from "@/app/components/ActionAdminCard";
+import ButtonSwitch from "@/app/components/ButtonSwitch";
+import Modal from "@/app/components/Modal";
+import Searcher from "@/app/components/Searcher";
+import { api } from "@/app/lib/axios";
 import "./actionsManage.css";
 
 

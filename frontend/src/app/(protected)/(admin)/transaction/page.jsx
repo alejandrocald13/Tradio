@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 import './transaction.css'
-import TableAdmin from "../components/TableAdmin"
+import TableAdmin from "@/app/components/TableAdmin"
 import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
-import Searcher from "../components/Searcher"
-import { api } from "../lib/axios"
+import Searcher from "@/app/components/Searcher"
+import { api } from "@/app/lib/axios"
 
 export default function Transaction(){
     const [showFilter, setShowFilter] = useState(false)

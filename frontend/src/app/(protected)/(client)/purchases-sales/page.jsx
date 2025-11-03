@@ -5,11 +5,11 @@ import styles from "./purchases-sales.module.css";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import DataTable from "../components/DataTable";
-import RightPanel from "../components/RightPanel";
-import ModalForm from "../components/ModalForm";
-import SidebarNavAuth from "../components/SidebarNav-Auth";
-import { api } from "../lib/axios";
+import DataTable from "@/app/components/DataTable";
+import RightPanel from "@/app/components/RightPanel";
+import ModalForm from "@/app/components/ModalForm";
+import SidebarNavAuth from "@/app/components/SidebarNav-Auth";
+import { api } from "@/app/lib/axios";
 
 export default function ComprasVentasPage() {
   const [tab, setTab] = useState("compras"); 

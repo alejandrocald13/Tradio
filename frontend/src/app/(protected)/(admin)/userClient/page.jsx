@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import TableAdmin from "../components/TableAdmin"
-import Modal from '../components/Modal'
-import Searcher from "../components/Searcher";
+import TableAdmin from "@/app/components/TableAdmin"
+import Modal from '@/app/components/Modal'
+import Searcher from "@/app/components/Searcher";
 import SidebarNavAdmin from '@/app/components/SidebarNav-Admin'
 import "./users.css"
-import { api } from "../lib/axios";
+import { api } from "@/app/lib/axios";
 
 export default function users() {
     const [users, setUsers] = useState([]);

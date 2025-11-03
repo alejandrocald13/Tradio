@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../purchases-sales/purchases-sales.module.css";
+import styles from "../(protected)/(client)/purchases-sales/purchases-sales.module.css";
 import DoughnutGraph from "./DoughnutGraph"; 
 
 export default function RightPanel({ metrics, graphData }) {

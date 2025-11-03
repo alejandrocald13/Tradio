@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 import './movements.css'
-import SidebarNavAdmin from "../components/SidebarNav-Admin"
-import Searcher from "../components/Searcher"
-import TableAdmin from "../components/TableAdmin"
-import { api } from "../lib/axios"
+import SidebarNavAdmin from "@/app/components/SidebarNav-Admin"
+import Searcher from "@/app/components/Searcher"
+import TableAdmin from "@/app/components/TableAdmin"
+import { api } from "@/app/lib/axios"
 
 export default function Movements () {
     const [showFilter, setShowFilter] = useState(false)

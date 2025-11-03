@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Searcher from "./Searcher";
 import ActionDetails from "./ActionDetails";
 import { api } from "@/app/lib/axios";
-import "../actions/[symbol]/actionSymbol.css";
+import "../(protected)/(client)/actions/[symbol]/actionSymbol.css";
 import "../styles/sharedActionDetail.css";
 
 export default function SharedActionDetail({ symbol, showSidebar = false, SidebarComponent = null, isPublic = false }) {

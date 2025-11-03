@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react"
-import TableAdmin from "../components/TableAdmin"
-import SidebarNavAdmin from "../components/SidebarNav-Admin"
-import ActionAdminCard from "../components/ActionAdminCard"
-import ActionADailyCard from "../components/ActionADailyCard"
-import { api } from "../lib/axios"
+import TableAdmin from "@/app/components/TableAdmin"
+import SidebarNavAdmin from "@/app/components/SidebarNav-Admin"
+import ActionAdminCard from "@/app/components/ActionAdminCard"
+import ActionADailyCard from "@/app/components/ActionADailyCard"
+import { api } from "@/app/lib/axios"
 import './adminHome.css'
 
 export default function AdminHome () {

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SidebarNav from "../components/SidebarNav-Auth";
-import BigChart from "../components/BigChart"
-import ActionPortfolio from "../components/ActionPortfolio";
-import Modal from "../components/Modal";
+import SidebarNav from "@/app/components/SidebarNav-Auth";
+import BigChart from "@/app/components/BigChart"
+import ActionPortfolio from "@/app/components/ActionPortfolio";
+import Modal from "@/app/components/Modal";
 import Link from "next/link";
-import { api } from "../lib/axios";
+import { api } from "@/app/lib/axios";
 import './authHome.css'
 
 
