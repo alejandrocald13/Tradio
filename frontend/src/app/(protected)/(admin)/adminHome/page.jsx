@@ -21,7 +21,7 @@ export default function AdminHome () {
 
 
 
-    const movesColumns = ['Type', 'User Email', 'Amount']
+    const movesColumns = ['Type', 'User Email', 'Amount', 'Commission']
 
     const [activeActions, setActiveActions] = useState([])
     
