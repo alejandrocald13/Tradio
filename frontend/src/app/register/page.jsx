@@ -23,141 +23,63 @@ export default function RegisterPage() {
     cellphone: "",
     dpi: "",
     address: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const validateAge = (birthdate) => {
     const today = new Date();
     const birthDate = new Date(birthdate);
-    const age = today.getFullYear() - birthDate.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1;
+      age--;
     }
     return age;
   };
 
-  const validateDPI = (dpi) => {
-    const dpiRegex = /^\d{1,13}$/;
-    return dpiRegex.test(dpi);
-  };
+  const validateDPI = (dpi) => /^\d{1,13}$/.test(dpi);
 
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[\+]?[(]?[\d\s\-\(\)]{8,}$/;
-    return phoneRegex.test(phone);
-  };
-
-  const formatPhone = (value) => {
-    const numbers = value.replace(/[^\d+]/g, "");
-    if (numbers.startsWith("+")) {
-      return numbers;
-    }
-    if (numbers.length <= 3) {
-      return numbers;
-    } else if (numbers.length <= 6) {
-      return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
-    } else {
-      return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-    }
-  };
+  // ✅ Phone must be 8 digits only
+  const validatePhone = (phone) => /^\d{8}$/.test(phone);
+  const formatPhone = (value) => value.replace(/\D/g, "").slice(0, 8);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
 
-    if (name === "cellphone") {
-      formattedValue = formatPhone(value);
-    }
-
-    if (name === "dpi") {
-      formattedValue = value.replace(/\D/g, "").slice(0, 13);
-    }
+    if (name === "cellphone") formattedValue = formatPhone(value);
+    if (name === "dpi") formattedValue = value.replace(/\D/g, "").slice(0, 13);
 
     setFormData({ ...formData, [name]: formattedValue });
 
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
+    if (errors[name]) setErrors({ ...errors, [name]: "" });
 
     if (name === "birthdate" && value) {
       const age = validateAge(value);
       if (age < 18) {
         setErrors({ ...errors, birthdate: "You must be at least 18 years old." });
-      } else {
-        const newErrors = { ...errors };
-        delete newErrors.birthdate;
-        setErrors(newErrors);
       }
     }
 
-    if (name === "dpi" && value) {
-      if (!validateDPI(value)) {
-        setErrors({
-          ...errors,
-          dpi: "DPI must contain only numbers (maximum 13 digits).",
-        });
+    if (name === "dpi" && value && !validateDPI(formattedValue)) {
+      setErrors({ ...errors, dpi: "DPI must contain only numbers (maximum 13 digits)." });
+    }
+
+    if (name === "cellphone") {
+      if (formattedValue && !validatePhone(formattedValue)) {
+        setErrors({ ...errors, cellphone: "Enter an 8-digit mobile number." });
       } else {
-        const newErrors = { ...errors };
-        delete newErrors.dpi;
-        setErrors(newErrors);
+        const { cellphone, ...rest } = errors;
+        setErrors(rest);
       }
     }
-
-    if (name === "cellphone" && value) {
-      const cleanPhone = value.replace(/[^\d+]/g, "");
-      if (!validatePhone(cleanPhone)) {
-        setErrors({ ...errors, cellphone: "Enter a valid phone number." });
-      } else {
-        const newErrors = { ...errors };
-        delete newErrors.cellphone;
-        setErrors(newErrors);
-      }
-    }
-  };
-
-  const handleNext = (e) => {
-    e.preventDefault();
-    const { email, password, confirmPassword } = formData;
-    const newErrors = {};
-
-    if (!email) {
-      newErrors.email = "Email is required.";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Enter a valid email.";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required.";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters.";
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = "Confirm your password.";
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setErrors({});
-    setStep(2);
-  };
-
-  const handleBack = (e) => {
-    e.preventDefault();
-    setStep(1);
   };
 
   const handleSubmit = (e) => {
@@ -166,30 +88,14 @@ export default function RegisterPage() {
     const newErrors = {};
 
     if (!fullName) newErrors.fullName = "Full name is required.";
+    if (!birthdate) newErrors.birthdate = "Date of birth is required.";
+    else if (validateAge(birthdate) < 18) newErrors.birthdate = "You must be at least 18 years old.";
 
-    if (!birthdate) {
-      newErrors.birthdate = "Date of birth is required.";
-    } else {
-      const age = validateAge(birthdate);
-      if (age < 18) {
-        newErrors.birthdate = "You must be at least 18 years old.";
-      }
-    }
+    if (!cellphone) newErrors.cellphone = "Phone number is required.";
+    else if (!validatePhone(cellphone)) newErrors.cellphone = "Enter an 8-digit mobile number.";
 
-    if (!cellphone) {
-      newErrors.cellphone = "Phone number is required.";
-    } else {
-      const cleanPhone = cellphone.replace(/[^\d+]/g, "");
-      if (!validatePhone(cleanPhone)) {
-        newErrors.cellphone = "Enter a valid phone number.";
-      }
-    }
-
-    if (!dpi) {
-      newErrors.dpi = "DPI number is required.";
-    } else if (!validateDPI(dpi)) {
-      newErrors.dpi = "DPI must contain only numbers (maximum 13 digits).";
-    }
+    if (!dpi) newErrors.dpi = "DPI is required.";
+    else if (!validateDPI(dpi)) newErrors.dpi = "DPI must contain only numbers (max 13 digits).";
 
     if (!address) newErrors.address = "Address is required.";
 
@@ -199,6 +105,7 @@ export default function RegisterPage() {
     }
 
     setErrors({});
+    saveInfo();
   };
 
   const getMaxBirthdate = () => {
@@ -215,15 +122,16 @@ export default function RegisterPage() {
 
   const saveInfo = async () => {
     try {
-      const response = await api.patch("/users/me", {
+      await api.patch("/users/me", {
         profile: {
           name: formData.fullName,
           birth_date: formData.birthdate,
           address: formData.address,
-          cellphone: formData.cellphone,
+          cellphone: formData.cellphone, 
           dpi: formData.dpi,
         },
       });
+
       alert("Personal info saved successfully.");
     } catch (error) {
       console.log(error);
@@ -240,98 +148,85 @@ export default function RegisterPage() {
 
         <div className="right">
           <form className="form" onSubmit={handleSubmit}>
-            {step === 1 && (
-              <div className="section active">
-                <h2 className="sectionTitle">Complete Personal Info</h2>
+            <div className="section active">
+              <h2 className="sectionTitle">Complete Personal Info</h2>
 
-                <div className="inputGroup">
-                  <FaUser className="icon" />
-                  <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full Name"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className={errors.fullName ? "error" : ""}
-                  />
-                </div>
-                {errors.fullName && (
-                  <span className="error-message">{errors.fullName}</span>
-                )}
-
-                <div className="inputGroup">
-                  <FaBirthdayCake className="icon" />
-                  <input
-                    type="date"
-                    name="birthdate"
-                    value={formData.birthdate}
-                    onChange={handleChange}
-                    className={errors.birthdate ? "error" : ""}
-                    min={getMinBirthdate()}
-                    max={getMaxBirthdate()}
-                  />
-                  <span className="age-info">
-                    {formData.birthdate &&
-                      `Age: ${validateAge(formData.birthdate)} years`}
-                  </span>
-                </div>
-                {errors.birthdate && (
-                  <span className="error-message">{errors.birthdate}</span>
-                )}
-
-                <div className="inputGroup">
-                  <FaPhone className="icon" />
-                  <input
-                    type="tel"
-                    name="cellphone"
-                    placeholder="e.g., (502) 1234-5678 or +1 (555) 123-4567"
-                    value={formData.cellphone}
-                    onChange={handleChange}
-                    className={errors.cellphone ? "error" : ""}
-                  />
-                </div>
-                {errors.cellphone && (
-                  <span className="error-message">{errors.cellphone}</span>
-                )}
-
-                <div className="inputGroup">
-                  <FaIdCard className="icon" />
-                  <input
-                    type="text"
-                    name="dpi"
-                    placeholder="DPI (numbers only, max 13 digits)"
-                    value={formData.dpi}
-                    onChange={handleChange}
-                    className={errors.dpi ? "error" : ""}
-                    maxLength={13}
-                  />
-                </div>
-                {errors.dpi && <span className="error-message">{errors.dpi}</span>}
-
-                <div className="inputGroup">
-                  <FaMapMarkerAlt className="icon" />
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className={errors.address ? "error" : ""}
-                  />
-                </div>
-                {errors.address && (
-                  <span className="error-message">{errors.address}</span>
-                )}
-
-                <div className="buttonWrapper stepsButtons">
-                  <Link href={`/api/auth/logout?returnTo=/auth-redirect/${2}`}>
-                    <button type="submit" className="btn" onClick={saveInfo}>
-                      Register
-                    </button>
-                  </Link>
-                </div>
+              <div className="inputGroup">
+                <FaUser className="icon" />
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Full Name"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className={errors.fullName ? "error" : ""}
+                />
               </div>
-            )}
+              {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+
+              <div className="inputGroup">
+                <FaBirthdayCake className="icon" />
+                <input
+                  type="date"
+                  name="birthdate"
+                  value={formData.birthdate}
+                  onChange={handleChange}
+                  min={getMinBirthdate()}
+                  max={getMaxBirthdate()}
+                  className={errors.birthdate ? "error" : ""}
+                />
+              </div>
+              {errors.birthdate && <span className="error-message">{errors.birthdate}</span>}
+
+              <div className="inputGroup">
+                <FaPhone className="icon" />
+                <input
+                  type="tel"
+                  name="cellphone"
+                  placeholder="e.g., 12345678"
+                  value={formData.cellphone}
+                  onChange={handleChange}
+                  className={errors.cellphone ? "error" : ""}
+                  inputMode="numeric"
+                  pattern="\d{8}"
+                  maxLength={8}
+                  autoComplete="tel"
+                />
+              </div>
+              {errors.cellphone && <span className="error-message">{errors.cellphone}</span>}
+
+              <div className="inputGroup">
+                <FaIdCard className="icon" />
+                <input
+                  type="text"
+                  name="dpi"
+                  placeholder="DPI (max 13 digits)"
+                  value={formData.dpi}
+                  onChange={handleChange}
+                  className={errors.dpi ? "error" : ""}
+                  maxLength={13}
+                />
+              </div>
+              {errors.dpi && <span className="error-message">{errors.dpi}</span>}
+
+              <div className="inputGroup">
+                <FaMapMarkerAlt className="icon" />
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className={errors.address ? "error" : ""}
+                />
+              </div>
+              {errors.address && <span className="error-message">{errors.address}</span>}
+
+              <div className="buttonWrapper stepsButtons">
+                <button type="submit" className="btn">Register</button>
+              </div>
+
+            </div>
           </form>
         </div>
       </div>
