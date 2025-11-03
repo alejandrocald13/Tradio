@@ -8,7 +8,7 @@ export default function AboutUsPage() {
       {/* NAVBAR */}
       <header className={styles.navbar}>
         <div className={styles.logo}>
-       <img src="/logo_tradio_icon.png" alt="Tradio Logo" className={styles.logoImage} />
+       <img src="/logo_tradio.png" alt="Tradio Logo" className={styles.logoImage} />
       </div>
 
         <nav>

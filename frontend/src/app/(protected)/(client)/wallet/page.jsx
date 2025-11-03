@@ -128,6 +128,9 @@ export default function WalletPage() {
     { key: "type", label: "Type" },
   ];
 
+  const amountNum = useMemo(() => parseFloat(formData.amount) || 0, [formData.amount]);
+  const commission = useMemo(() => (amountNum > 100 ? amountNum * 0.0365 : 3), [amountNum]);
+
   return (
     <div className="container">
       <SidebarNav />
@@ -139,7 +142,7 @@ export default function WalletPage() {
             <p className="balanceAmount">${Number(balance).toFixed(2)}</p>
           </div>
 
-          <div className="buttons">
+        <div className="buttons">
             <button className="btn deposit" onClick={() => handleOpenPanel("Deposit")}>
               Deposit
             </button>
@@ -180,6 +183,10 @@ export default function WalletPage() {
             <div className="formGroup">
               <label>Code:</label>
               <input type="text" name="code" value={formData.code} readOnly />
+            </div>
+
+            <div style={{ marginTop: "6px", fontSize: "12px" }}>
+              Commission ({actionType === "Deposit" ? "Deposit" : "Withdrawal"}): USD {commission.toFixed(2)}
             </div>
 
             <button type="submit" className="sendBtn">Send Money</button>

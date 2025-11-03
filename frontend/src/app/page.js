@@ -2,7 +2,7 @@
 import styles from "./landing/landing.module.css";
 import { Rocket, Shield } from "lucide-react"; 
 import Link from "next/link";
-
+import Image from "next/image";
 
 
 export default function LandingPage() {
@@ -10,10 +10,16 @@ export default function LandingPage() {
     <div className={styles.container}>
       {/* NAVBAR */}
       <header className={styles.navbar}>
-       <a href="/" className={styles.logo}>
-      <img src="/logo_tradio_icon.png" alt="Tradio Logo" className={styles.logoImage} />
-      </a>
-
+        <Link href="/" className={styles.logo}>
+          <Image
+            src="/logo_tradio.png"
+            alt="Tradio Logo"
+            className={styles.logoImage}
+            width={55}
+            height={55}
+            priority
+          />
+        </Link>
         <nav>
           <ul className={styles.menu}>
             <li><Link href="/" className={`${styles.link} ${styles.active}`}>HOME</Link></li>

@@ -24,7 +24,7 @@ export default function ReferralsPage() {
           const profile = res?.data?.profile;
           if (profile && profile.has_used_referral) {
             setHasAppliedCode(true);
-
+            
           }
         } catch (err) {
           console.error("Error checking referral status:", err);

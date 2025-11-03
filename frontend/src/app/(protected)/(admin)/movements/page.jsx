@@ -50,7 +50,8 @@ export default function Movements () {
         fetchMovements()
     }, [emailSearch, typeSelected, date1, date2])
 
-    const movesColumns = ['Type', 'User Email', 'Amount', 'Date']
+    // Añadi "Commission" a las columnas
+    const movesColumns = ['Type', 'User Email', 'Amount', 'Commission', 'Date']
 
     return (
         <>
@@ -112,8 +113,6 @@ export default function Movements () {
                         placeholderI={'Enter email'}
                         getValue={getDataSearcher}
                     />
-
-                    
                 </div>
                 
                 <div className="table-transaction-M">
