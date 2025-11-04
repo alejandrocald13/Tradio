@@ -288,15 +288,6 @@
 }
 
 
-.actionCardsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 1px; 
-  justify-items: center; 
-  transform: translateX(20px);
-  
-
-}
 
 
 .actionCardWrapper {
@@ -305,6 +296,12 @@
   
 }
 
+.actionCardsGrid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+gap: 30px; 
+justify-items: center; 
+}
 
 /* Responsive */
 @media (max-width: 768px) {
