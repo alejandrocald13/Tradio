@@ -293,7 +293,7 @@
   grid-template-columns: repeat(3, 1fr); 
   gap: 1px; 
   justify-items: center; 
-  transform: translateX(20px);
+  transform: translateX(5px);
   
 
 }
