@@ -25,7 +25,6 @@ from apps.transactions_all.market_clock.utils import is_open
 from apps.common.email_service import send_trade_confirmation_email
 from apps.transactions_all.services import TradeService
 
-# --- no repudio ---
 from apps.users.utils import log_action
 from apps.users.actions import Action
 
@@ -85,7 +84,6 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
         examples=[OpenApiExample("Request de compra", value={"stock": 3, "quantity": "2.00"}, request_only=True)]
     )
     def create(self, request, *args, **kwargs):
-        # no repudio: intento de compra
         try:
             log_action(request, request.user, Action.TRADING_BUY_SUBMITTED)
         except Exception:
@@ -109,8 +107,6 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
             trade = TradeService()
             purchase, wallet, portfolio, unit_price = trade.buy(user=request.user, stock_id=stock_id, quantity=quantity, reference=reference)
             serializer = self.get_serializer(purchase)
-
-            # intento de email -> log de envío si fue ok
             try:
                 total = float(purchase.quantity) * float(purchase.unit_price)
                 send_trade_confirmation_email(
@@ -132,7 +128,6 @@ class PurchaseTransactionViewSet(viewsets.ModelViewSet):
             except Exception as e:
                 logger.warning(f"Error enviando correo de confirmación de compra: {e}")
 
-            # no repudio: compra ejecutada
             try:
                 log_action(request, request.user, Action.TRADING_BUY_EXECUTED)
             except Exception:
@@ -179,7 +174,6 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
         examples=[OpenApiExample("Request de venta", value={"stock": 3, "quantity": "1.00"}, request_only=True)]
     )
     def create(self, request, *args, **kwargs):
-        # no repudio: intento de venta
         try:
             log_action(request, request.user, Action.TRADING_SELL_SUBMITTED)
         except Exception:
@@ -223,7 +217,6 @@ class SaleTransactionViewSet(viewsets.ModelViewSet):
             except Exception as e:
                 logger.warning(f"Error enviando correo de confirmación de venta: {e}")
 
-            # no repudio: venta ejecutada
             try:
                 log_action(request, request.user, Action.TRADING_SELL_EXECUTED)
             except Exception:
@@ -265,7 +258,6 @@ class UserPurchasesView(APIView):
         responses={200: OpenApiResponse(description="OK")},
     )
     def get(self, request):
-        # no repudio: vista de transacciones
         try:
             log_action(request, request.user, Action.TRANSACTIONS_VIEWED)
         except Exception:
@@ -278,15 +270,30 @@ class UserPurchasesView(APIView):
         qs = PurchaseTransaction.objects.filter(user=user).select_related("stock")
 
         if date_from and date_to:
-            def apply_date_filter(qs, fields):
-                for f in fields:
-                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
-                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
-                return qs
-            qs = apply_date_filter(
-                qs,
-                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
-            )
+            try:
+                df = datetime.fromisoformat(date_from).date()
+            except Exception:
+                df = None
+            try:
+                dt = datetime.fromisoformat(date_to).date()
+            except Exception:
+                dt = None
+
+            if df and dt:
+                fields_map = {f.name: f for f in PurchaseTransaction._meta.get_fields() if hasattr(f, "attname")}
+                for candidate in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+                    if candidate in fields_map:
+                        field = fields_map[candidate]
+                        if isinstance(field, DateTimeField):
+                            start = datetime.combine(df, datetime.min.time())
+                            end = datetime.combine(dt + timedelta(days=1), datetime.min.time())
+                            qs = qs.filter(**{
+                                f"{candidate}__gte": start,
+                                f"{candidate}__lt": end,
+                            })
+                        elif isinstance(field, DateField):
+                            qs = qs.filter(**{f"{candidate}__range": [df, dt]})
+                        break
 
         data = []
         for row in qs:
@@ -318,7 +325,6 @@ class UserSalesView(APIView):
         responses={200: OpenApiResponse(description="OK")},
     )
     def get(self, request):
-        # no repudio: vista de transacciones
         try:
             log_action(request, request.user, Action.TRANSACTIONS_VIEWED)
         except Exception:
@@ -331,21 +337,59 @@ class UserSalesView(APIView):
         qs = SaleTransaction.objects.filter(user=user).select_related("stock")
 
         if date_from and date_to:
-            def apply_date_filter(qs, fields):
-                for f in fields:
-                    if f in [fld.name for fld in qs.model._meta.get_fields()]:
-                        return qs.filter(**{f"{f}__range": [date_from, date_to]})
-                return qs
-            qs = apply_date_filter(
-                qs,
-                ["created_at", "date", "timestamp", "transaction_date", "datetime"],
-            )
+            try:
+                df = datetime.fromisoformat(date_from).date()
+            except Exception:
+                df = None
+            try:
+                dt = datetime.fromisoformat(date_to).date()
+            except Exception:
+                dt = None
+
+            if df and dt:
+                fields_map = {f.name: f for f in SaleTransaction._meta.get_fields() if hasattr(f, "attname")}
+                for candidate in ["created_at", "date", "timestamp", "transaction_date", "datetime"]:
+                    if candidate in fields_map:
+                        field = fields_map[candidate]
+                        if isinstance(field, DateTimeField):
+                            start = datetime.combine(df, datetime.min.time())
+                            end = datetime.combine(dt + timedelta(days=1), datetime.min.time())
+                            qs = qs.filter(**{
+                                f"{candidate}__gte": start,
+                                f"{candidate}__lt": end,
+                            })
+                        elif isinstance(field, DateField):
+                            qs = qs.filter(**{f"{candidate}__range": [df, dt]})
+                        break
 
         data = []
         for row in qs:
+            avg_cost = getattr(row, "average_cost", None)
+            try:
+                unit_sale = Decimal(str(getattr(row, "unit_price", "0") or "0"))
+            except Exception:
+                unit_sale = Decimal("0")
+
+            if avg_cost is not None:
+                try:
+                    avg_dec = Decimal(str(avg_cost))
+                except Exception:
+                    avg_dec = Decimal("0")
+            else:
+                avg_dec = Decimal("0")
+
+            compra_str = f"${avg_dec.quantize(Decimal('0.01'))}" if avg_dec is not None else ""
+            if avg_dec and avg_dec > 0:
+                pct_gain = ((unit_sale - avg_dec) / avg_dec) * Decimal("100")
+                pct_str = f"{pct_gain.quantize(Decimal('0.01'))}%"
+            else:
+                pct_str = ""
+
             data.append({
                 "accion": getattr(row.stock, "name", "-") if getattr(row, "stock", None) else "-",
+                "compra": compra_str,
                 "venta": f"${getattr(row, 'unit_price', Decimal('0'))}",
+                "pct": pct_str,
                 "cantidad": str(getattr(row, "quantity", "")),
                 "fecha": safe_date(row),
             })
@@ -399,7 +443,6 @@ class AdminTransactionsReportView(APIView):
             purchase_qs = purchase_qs.filter(user__email__icontains=email_filter)
             sale_qs = sale_qs.filter(user__email__icontains=email_filter)
         if date_from and date_to:
-            # --------- FILTRO CORREGIDO: incluye TODO el día 'date_to' ---------
             try:
                 df = datetime.fromisoformat(date_from).date()
             except Exception:
@@ -458,7 +501,6 @@ class AdminTransactionsReportView(APIView):
                     "Total": f"{safe_total(s)}",
                     "Date": safe_date(s),
                 })
-
 
         try:
             log_action(request, request.user, Action.REPORTS_GENERATED)
