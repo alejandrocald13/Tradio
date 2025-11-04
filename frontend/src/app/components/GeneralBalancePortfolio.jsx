@@ -136,6 +136,17 @@ export default function CardInfoPortafolio(){
     }, [])
 
     const getPercentage =() =>{
+        if (!currentTotalActions.total &&  !wallet.balance){
+            return [0, 0]
+        }
+
+        if(!currentTotalActions.total){
+            return [0, 100]
+        }
+
+        if(!wallet.balance){
+            return [100, 0]
+        }
         const total = currentTotalActions.total + wallet.balance
         const percentage1 = (currentTotalActions.total / total) * 100
         const percentage2 = (wallet.balance / total) * 100
