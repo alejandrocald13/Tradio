@@ -1,6 +1,20 @@
 from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
+from datetime import datetime, timedelta, timezone
 
 def get_financial_report_data(user, from_date, to_date):
+
+    if isinstance(from_date, str):
+        from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    if isinstance(to_date, str):
+        to_date = datetime.strptime(to_date, "%Y-%m-%d")
+
+    to_date = to_date + timedelta(days=1)
+
+    if not timezone.is_aware(from_date):
+        from_date = timezone.make_aware(from_date)
+    if not timezone.is_aware(to_date):
+        to_date = timezone.make_aware(to_date)
+
     compras_qs = PurchaseTransaction.objects.filter(
         user=user,
         date__range=(from_date, to_date)

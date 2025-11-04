@@ -1,9 +1,8 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 import os
-import tempfile
-
+from django.conf import settings
 
 def generate_report_pdf(user, from_date, to_date, data, request=None):
 
@@ -18,12 +17,9 @@ def generate_report_pdf(user, from_date, to_date, data, request=None):
         "saldo": data.get("saldo", 0),
     })
 
-    if request:
-        base_url = request.build_absolute_uri('/')  # Ej: http://localhost:8000/
-    else:
-        base_url = "http://localhost:8000/"  # fallback
+    css_path = os.path.join(settings.BASE_DIR, "apps", "reports", "static", "reports", "report.css")
 
-    pdf_content = HTML(string=html_string, base_url=base_url).write_pdf()
+    pdf_content = HTML(string=html_string).write_pdf(stylesheets=[CSS(css_path)])
 
     filename = f"TReport_{from_date}_{to_date}.pdf"
     
