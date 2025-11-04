@@ -1,5 +1,6 @@
 from apps.transactions_all.models import PurchaseTransaction, SaleTransaction
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 def get_financial_report_data(user, from_date, to_date):
 
