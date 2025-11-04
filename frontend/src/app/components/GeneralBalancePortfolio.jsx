@@ -12,8 +12,6 @@ export default function CardInfoPortafolio(){
     const [currentTotalActions, setCurrentTotalActions] = useState({total: 0})
     const [wallet, setWallet] = useState({balance: 0})
     const [totalAssets, setTotalAssets] = useState(0)
-    const [date1, setdate1] = useState("");
-    const [date2, setdate2] = useState("");
 
         // Aqui guardaremos la info para cada tarjeta
     const [highestPerformanceAction, setHighestPerformanceAction] = useState({
@@ -137,10 +135,27 @@ export default function CardInfoPortafolio(){
         getWallet()
     }, [])
 
+    const getPercentage =() =>{
+        if (!currentTotalActions.total &&  !wallet.balance){
+            return [0, 0]
+        }
+
+        if(!currentTotalActions.total){
+            return [0, 100]
+        }
+
+        if(!wallet.balance){
+            return [100, 0]
+        }
+        const total = currentTotalActions.total + wallet.balance
+        const percentage1 = (currentTotalActions.total / total) * 100
+        const percentage2 = (wallet.balance / total) * 100
+        return [percentage1, percentage2]
+    }
     const graphData = {
         clasificacion: ['Assets', 'Cash'],
-        name: 'General Balance (%)',
-        dataL: [30, 70],
+        name: 'General Balance(%)',
+        dataL: getPercentage(),
         widthSend: 300,
         heightSend: 300,
         num: 2,

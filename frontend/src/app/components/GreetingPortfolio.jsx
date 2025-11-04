@@ -43,6 +43,8 @@ export default function GreetingPortafolio({message}){
     const clickInforme = async () => {
         try{
             validateDate()
+            console.log("Hola obteniendo fecha 1", date1)
+            console.log("Hola obteniendo fecha 2", date2)
             const response = await api.post('/reports/',{
                 from: date1, 
                 to: date2
